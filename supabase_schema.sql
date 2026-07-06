@@ -20,80 +20,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Users can read and write their own profile
-CREATE POLICY IF NOT EXISTS "profiles: own read"
-    ON public.profiles FOR SELECT
-    USING (auth.uid() = id);
-
-CREATE POLICY IF NOT EXISTS "profiles: own insert"
-    ON public.profiles FOR INSERT
-    WITH CHECK (auth.uid() = id);
-
-CREATE POLICY IF NOT EXISTS "profiles: own update"
-    ON public.profiles FOR UPDATE
-    USING (auth.uid() = id);
-
--- Clinicians can read profiles of their assigned patients
-CREATE POLICY IF NOT EXISTS "profiles: clinician reads patient"
-    ON public.profiles FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.clinician_patients cp
-            WHERE cp.clinician_id = auth.uid()
-              AND cp.patient_id   = profiles.id
-        )
-    );
-
--- Caregivers can read profiles of their assigned patients
-CREATE POLICY IF NOT EXISTS "profiles: caregiver reads patient"
-    ON public.profiles FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.caregiver_patients cvp
-            WHERE cvp.caregiver_id = auth.uid()
-              AND cvp.patient_id   = profiles.id
-        )
-    );
-
--- Caregivers/care partners can discover patient profiles before linking
-CREATE POLICY IF NOT EXISTS "profiles: caregiver discover patients"
-    ON public.profiles FOR SELECT
-    USING (
-        role = 'patient'
-        AND EXISTS (
-            SELECT 1 FROM public.profiles me
-            WHERE me.id = auth.uid()
-              AND me.role IN ('caregiver', 'care_partner')
-        )
-    );
-
--- Clinicians can discover patient profiles before assignment
-CREATE POLICY IF NOT EXISTS "profiles: clinician discover patients"
-    ON public.profiles FOR SELECT
-    USING (
-        role = 'patient'
-        AND EXISTS (
-            SELECT 1 FROM public.profiles me
-            WHERE me.id = auth.uid()
-              AND me.role = 'clinician'
-        )
-    );
-
--- Patients can read profiles of assigned care team members (for messaging labels)
-CREATE POLICY IF NOT EXISTS "profiles: patient reads assigned care team"
-    ON public.profiles FOR SELECT
-    USING (
-        EXISTS (
-            SELECT 1 FROM public.clinician_patients cp
-            WHERE cp.patient_id = auth.uid()
-              AND cp.clinician_id = profiles.id
-        )
-        OR EXISTS (
-            SELECT 1 FROM public.caregiver_patients cvp
-            WHERE cvp.patient_id = auth.uid()
-              AND cvp.caregiver_id = profiles.id
-        )
-    );
+-- Profile policies are created after relationship tables exist.
 
 
 -- ── 2. clinician_patients ──────────────────────────────────
@@ -118,19 +45,23 @@ ALTER TABLE public.clinician_patients
 
 ALTER TABLE public.clinician_patients ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "clinician_patients: clinician select"
+DROP POLICY IF EXISTS "clinician_patients: clinician select" ON public.clinician_patients;
+CREATE POLICY "clinician_patients: clinician select"
     ON public.clinician_patients FOR SELECT
     USING (auth.uid() = clinician_id);
 
-CREATE POLICY IF NOT EXISTS "clinician_patients: clinician insert"
+DROP POLICY IF EXISTS "clinician_patients: clinician insert" ON public.clinician_patients;
+CREATE POLICY "clinician_patients: clinician insert"
     ON public.clinician_patients FOR INSERT
     WITH CHECK (auth.uid() = clinician_id);
 
-CREATE POLICY IF NOT EXISTS "clinician_patients: clinician update"
+DROP POLICY IF EXISTS "clinician_patients: clinician update" ON public.clinician_patients;
+CREATE POLICY "clinician_patients: clinician update"
     ON public.clinician_patients FOR UPDATE
     USING (auth.uid() = clinician_id);
 
-CREATE POLICY IF NOT EXISTS "clinician_patients: clinician delete"
+DROP POLICY IF EXISTS "clinician_patients: clinician delete" ON public.clinician_patients;
+CREATE POLICY "clinician_patients: clinician delete"
     ON public.clinician_patients FOR DELETE
     USING (auth.uid() = clinician_id);
 
@@ -151,19 +82,23 @@ ALTER TABLE public.caregiver_patients
 
 ALTER TABLE public.caregiver_patients ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "caregiver_patients: caregiver select"
+DROP POLICY IF EXISTS "caregiver_patients: caregiver select" ON public.caregiver_patients;
+CREATE POLICY "caregiver_patients: caregiver select"
     ON public.caregiver_patients FOR SELECT
     USING (auth.uid() = caregiver_id);
 
-CREATE POLICY IF NOT EXISTS "caregiver_patients: caregiver insert"
+DROP POLICY IF EXISTS "caregiver_patients: caregiver insert" ON public.caregiver_patients;
+CREATE POLICY "caregiver_patients: caregiver insert"
     ON public.caregiver_patients FOR INSERT
     WITH CHECK (auth.uid() = caregiver_id);
 
-CREATE POLICY IF NOT EXISTS "caregiver_patients: caregiver update"
+DROP POLICY IF EXISTS "caregiver_patients: caregiver update" ON public.caregiver_patients;
+CREATE POLICY "caregiver_patients: caregiver update"
     ON public.caregiver_patients FOR UPDATE
     USING (auth.uid() = caregiver_id);
 
-CREATE POLICY IF NOT EXISTS "caregiver_patients: caregiver delete"
+DROP POLICY IF EXISTS "caregiver_patients: caregiver delete" ON public.caregiver_patients;
+CREATE POLICY "caregiver_patients: caregiver delete"
     ON public.caregiver_patients FOR DELETE
     USING (auth.uid() = caregiver_id);
 
@@ -211,6 +146,91 @@ CREATE POLICY "clinician_patients: caregiver reads for patient"
     );
 
 
+-- ── 3b. profiles policies ─────────────────────────────────
+-- Users can read and write their own profile
+DROP POLICY IF EXISTS "profiles: own read" ON public.profiles;
+CREATE POLICY "profiles: own read"
+    ON public.profiles FOR SELECT
+    USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "profiles: own insert" ON public.profiles;
+CREATE POLICY "profiles: own insert"
+    ON public.profiles FOR INSERT
+    WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "profiles: own update" ON public.profiles;
+CREATE POLICY "profiles: own update"
+    ON public.profiles FOR UPDATE
+    USING (auth.uid() = id);
+
+-- Clinicians can read profiles of their assigned patients
+DROP POLICY IF EXISTS "profiles: clinician reads patient" ON public.profiles;
+CREATE POLICY "profiles: clinician reads patient"
+    ON public.profiles FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.clinician_patients cp
+            WHERE cp.clinician_id = auth.uid()
+              AND cp.patient_id   = profiles.id
+        )
+    );
+
+-- Caregivers can read profiles of their assigned patients
+DROP POLICY IF EXISTS "profiles: caregiver reads patient" ON public.profiles;
+CREATE POLICY "profiles: caregiver reads patient"
+    ON public.profiles FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.caregiver_patients cvp
+            WHERE cvp.caregiver_id = auth.uid()
+              AND cvp.patient_id   = profiles.id
+        )
+    );
+
+-- Caregivers/care partners can discover patient profiles before linking
+DROP POLICY IF EXISTS "profiles: caregiver discover patients" ON public.profiles;
+CREATE POLICY "profiles: caregiver discover patients"
+    ON public.profiles FOR SELECT
+    USING (
+        role = 'patient'
+        AND EXISTS (
+            SELECT 1 FROM public.profiles me
+            WHERE me.id = auth.uid()
+              AND me.role IN ('caregiver', 'care_partner')
+        )
+    );
+
+-- Clinicians can discover patient profiles before assignment
+DROP POLICY IF EXISTS "profiles: clinician discover patients" ON public.profiles;
+CREATE POLICY "profiles: clinician discover patients"
+    ON public.profiles FOR SELECT
+    USING (
+        role = 'patient'
+        AND EXISTS (
+            SELECT 1 FROM public.profiles me
+            WHERE me.id = auth.uid()
+              AND me.role = 'clinician'
+        )
+    );
+
+-- Patients can read profiles of assigned care team members (for messaging labels)
+DROP POLICY IF EXISTS "profiles: patient reads assigned care team" ON public.profiles;
+CREATE POLICY "profiles: patient reads assigned care team"
+    ON public.profiles FOR SELECT
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.clinician_patients cp
+            WHERE cp.patient_id = auth.uid()
+              AND cp.clinician_id = profiles.id
+        )
+        OR EXISTS (
+            SELECT 1 FROM public.caregiver_patients cvp
+            WHERE cvp.patient_id = auth.uid()
+              AND cvp.caregiver_id = profiles.id
+        )
+    );
+
+
 -- ── 4. clinician_notes ─────────────────────────────────────
 -- Clinical notes and recommendations written by clinicians.
 CREATE TABLE IF NOT EXISTS public.clinician_notes (
@@ -227,25 +247,30 @@ CREATE TABLE IF NOT EXISTS public.clinician_notes (
 ALTER TABLE public.clinician_notes ENABLE ROW LEVEL SECURITY;
 
 -- Clinician can fully manage notes they wrote
-CREATE POLICY IF NOT EXISTS "clinician_notes: clinician select"
+DROP POLICY IF EXISTS "clinician_notes: clinician select" ON public.clinician_notes;
+CREATE POLICY "clinician_notes: clinician select"
     ON public.clinician_notes FOR SELECT
     USING (auth.uid() = clinician_id);
 
-CREATE POLICY IF NOT EXISTS "clinician_notes: clinician insert"
+DROP POLICY IF EXISTS "clinician_notes: clinician insert" ON public.clinician_notes;
+CREATE POLICY "clinician_notes: clinician insert"
     ON public.clinician_notes FOR INSERT
     WITH CHECK (auth.uid() = clinician_id);
 
-CREATE POLICY IF NOT EXISTS "clinician_notes: clinician update"
+DROP POLICY IF EXISTS "clinician_notes: clinician update" ON public.clinician_notes;
+CREATE POLICY "clinician_notes: clinician update"
     ON public.clinician_notes FOR UPDATE
     USING (auth.uid() = clinician_id);
 
 -- Patients can read notes written about them (so they see recommendations)
-CREATE POLICY IF NOT EXISTS "clinician_notes: patient reads own"
+DROP POLICY IF EXISTS "clinician_notes: patient reads own" ON public.clinician_notes;
+CREATE POLICY "clinician_notes: patient reads own"
     ON public.clinician_notes FOR SELECT
     USING (auth.uid() = patient_id);
 
 -- Patients can mark their own notes as read
-CREATE POLICY IF NOT EXISTS "clinician_notes: patient marks read"
+DROP POLICY IF EXISTS "clinician_notes: patient marks read" ON public.clinician_notes;
+CREATE POLICY "clinician_notes: patient marks read"
     ON public.clinician_notes FOR UPDATE
     USING (auth.uid() = patient_id);
 
@@ -274,13 +299,15 @@ ALTER TABLE public.sleep_logs
 
 ALTER TABLE public.sleep_logs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "sleep_logs: patient own"
+DROP POLICY IF EXISTS "sleep_logs: patient own" ON public.sleep_logs;
+CREATE POLICY "sleep_logs: patient own"
     ON public.sleep_logs FOR ALL
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
 -- Clinicians can read sleep logs for their assigned patients
-CREATE POLICY IF NOT EXISTS "sleep_logs: clinician reads patient"
+DROP POLICY IF EXISTS "sleep_logs: clinician reads patient" ON public.sleep_logs;
+CREATE POLICY "sleep_logs: clinician reads patient"
     ON public.sleep_logs FOR SELECT
     USING (
         EXISTS (
@@ -291,7 +318,8 @@ CREATE POLICY IF NOT EXISTS "sleep_logs: clinician reads patient"
     );
 
 -- Caregivers can read sleep logs for their assigned patients
-CREATE POLICY IF NOT EXISTS "sleep_logs: caregiver reads patient"
+DROP POLICY IF EXISTS "sleep_logs: caregiver reads patient" ON public.sleep_logs;
+CREATE POLICY "sleep_logs: caregiver reads patient"
     ON public.sleep_logs FOR SELECT
     USING (
         EXISTS (
@@ -321,20 +349,24 @@ CREATE TABLE IF NOT EXISTS public.messages (
 
 ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "messages: sender or recipient select"
+DROP POLICY IF EXISTS "messages: sender or recipient select" ON public.messages;
+CREATE POLICY "messages: sender or recipient select"
     ON public.messages FOR SELECT
     USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
 
-CREATE POLICY IF NOT EXISTS "messages: sender insert"
+DROP POLICY IF EXISTS "messages: sender insert" ON public.messages;
+CREATE POLICY "messages: sender insert"
     ON public.messages FOR INSERT
     WITH CHECK (auth.uid() = sender_id);
 
 -- Recipient can mark message as read; sender can delete
-CREATE POLICY IF NOT EXISTS "messages: recipient update"
+DROP POLICY IF EXISTS "messages: recipient update" ON public.messages;
+CREATE POLICY "messages: recipient update"
     ON public.messages FOR UPDATE
     USING (auth.uid() = recipient_id OR auth.uid() = sender_id);
 
-CREATE POLICY IF NOT EXISTS "messages: sender or recipient delete"
+DROP POLICY IF EXISTS "messages: sender or recipient delete" ON public.messages;
+CREATE POLICY "messages: sender or recipient delete"
     ON public.messages FOR DELETE
     USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
 
@@ -342,7 +374,12 @@ CREATE POLICY IF NOT EXISTS "messages: sender or recipient delete"
 -- ── 6b. messages — real-time & indexes ────────────────────
 -- Enable Supabase real-time replication for instant cross-user updates.
 -- Without this, new messages only appear after a page reload.
-ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+DO $$
+BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+EXCEPTION
+    WHEN duplicate_object THEN NULL;
+END $$;
 
 -- FULL replica identity ensures all row columns are present in the WAL event
 -- for both INSERT and UPDATE. Required for real-time row-level filters on
@@ -369,22 +406,32 @@ CREATE INDEX IF NOT EXISTS messages_unread_recipient_idx
 -- ── 7. app_data ────────────────────────────────────────────
 -- Generic key-value store for per-user app preferences and data.
 CREATE TABLE IF NOT EXISTS public.app_data (
-    id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id  UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    data_key TEXT NOT NULL,
-    value    JSONB,
+    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    data_key   TEXT NOT NULL,
+    value      JSONB,
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now(),
     UNIQUE (user_id, data_key)
 );
 
 ALTER TABLE public.app_data ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "app_data: own"
-    ON public.app_data FOR ALL
-    USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+ALTER TABLE public.app_data
+ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
+
+ALTER TABLE public.app_data
+ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+DROP POLICY IF EXISTS "app_data: own" ON public.app_data;
+CREATE POLICY "app_data: own"
+ON public.app_data FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
 
 -- Caregivers and clinicians can read assigned patients' module progress only.
-CREATE POLICY IF NOT EXISTS "app_data: caregiver/clinician reads module progress"
+DROP POLICY IF EXISTS "app_data: caregiver/clinician reads module progress" ON public.app_data;
+CREATE POLICY "app_data: caregiver/clinician reads module progress"
     ON public.app_data FOR SELECT
     USING (
         data_key = 'modules_progress_v1'
@@ -401,3 +448,36 @@ CREATE POLICY IF NOT EXISTS "app_data: caregiver/clinician reads module progress
             )
         )
     );
+
+
+CREATE TABLE public.daily_questionnaire (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sleep_log_id UUID REFERENCES public.sleep_logs(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  
+  -- Stimulus Control
+  sc_avoid_bedroom_activities BOOLEAN,
+  sc_fell_asleep_within_20min BOOLEAN,
+  sc_got_up_if_couldnt_sleep BOOLEAN,
+  sc_slept_through_night BOOLEAN,
+  sc_got_up_after_awakening BOOLEAN,
+  sc_avoided_napping BOOLEAN,
+  
+  -- Sleep Hygiene
+  sh_avoided_caffeine BOOLEAN,
+  sh_avoided_exercise BOOLEAN,
+  sh_avoided_nicotine BOOLEAN,
+  sh_avoided_alcohol BOOLEAN,
+  sh_avoided_heavy_meals BOOLEAN,
+  sh_pleasant_activity BOOLEAN,
+  
+  -- Thought Record
+  tr_situation TEXT,
+  tr_automatic_thoughts TEXT,
+  tr_emotion TEXT,
+  tr_emotion_intensity INTEGER CHECK (tr_emotion_intensity BETWEEN 1 AND 100),
+  
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (user_id, date)
+);

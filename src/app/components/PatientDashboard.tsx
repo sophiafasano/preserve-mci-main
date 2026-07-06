@@ -31,6 +31,7 @@ import { useAuth } from '../contexts/useAuth';
 import { useMessaging } from '../hooks/useMessaging';
 import SleepLogModal, { SleepLogData } from './SleepLogModal';
 import { supabase } from '../utils/supabaseClient';
+import { toast } from 'sonner';
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
@@ -38,7 +39,6 @@ export default function PatientDashboard() {
   const { user, signout } = useAuth();
   const { unreadCount } = useMessaging();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarHovered, setSidebarHovered] = useState(false);
   const [sleepLogModalOpen, setSleepLogModalOpen] = useState(false);
   const [sleepTipsOpen, setSleepTipsOpen] = useState(false);
   const [sleepTrendMetric, setSleepTrendMetric] = useState<'duration' | 'efficiency' | 'wakeTime'>('duration');
@@ -230,6 +230,16 @@ export default function PatientDashboard() {
     };
   }, [isSamplePreview, sampleTrendSeries, sleepTrendMetric, sleepTrendSeries]);
 
+  const openSleepLogModal = () => {
+  const today = new Date().toDateString();
+  const hasLoggedToday = sleepLogs.some((log) => new Date(log.date).toDateString() === today);
+  if (hasLoggedToday) {
+    toast.error("You've already logged your sleep for today");
+  } else {
+    setSleepLogModalOpen(true);
+  }
+};
+
   const quickActions = [
     { label: 'Log Last Night\'s Sleep', icon: Moon, color: 'purple', action: 'log-sleep' },
     { label: 'View Sleep Tips', icon: BookOpen, color: 'purple', action: 'sleep-tips' },
@@ -239,7 +249,7 @@ export default function PatientDashboard() {
   const handleQuickAction = (action: string) => {
     switch (action) {
       case 'log-sleep':
-        setSleepLogModalOpen(true);
+        openSleepLogModal();
         break;
       case 'sleep-tips':
         setSleepTipsOpen(true);
@@ -275,9 +285,9 @@ export default function PatientDashboard() {
 
   const navigationItems: Array<{ label: string; icon: React.ElementType; path: string; action?: string; badge?: number }> = [
     { label: 'Dashboard',      icon: LayoutDashboard, path: '/patient/dashboard' },
-    { label: 'Sleep Modules',  icon: BookOpen,        path: '/modules' },
-    { label: 'Sleep Log',      icon: NotebookPen,     path: '/patient/dashboard', action: 'log-sleep' },
-    { label: 'Sleep Analytics', icon: BarChart2,      path: '/patient/sleep-analytics' },
+    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: '/modules' },
+    { label: 'Sleep Log',      icon: NotebookPen,     path: 'null', action: 'log-sleep' },
+    { label: 'Sleep Analysis', icon: BarChart2,      path: '/patient/sleep-analytics' },
     { label: 'My Progress',    icon: TrendingUp,      path: '/patient/progress' },
     { label: 'Messages',       icon: MessageCircle,   path: '/patient/messages', badge: unreadCount },
   ];
@@ -306,7 +316,7 @@ export default function PatientDashboard() {
     navigate('/');
   };
 
-  const showSidebarLabels = sidebarOpen || sidebarHovered;
+  const showSidebarLabels = true;
   const homepagePurple = '#6D28D9';
   const homepageButtonGradient = 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)';
   const homepageGradientClass = 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800';
@@ -351,17 +361,11 @@ export default function PatientDashboard() {
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
         <aside
-          onMouseEnter={() => setSidebarHovered(true)}
-          onMouseLeave={() => setSidebarHovered(false)}
-          className={`group fixed top-0 left-0 h-screen flex flex-col transition-all duration-300 z-30 w-72 ${
-            sidebarHovered ? 'lg:w-72' : 'lg:w-24'
-          } ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-          }`}
+          className="relative flex flex-col w-72 min-h-screen"
           style={{ backgroundColor: token.white, borderRight: `0.5px solid ${token.purple100}` }}
         >
           <div className={`px-4 pb-2 ${showSidebarLabels ? 'block' : 'hidden'}`}></div>
-          <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
+          <nav className="p-4 space-y-2 w-full overflow-y-auto">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               const isActive = !item.action && location.pathname === item.path;
@@ -462,7 +466,7 @@ export default function PatientDashboard() {
 
         {/* Main Content */}
         <main
-          className="flex-1 lg:pl-24 p-6 lg:p-8 max-w-7xl mx-auto w-full"
+          className="w-full lg:pl-24 p-6 lg:p-8 max-w-7xl mx-auto w-full"
           style={{
             zoom: contentScale,
             marginLeft: 'auto',
@@ -495,7 +499,7 @@ export default function PatientDashboard() {
                 Week {currentWeek} of {totalWeeks}
               </span>
               <button
-                onClick={() => setSleepLogModalOpen(true)}
+                onClick={() => openSleepLogModal()}
                 className="transition-all duration-200 hover:brightness-95 hover:-translate-y-px active:translate-y-0"
                 style={{
                   color: token.white,
@@ -514,18 +518,18 @@ export default function PatientDashboard() {
 
           {/* Current Week's Module - Main Focus */}
           <div className="mb-3">
-            <div style={{ ...cardStyle, border: `0.5px solid ${token.purple200}` }}>
+            <div style={{ ...cardStyle, border: `6px solid ${token.purple200}`, backgroundColor: '#F3E9FB' }}>
               <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
+                <div className="w-full">
                   <div className="flex items-center gap-3 mb-3">
                     <div
                       className="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center"
                       style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}
                     >
-                      <BookOpen size={18} strokeWidth={1.5} color="#6B7280" />
+                      <BookOpen size={18} strokeWidth={1.5} color="#9333EA" />
                     </div>
                     <div>
-                      <p style={{ fontSize: '10px', fontWeight: 600, color: '#9333EA', letterSpacing: '0.08em' }}>
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#9333EA', letterSpacing: '0.08em' }}>
                         CURRENT MODULE
                       </p>
                       <h2 style={{ fontSize: '18px', fontWeight: 500, color: token.textBlack }}>{currentModule.title}</h2>
@@ -548,7 +552,7 @@ export default function PatientDashboard() {
                     {moduleProgress}%
                   </span>
                 </div>
-                <div className="h-2 rounded-[4px] overflow-hidden" style={{ backgroundColor: token.purple100 }}>
+                <div className="h-2 rounded-[4px] overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
                   <div
                     className={`h-full rounded-[2px] transition-all duration-500 ${homepageGradientClass}`}
                     style={{ width: `${moduleProgress}%` }}
@@ -590,9 +594,9 @@ export default function PatientDashboard() {
                   <div className="flex items-start justify-between mb-3">
                     <div
                       className="w-9 h-9 rounded-[10px] flex items-center justify-center"
-                      style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}
+                      style={{ backgroundColor: '#F3E9FB', color: '#6D28D9' }}
                     >
-                      <Icon size={18} strokeWidth={1.5} color="#6B7280" />
+                      <Icon size={18} strokeWidth={1.5} color="#7200CA" />
                     </div>
                     <div
                       className="flex items-center space-x-1 px-2 py-1 rounded-full"
@@ -604,24 +608,23 @@ export default function PatientDashboard() {
                     </div>
                   </div>
                   {index === 0 ? (
-                    <div className="mt-1 flex items-stretch justify-between">
-                      <div className="flex-1 text-center">
-                        <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Avg Sleep</p>
-                        <p style={{ fontSize: '22px', fontWeight: 600, color: '#1A1A2E' }}>
-                          {isEmpty ? '—' : stat.value}
-                        </p>
-                      </div>
-                      <div style={{ width: '0.5px', backgroundColor: '#E9D5FF' }}></div>
-                      <div className="flex-1 text-center">
-                        <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Sleep Prescription</p>
-                        <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
-                          {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
-                        </p>
-                      </div>
-                    </div>
+                    <>
+                      <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '6px' }}>{stat.label}</p>
+                      {isEmpty ? (
+                        <>
+                          <p style={{ fontSize: '15px', color: '#D8B4FE', fontWeight: 400 }}>No sleep data</p>
+                          <button className="mt-1 cursor-pointer transition-colors duration-200 hover:text-[#5B21B6] hover:underline" style={{ color: homepagePurple, fontSize: '12px' }}>
+                            Start logging →
+                          </button>
+                        </>
+                      ) : (
+                        <p style={{ fontSize: '26px', color: token.textBlack, fontWeight: 500 }}>{stat.value}</p>
+                      )}
+                      <p style={{ fontSize: '12px', color: token.textBlack, marginTop: '6px' }}>Updated from your recent logs</p>
+                    </>
                   ) : (
                     <>
-                      <p style={{ fontSize: '13px', color: token.textBlack, marginBottom: '6px' }}>{stat.label}</p>
+                      <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '6px' }}>{stat.label}</p>
                       {isEmpty ? (
                         <>
                           <p style={{ fontSize: '15px', color: '#D8B4FE', fontWeight: 400 }}>No sleep data</p>
@@ -638,6 +641,19 @@ export default function PatientDashboard() {
                 </div>
               );
             })}
+          </div>
+
+          {/* Sleep Prescription */}
+          <div style={{ ...cardStyle, marginBottom: '12px' }}>
+            <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '4px' }}>
+              Sleep Prescription
+            </p>
+            <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
+              {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
+            </p>
+            <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+              Recommended by your clinician
+            </p>
           </div>
 
           {/* Sleep Trend Chart */}
@@ -761,7 +777,7 @@ export default function PatientDashboard() {
                   </ResponsiveContainer>
                 </div>
 
-                <div className="mt-4 flex items-center justify-center space-x-2" style={{ fontSize: '12px', color: token.textBlack }}>
+                <div className="mt-4 flex items-center justify-center space-x-2" style={{ fontSize: '14px', color: token.textBlack }}>
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: token.purple600 }}></div>
                     <span>{chartConfig.legend}</span>
@@ -786,7 +802,7 @@ export default function PatientDashboard() {
                       This is a demo graph preview. Start logging sleep to see your real trends.
                     </p>
                     <button
-                      onClick={() => setSleepLogModalOpen(true)}
+                      onClick={() => openSleepLogModal()}
                       className="rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
                       style={{
                         fontSize: '13px',
@@ -818,7 +834,7 @@ export default function PatientDashboard() {
                   Log your first night to see your sleep trends appear here
                 </p>
                 <button
-                  onClick={() => setSleepLogModalOpen(true)}
+                  onClick={() => openSleepLogModal()}
                   className="mt-4 rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
                   style={{
                     fontSize: '13px',
@@ -858,8 +874,10 @@ export default function PatientDashboard() {
                       }}
                     >
                       <div className="flex items-center space-x-4">
-                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
-                          <Icon size={18} strokeWidth={1.5} color="#6B7280" />
+                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" 
+                        style={{ backgroundColor: '#F3E9FB', color: '#6D28D9' }}
+                        >
+                          <Icon size={18} strokeWidth={1.5} color="#7200CA" />
                         </div>
                         <div className="flex items-center gap-2">
                           <span
@@ -895,8 +913,10 @@ export default function PatientDashboard() {
                         borderBottom: index !== upcomingItems.length - 1 ? `0.5px solid ${token.divider}` : 'none',
                       }}
                     >
-                      <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}>
-                        <Icon size={18} strokeWidth={1.5} color="#6B7280" />
+                      <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" 
+                      style={{ backgroundColor: '#F3E9FB', color: '#6D28D9' }}
+                      >
+                        <Icon size={18} strokeWidth={1.5} color="#7200CA" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p style={{ fontSize: '14px', color: '#1A1A2E', marginBottom: '5px', fontWeight: 500 }}>

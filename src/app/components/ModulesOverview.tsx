@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
 import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
+import PatientSidebarShell from './patient/PatientSidebarShell';
 
 type ResourceLink = {
   label: string;
@@ -34,21 +35,21 @@ type StaticResource = {
 const staticResources: StaticResource[] = [
   {
     id: 'res_progressive_muscle_relaxation',
-    title: 'Progressive Muscle Relaxation',
+    title: 'Relaxation and Wind-Down Techniques',
     description: 'Guided progressive relaxation exercises to ease tension before sleep.',
     icon: Dumbbell,
     path: '/modules/resources/progressive-muscle-relaxation',
   },
   {
     id: 'res_sleep_hygiene',
-    title: 'Sleep Hygiene',
+    title: 'Sleep Hygiene Fundamentals',
     description: 'Build a healthier sleep environment and bedtime habits.',
     icon: House,
     path: '/modules/resources/sleep-hygiene',
   },
   {
     id: 'res_relaxation',
-    title: 'Autogenic Relaxation',
+    title: 'Managing Worry and Racing Thoughts',
     description: 'Short calming exercises to quiet body and mind before sleep.',
     icon: Wind,
     path: '/modules/resources/autogenic-relaxation',
@@ -134,26 +135,19 @@ export default function ModulesOverview() {
       .filter((item): item is ModuleWithProgress => Boolean(item));
   }, [modules]);
 
-  return (
-    <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
-      <div className="mx-auto max-w-6xl">
-          <header className="mb-6 flex items-center justify-between">
-            <button
-              onClick={() => navigate('/patient/dashboard')}
-              className="inline-flex items-center gap-1.5 hover:opacity-90"
-              style={{ color: '#7200CA', fontSize: '13px', fontWeight: 500 }}
-            >
-              <ArrowLeft size={16} />
-              <span>Back to Dashboard</span>
-            </button>
-            <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Sleep Modules</h1>
-          </header>
+return (
+  <PatientSidebarShell>
+  <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
+    <div className="mx-auto max-w-6xl">
+        <header className="mb-6">
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Sleep Modules</h1>
+        </header>
 
           <section className="mb-7 rounded-[12px] bg-white p-6" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="mb-4 flex items-end justify-between">
               <div>
-                <h2 style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
-                <p style={{ fontSize: '13px', color: '#9CA3AF' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
+                <p style={{ fontSize: '14px', color: '#858993' }}>
                   {summary.watchedVideos} of {summary.totalVideos} queue videos completed
                 </p>
               </div>
@@ -173,15 +167,15 @@ export default function ModulesOverview() {
             <div className="mt-5 grid grid-cols-3 text-center">
               <div>
                 <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.completedCount}</p>
-                <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Completed</p>
+                <p style={{ fontSize: '16px', color: '#858993' }}>Completed</p>
               </div>
               <div style={{ borderLeft: '0.5px solid #E9D5FF', borderRight: '0.5px solid #E9D5FF' }}>
                 <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.inProgressCount}</p>
-                <p style={{ fontSize: '12px', color: '#9CA3AF' }}>In Progress</p>
+                <p style={{ fontSize: '16px', color: '#858993' }}>In Progress</p>
               </div>
               <div>
                 <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.notStartedCount}</p>
-                <p style={{ fontSize: '12px', color: '#9CA3AF' }}>Not Started</p>
+                <p style={{ fontSize: '16px', color: '#858993' }}>Not Started</p>
               </div>
             </div>
           </section>
@@ -215,7 +209,7 @@ export default function ModulesOverview() {
                           <Lock size={16} color="#7200CA" />
                         </div>
                         <div className="absolute bottom-3 left-4">
-                          <p style={{ fontSize: '12px', color: '#7200CA', fontWeight: 500 }}>
+                          <p style={{ fontSize: '16px', color: '#7200CA', fontWeight: 500 }}>
                             Complete Week {module.weekNumber - 1} to unlock
                           </p>
                         </div>
@@ -226,8 +220,8 @@ export default function ModulesOverview() {
                       <div>
                         <p
                           style={{
-                            fontSize: '11px',
-                            color: '#9CA3AF',
+                            fontSize: '12px',
+                            color: '#858993',
                             fontWeight: 600,
                             textTransform: 'uppercase',
                             letterSpacing: '0.06em',
@@ -243,7 +237,7 @@ export default function ModulesOverview() {
                         </h3>
                         <p
                           className="line-clamp-2"
-                          style={{ fontSize: '13px', color: '#9CA3AF', lineHeight: 1.35, minHeight: '35px' }}
+                          style={{ fontSize: '14px', color: '#858993', lineHeight: 1.35, minHeight: '35px' }}
                         >
                           {module.subtitle}
                         </p>
@@ -265,7 +259,7 @@ export default function ModulesOverview() {
                       </div>
                     </div>
 
-                    <div className="mb-4 flex items-center gap-4" style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                    <div className="mb-4 flex items-center gap-4" style={{ fontSize: '14px', color: '#858993' }}>
                       <span className="inline-flex items-center gap-1">
                         <Clock3 size={13} color="#C4B5FD" />
                         {module.duration}
@@ -287,7 +281,7 @@ export default function ModulesOverview() {
                     </div>
 
                     {isInProgress && (
-                      <p className="mb-3" style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                      <p className="mb-3" style={{ fontSize: '14px', color: '#858993' }}>
                         {watchedCount} of {module.queue.length} videos completed
                       </p>
                     )}
@@ -303,13 +297,13 @@ export default function ModulesOverview() {
                               color: '#7200CA',
                               border: '1px solid #7200CA',
                               fontWeight: 500,
-                              fontSize: '14px',
+                              fontSize: '16px',
                             }
                           : {
                               color: 'white',
                               border: 'none',
                               fontWeight: 600,
-                              fontSize: '14px',
+                              fontSize: '16px',
                               background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               opacity: module.unlocked ? 1 : 0.55,
                             }
@@ -409,5 +403,6 @@ export default function ModulesOverview() {
           </section>
       </div>
     </div>
+    </PatientSidebarShell>
   );
 }

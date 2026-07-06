@@ -15,12 +15,15 @@ import {
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import {
   moduleWeekOrder,
+  moduleData,
   toWeekKeyFromSlug,
   weekNumberFromKey,
   weekSlugFromKey,
   type ModuleWeekKey,
 } from '../data/moduleData';
 import { modulesAPI, type ModuleWithProgress } from '../utils/modulesAPI';
+import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../contexts/useAuth'; 
 
 interface PlayerSelection {
   id: string;
@@ -57,7 +60,7 @@ export default function SleepModulePage() {
 
   const countdownTimerRef = useRef<number | null>(null);
   const placeholderTimerRef = useRef<number | null>(null);
-  const playerRef = useRef<HTMLVideoElement | null>(null);
+  const playerRef = useRef<HTMLIFrameElement | null>(null);
   const fullscreenContainerRef = useRef<HTMLDivElement | null>(null);
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const shouldAutoplayNextRef = useRef(false);
@@ -109,6 +112,26 @@ export default function SleepModulePage() {
       mounted = false;
     };
   }, [navigate, weekKey]);
+
+  const { user } = useAuth();
+  const [prescribedSleepHours, setPrescribedSleepHours] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('clinician_patients')
+      .select('prescribed_sleep_hours')
+      .eq('patient_id', user.id)
+      .eq('status', 'active')
+      .order('assigned_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.prescribed_sleep_hours != null) {
+          setPrescribedSleepHours(Number(data.prescribed_sleep_hours));
+        }
+      });
+  }, [user]);
 
   useEffect(() => {
     return () => {
@@ -165,7 +188,7 @@ export default function SleepModulePage() {
   }, [captionsEnabled, currentSelection?.id, currentSelection?.videoUrl]);
 
   const nextQueueVideo = module && pendingNextIndex !== null ? module.queue[pendingNextIndex] : null;
-
+  
   useEffect(() => {
     const isQueuePlaceholder = Boolean(
       currentSelection && currentSelection.kind === 'queue' && !currentSelection.videoUrl,
@@ -347,6 +370,40 @@ export default function SleepModulePage() {
     }, 80);
   }, [activeQueueIndex, module, selectedResource]);
 
+  useEffect(() => {
+    if (!currentSelection?.videoUrl?.includes('youtube.com')) return;
+
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+    }
+
+    const initPlayer = () => {
+      if (!playerRef.current) return;
+      new (window as any).YT.Player(playerRef.current, {
+        events: {
+          onStateChange: (event: any) => {
+            if (event.data === 0) {
+              setIsRealPlaying(false);
+              if (currentSelection.kind === 'queue') {
+                void handleQueueVideoEnded();
+              }
+            } else if (event.data === 1) {
+              setIsRealPlaying(true);
+            }
+          },
+        },
+      });
+    };
+
+    if ((window as any).YT && (window as any).YT.Player) {
+      initPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+    }
+  }, [currentSelection?.videoUrl]);
+
   if (!weekKey || !module || !currentSelection) {
     return (
       <PatientSidebarShell>
@@ -416,14 +473,6 @@ export default function SleepModulePage() {
       <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-center justify-between">
-            <button
-              onClick={() => navigate('/modules')}
-              className="inline-flex items-center gap-1.5 hover:opacity-90"
-              style={{ color: '#7200CA', fontSize: '13px', fontWeight: 500 }}
-            >
-              <ArrowLeft size={16} />
-              <span>Back to Dashboard</span>
-            </button>
             <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Sleep Modules</h1>
           </header>
 
@@ -456,7 +505,7 @@ export default function SleepModulePage() {
                   </button>
 
                   {currentSelection.videoUrl ? (
-                    <video
+                    <iframe
                       ref={playerRef}
                       className="h-full w-full"
                       controls
@@ -486,7 +535,7 @@ export default function SleepModulePage() {
                           label="English"
                         />
                       )}
-                    </video>
+                    </iframe>
                   ) : (
                     <button
                       onClick={() => {
@@ -660,7 +709,8 @@ export default function SleepModulePage() {
               </div>
             </section>
 
-            <aside className="h-fit self-start rounded-[12px] bg-white p-4 lg:sticky lg:top-8" style={{ border: '0.5px solid #E9D5FF' }}>
+            <div className="flex flex-col gap-4 lg:sticky lg:top-8 self-start">
+            <aside className="h-fit rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
               <div className="mb-3 flex gap-4">
                 <button
                   onClick={() => setActiveTab('queue')}
@@ -724,6 +774,73 @@ export default function SleepModulePage() {
                 </div>
               )}
             </aside>
+              <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
+                <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>
+                  Sleep Prescription
+                </p>
+                <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
+                  {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
+                </p>
+                <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+                  Recommended by your clinician
+                </p>
+              </div>
+            </div>
+            
+            {/* Previous Week Resources */}
+            {(() => {
+              const weekIndex = moduleWeekOrder.indexOf(weekKey);
+              const prevWeekKey = weekIndex > 0 ? moduleWeekOrder[weekIndex - 1] : null;
+              const prevResources = prevWeekKey ? moduleData[prevWeekKey].resources : [];
+              if (prevResources.length === 0) return null;
+              return (
+                <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A2E', marginBottom: '12px' }}>
+                    Resources
+                  </p>
+                  <div className="space-y-2">
+                    {prevResources.map((resource) => (
+                      <button
+                        key={resource.id}
+                        onClick={() => {
+                          setSelectedResource({
+                            id: resource.id,
+                            title: resource.title,
+                            description: resource.title,
+                            duration: '',
+                            videoUrl: resource.videoUrl,
+                            kind: 'resource',
+                            captionUrl: resource.captionUrl,
+                          });
+                          stopPlaceholderSimulation();
+                          stopCountdown();
+                        }}
+                        className="w-full rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-[#F9F7FF]"
+                        style={
+                          selectedResource?.id === resource.id
+                            ? { borderLeft: '2px solid #7200CA', backgroundColor: '#F9F7FF' }
+                            : {}
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="relative flex h-[50px] w-[80px] items-center justify-center rounded-[6px]"
+                            style={{ backgroundColor: '#1A1A2E' }}
+                          >
+                            <Play size={14} color="white" fill="white" opacity={0.7} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate" style={{ fontSize: '13px', color: '#1A1A2E', fontWeight: 500 }}>
+                              {resource.title}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
