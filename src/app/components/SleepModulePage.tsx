@@ -190,40 +190,25 @@ export default function SleepModulePage() {
   const nextQueueVideo = module && pendingNextIndex !== null ? module.queue[pendingNextIndex] : null;
   
   useEffect(() => {
-    const isQueuePlaceholder = Boolean(
-      currentSelection && currentSelection.kind === 'queue' && !currentSelection.videoUrl,
-    );
+  if (!currentSelection || currentSelection.kind !== 'queue') return;
+  if (currentQueueVideo?.progress.watched) return;
 
-    if (!isQueuePlaceholder || !isPlaceholderSimulating) {
-      if (placeholderTimerRef.current) {
-        window.clearInterval(placeholderTimerRef.current);
-        placeholderTimerRef.current = null;
-      }
-      return;
-    }
+  // YouTube: handled by IFrame API
+  if (currentSelection.videoUrl?.includes('youtube.com')) return;
 
-    placeholderTimerRef.current = window.setInterval(() => {
-      mockElapsedMsRef.current = Math.min(3000, mockElapsedMsRef.current + 100 * mockSpeed);
-      setMockElapsedMs(mockElapsedMsRef.current);
+  // SharePoint / any other URL: auto-complete after listed duration
+  const durationStr = currentSelection.duration ?? '';
+  const match = durationStr.match(/\d+/);
+  const durationMs = match ? Number(match[0]) * 60 * 1000 : 5 * 60 * 1000;
+  const completionMs = Math.floor(durationMs * 0.8);
 
-      if (mockElapsedMsRef.current >= 3000 && !placeholderEndedRef.current) {
-        placeholderEndedRef.current = true;
-        if (placeholderTimerRef.current) {
-          window.clearInterval(placeholderTimerRef.current);
-          placeholderTimerRef.current = null;
-        }
-        setIsPlaceholderSimulating(false);
-        void handleQueueVideoEnded();
-      }
-    }, 100);
 
-    return () => {
-      if (placeholderTimerRef.current) {
-        window.clearInterval(placeholderTimerRef.current);
-        placeholderTimerRef.current = null;
-      }
-    };
-  }, [currentSelection, isPlaceholderSimulating, mockSpeed]);
+  const timer = window.setTimeout(() => {
+    void handleQueueVideoEnded();
+  }, completionMs);
+
+  return () => window.clearTimeout(timer);
+}, [currentSelection?.videoUrl, currentQueueVideo?.progress.watched]);
 
   async function refreshWeek(keepQueueIndex = true) {
     if (!weekKey) return;
@@ -305,6 +290,7 @@ export default function SleepModulePage() {
   }
 
   async function handleQueueVideoEnded() {
+    console.log('handleQueueVideoEnded - activeQueueIndex:', activeQueueIndex, 'module.queue.length:', module?.queue.length);
     if (!module || !currentQueueVideo) return;
 
     await markCurrentQueueVideo(100);
@@ -327,8 +313,11 @@ export default function SleepModulePage() {
     const item = module.queue[index];
     if (item.progress.watched) return 'Completed';
     if (index === activeQueueIndex && !selectedResource) return 'Playing';
-    if (index === activeQueueIndex + 1) return 'Up next';
-    if (index < activeQueueIndex) return 'Completed';
+
+    // Find the first unwatched video
+    const firstUnwatched = module.queue.findIndex((v) => !v.progress.watched);
+    if (index === firstUnwatched) return 'Up next';
+
     return 'Locked';
   }
 
@@ -473,6 +462,14 @@ export default function SleepModulePage() {
       <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-center justify-between">
+            <button
+              onClick={() => navigate('/modules')}
+              className="inline-flex items-center gap-1.5 hover:opacity-90 cursor-pointer"
+              style={{ color: '#7200CA', fontSize: '16px', fontWeight: 500 }}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Modules</span>
+            </button>
             <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Sleep Modules</h1>
           </header>
 
@@ -737,6 +734,11 @@ export default function SleepModulePage() {
                         key={item.id}
                         onClick={() => {
                           if (status === 'Locked') return;
+                          // Block if any video before this one hasn't been watched
+                          const allPreviousWatched = module.queue
+                            .slice(0, index)
+                            .every((v) => v.progress.watched);
+                          if (!allPreviousWatched) return;
                           stopPlaceholderSimulation();
                           setActiveQueueIndex(index);
                           setSelectedResource(null);
@@ -845,7 +847,7 @@ export default function SleepModulePage() {
         </div>
       </div>
 
-      {showCompletionModal && (
+      {/* {showCompletionModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-6"
           style={{ backgroundColor: 'rgba(26,26,46,0.5)' }}
@@ -896,7 +898,7 @@ export default function SleepModulePage() {
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </PatientSidebarShell>
   );
 }

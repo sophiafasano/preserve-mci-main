@@ -20,6 +20,7 @@ export interface VideoProgress {
 
 export interface UserModuleProgressRecord {
   videos: Record<string, VideoProgress>;
+  weekStartedAt: Record<string, string>; // weekKey → ISO timestamp
   updatedAt: string;
 }
 
@@ -74,6 +75,7 @@ export interface ProgressPostResponse {
 function buildDefaultProgress(): UserModuleProgressRecord {
   return {
     videos: {},
+    weekStartedAt: {},
     updatedAt: new Date().toISOString(),
   };
 }
@@ -85,14 +87,11 @@ function clampPercent(value: number): number {
 
 async function getProgressRecord(): Promise<UserModuleProgressRecord> {
   const data = await dataAPI.get(MODULE_PROGRESS_KEY);
-
-  if (!data || typeof data !== 'object') {
-    return buildDefaultProgress();
-  }
-
+  if (!data || typeof data !== 'object') return buildDefaultProgress();
   const raw = data as Partial<UserModuleProgressRecord>;
   return {
     videos: raw.videos ?? {},
+    weekStartedAt: raw.weekStartedAt ?? {},
     updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString(),
   };
 }
@@ -131,8 +130,21 @@ function isWeekUnlocked(weekKey: ModuleWeekKey, record: UserModuleProgressRecord
 
   const index = moduleWeekOrder.indexOf(weekKey);
   if (index <= 0) return true;
+
   const previousWeek = moduleWeekOrder[index - 1];
-  return computeModuleCompletion(previousWeek, record);
+
+  // Previous week must be completed
+  if (!computeModuleCompletion(previousWeek, record)) return false;
+
+  // And 7 calendar days must have passed since previous week was started
+  const prevWeekStarted = record.weekStartedAt[previousWeek];
+  if (!prevWeekStarted) return false;
+
+  const startDate = new Date(prevWeekStarted);
+  const now = new Date();
+  const daysPassed = (now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+
+  return daysPassed >= 7;
 }
 
 function buildModuleWithProgress(
@@ -254,6 +266,11 @@ export const modulesAPI = {
     }
 
     const record = await getProgressRecord();
+
+    // Record when this week was first started
+    if (!record.weekStartedAt[weekKey]) {
+      record.weekStartedAt[weekKey] = new Date().toISOString();
+    }
     const watchedPercent = clampPercent(body.watchedPercent);
 
     const previous = record.videos[videoId];

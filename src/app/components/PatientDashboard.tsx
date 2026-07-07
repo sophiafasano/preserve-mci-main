@@ -24,7 +24,8 @@ import {
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useSleepLogs } from '../hooks/useSleepLogs';
-import { useAllModulesProgress } from '../hooks/useModuleProgress';
+// import { useAllModulesProgress } from '../hooks/useModuleProgress';
+import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../utils/modulesAPI';
 import { moduleData, moduleWeekOrder } from '../data/moduleData';
 import { useReminders } from '../hooks/useReminders';
 import { useAuth } from '../contexts/useAuth';
@@ -47,7 +48,19 @@ export default function PatientDashboard() {
   const { logs: sleepLogs, addSleepLog, stats: sleepStats, getChartData } = useSleepLogs();
   
   // Use localStorage-backed module progress
-  const moduleProgressStats = useAllModulesProgress();
+  // const moduleProgressStats = useAllModulesProgress();
+
+  // Use app_data module progress
+  const [modulesData, setModulesData] = useState<{
+    modules: ModuleWithProgress[];
+    summary: ModulesSummary;
+  } | null>(null);
+
+  useEffect(() => {
+    modulesAPI.getModules().then((res) => {
+      setModulesData({ modules: res.modules, summary: res.summary });
+    }).catch(() => {});
+  }, []);
 
   // Reminders system
   const { activeCount, refreshAutomaticReminders } = useReminders();
@@ -58,11 +71,11 @@ export default function PatientDashboard() {
       ? sleepLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
       : null;
 
-    const incompleteModules = (moduleProgressStats.totalModules || 8) - (moduleProgressStats.completedCount || 0);
+    const incompleteModules = totalWeeks - (modulesData?.summary.completedCount ?? 0);
 
     refreshAutomaticReminders(lastLogDate, sleepStats.currentStreak, incompleteModules);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sleepLogs.length, sleepStats.currentStreak, moduleProgressStats.completedCount]);
+  }, [sleepLogs.length, sleepStats.currentStreak, modulesData?.summary.completedCount]);
 
   const handleSleepLogSubmit = (data: SleepLogData) => {
     addSleepLog(data);
@@ -73,24 +86,25 @@ export default function PatientDashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
-  // Real module progress from localStorage
+  // Module progress from app_data
   const totalWeeks = moduleWeekOrder.length;
-  const currentWeekIndex = Math.min(moduleProgressStats.completedCount, totalWeeks - 1);
-  const currentWeek = Math.min(moduleProgressStats.completedCount + 1, totalWeeks);
+  const completedCount = modulesData?.summary.completedCount ?? 0;
+  const currentWeek = Math.min(completedCount + 1, totalWeeks);
+  const currentWeekIndex = Math.min(completedCount, totalWeeks - 1);
   const currentWeekKey = moduleWeekOrder[currentWeekIndex];
   const currentModuleData = moduleData[currentWeekKey];
-  const currentModuleProgress = moduleProgressStats.allModules[currentWeekKey];
-  const lessonsCompleted = currentModuleProgress
-    ? [currentModuleProgress.videoWatched, currentModuleProgress.quizCompleted, currentModuleProgress.exerciseCompleted].filter(Boolean).length
+  const currentModuleInProgress = modulesData?.modules.find(m => m.weekKey === currentWeekKey);
+  const lessonsCompleted = currentModuleInProgress
+    ? currentModuleInProgress.queue.filter(v => v.progress.watched).length
     : 0;
-  const moduleProgress = Math.round(
-    moduleWeekOrder.reduce((sum, key) => sum + (moduleProgressStats.allModules[key]?.progress ?? 0), 0) / totalWeeks
-  );
+  const totalLessons = currentModuleData.queue.length;
+  const moduleProgress = modulesData?.summary.overallPercent ?? 0;
+
   const currentModule = {
     title: currentModuleData.title,
     description: currentModuleData.description,
     lessonsCompleted,
-    totalLessons: 3,
+    totalLessons,
     estimatedTime: currentModuleData.duration,
   };
 
@@ -549,13 +563,13 @@ export default function PatientDashboard() {
                     completed
                   </span>
                   <span style={{ fontSize: '13px', color: token.textBlack }}>
-                    {moduleProgress}%
+                    {totalLessons > 0 ? Math.round((lessonsCompleted / totalLessons) * 100) : 0}%
                   </span>
                 </div>
                 <div className="h-2 rounded-[4px] overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
                   <div
                     className={`h-full rounded-[2px] transition-all duration-500 ${homepageGradientClass}`}
-                    style={{ width: `${moduleProgress}%` }}
+                    style={{ width: `${totalLessons > 0 ? Math.round((lessonsCompleted / totalLessons) * 100) : 0}%` }}
                   ></div>
                 </div>
               </div>
