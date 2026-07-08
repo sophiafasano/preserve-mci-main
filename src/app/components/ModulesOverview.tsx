@@ -260,7 +260,9 @@ return (
                         </div>
                         <div className="absolute bottom-3 left-4">
                           <p style={{ fontSize: '16px', color: '#7200CA', fontWeight: 500 }}>
-                            Complete Week {module.weekNumber - 1} to unlock
+                            {module.daysUntilUnlock !== null && module.daysUntilUnlock > 0
+                              ? `Available in ${module.daysUntilUnlock} day${module.daysUntilUnlock !== 1 ? 's' : ''}`
+                              : `Complete Week ${module.weekNumber - 1} to unlock`}
                           </p>
                         </div>
                       </div>

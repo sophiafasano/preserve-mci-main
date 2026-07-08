@@ -91,8 +91,9 @@ export default function PatientDashboard() {
   const totalWeeks = moduleWeekOrder.length;
   const completedCount = modulesData?.summary.completedCount ?? 0;
   const currentWeek = Math.min(completedCount + 1, totalWeeks);
-  const currentWeekIndex = Math.min(completedCount, totalWeeks - 1);
-  const currentWeekKey = moduleWeekOrder[currentWeekIndex];
+  const currentWeekIndex = modulesData?.modules.findIndex(m => !m.completed || m.isLocked) ?? 0;
+  const safeCurrentWeekIndex = currentWeekIndex === -1 ? totalWeeks - 1 : currentWeekIndex;
+  const currentWeekKey = moduleWeekOrder[safeCurrentWeekIndex];  
   const currentModuleData = moduleData[currentWeekKey];
   const currentModuleInProgress = modulesData?.modules.find(m => m.weekKey === currentWeekKey);
   const lessonsCompleted = currentModuleInProgress

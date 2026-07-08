@@ -37,6 +37,7 @@ export interface ModuleWithProgress extends WeekModuleData {
   weekNumber: number;
   unlocked: boolean;
   isLocked: boolean;
+  daysUntilUnlock: number | null; // null if unlocked or previous week not started
   completed: boolean;
   completionStatus: 'completed' | 'in_progress' | 'not_started';
   overallPercent: number;
@@ -70,6 +71,25 @@ export interface ProgressPostResponse {
   module: ModuleWithProgress;
   updatedProgress: VideoProgress;
   summary: ModulesSummary;
+}
+
+function getDaysUntilUnlock(weekKey: ModuleWeekKey, record: UserModuleProgressRecord): number | null {
+  if (weekKey === 'week1') return null;
+  const index = moduleWeekOrder.indexOf(weekKey);
+  if (index <= 0) return null;
+  const previousWeek = moduleWeekOrder[index - 1];
+  if (!computeModuleCompletion(previousWeek, record)) return null;
+  const prevWeekStarted = record.weekStartedAt[previousWeek];
+  if (!prevWeekStarted) return null;
+
+  // Use calendar days
+  const startDate = new Date(prevWeekStarted);
+  const startDay = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const today = new Date();
+  const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const calendarDaysPassed = Math.floor((todayDay.getTime() - startDay.getTime()) / (1000 * 60 * 60 * 24));
+  const remaining = 7 - calendarDaysPassed;
+  return remaining > 0 ? remaining : 0;
 }
 
 function buildDefaultProgress(): UserModuleProgressRecord {
@@ -170,6 +190,7 @@ function buildModuleWithProgress(
     weekNumber: weekNumberFromKey(weekKey),
     unlocked: isWeekUnlocked(weekKey, record),
     isLocked: !isWeekUnlocked(weekKey, record),
+    daysUntilUnlock: getDaysUntilUnlock(weekKey, record),
     completed: isCompleted,
     completionStatus: isCompleted ? 'completed' : watchedCount > 0 ? 'in_progress' : 'not_started',
     overallPercent,

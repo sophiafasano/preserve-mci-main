@@ -847,7 +847,7 @@ export default function SleepModulePage() {
         </div>
       </div>
 
-      {/* {showCompletionModal && (
+      {showCompletionModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-6"
           style={{ backgroundColor: 'rgba(26,26,46,0.5)' }}
@@ -861,27 +861,32 @@ export default function SleepModulePage() {
               You&apos;ve completed all videos for this week. Come back next week to continue your program.
             </p>
 
-            {nextWeekKey && (
-              <button
-                onClick={async () => {
-                  const nextWeek = await modulesAPI.getModuleWeek(nextWeekKey);
-                  if (nextWeek.module.unlocked) {
-                    navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`);
-                    return;
-                  }
-                  navigate('/modules');
-                }}
-                className="mt-5 w-full rounded-[10px] py-2.5"
-                style={{
-                  background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                }}
-              >
-                Start Week {weekNumberFromKey(nextWeekKey)}
-              </button>
-            )}
+            {nextWeekKey && (() => {
+              const [nextModuleData, setNextModuleData] = useState<any>(null);
+              useEffect(() => {
+                modulesAPI.getModuleWeek(nextWeekKey).then(res => setNextModuleData(res.module)).catch(() => {});
+              }, [nextWeekKey]);
+
+              if (nextModuleData?.unlocked) {
+                return (
+                  <button
+                    onClick={() => navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`)}
+                    className="mt-5 w-full rounded-[10px] py-2.5"
+                    style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
+                  >
+                    Start Week {weekNumberFromKey(nextWeekKey)}
+                  </button>
+                );
+              }
+
+              return (
+                <p className="mt-5 text-center" style={{ fontSize: '13px', color: '#9CA3AF' }}>
+                  {nextModuleData?.daysUntilUnlock > 0
+                    ? `Week ${weekNumberFromKey(nextWeekKey)} available in ${nextModuleData.daysUntilUnlock} day${nextModuleData.daysUntilUnlock !== 1 ? 's' : ''}`
+                    : `Complete all videos to unlock Week ${weekNumberFromKey(nextWeekKey)}`}
+                </p>
+              );
+            })()}
 
             <button
               onClick={() => navigate('/modules')}
@@ -898,7 +903,7 @@ export default function SleepModulePage() {
             </button>
           </div>
         </div>
-      )} */}
+      )}
     </PatientSidebarShell>
   );
 }
