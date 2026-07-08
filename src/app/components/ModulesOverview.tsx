@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useReminders } from '../hooks/useReminders';
+import { useSleepLogs } from '../hooks/useSleepLogs';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -13,6 +15,11 @@ import {
   Moon,
   Play,
   Wind,
+  MessageCircle,
+  ChevronRight,
+  Clock,
+  ClipboardList,
+  CalendarCheck
 } from 'lucide-react';
 import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
 import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
@@ -100,6 +107,49 @@ export default function ModulesOverview() {
   const [modules, setModules] = useState<ModuleWithProgress[]>([]);
   const [summary, setSummary] = useState<ModulesSummary>(emptySummary);
   const [expandedResourceIds, setExpandedResourceIds] = useState<Record<string, boolean>>({});
+  const quickActions = [
+    { label: "Log Last Night's Sleep", icon: Moon, action: 'log-sleep' },
+    { label: 'View Sleep Tips', icon: BookOpen, action: 'sleep-tips' },
+    { label: 'Message Care Team', icon: MessageCircle, action: 'messages' },
+  ];
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'log-sleep':
+        window.dispatchEvent(new Event('open-sleep-log'));
+        break;
+      case 'sleep-tips':
+        window.dispatchEvent(new Event('open-sleep-tips'));
+        break;
+      case 'messages':
+        navigate('/patient/messages');
+        break;
+    }
+  };
+
+  const { activeCount } = useReminders();
+  const { logs: sleepLogs } = useSleepLogs();
+
+  const upcomingItems = useMemo(() => {
+    const items: { type: string; title: string; date: string; icon: typeof CalendarCheck }[] = [];
+    const today = new Date().toISOString().split('T')[0];
+    const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
+    if (!hasLoggedToday) {
+      items.push({ type: 'reminder', title: "Log last night's sleep", date: 'Today', icon: Clock });
+    }
+    if (activeCount > 0) {
+      items.push({
+        type: 'reminder',
+        title: `${activeCount} active reminder${activeCount !== 1 ? 's' : ''}`,
+        date: 'Pending',
+        icon: ClipboardList,
+      });
+    }
+    if (items.length === 0) {
+      items.push({ type: 'info', title: 'All caught up! Keep logging your sleep.', date: '', icon: CalendarCheck });
+    }
+    return items;
+  }, [sleepLogs, activeCount]);
 
   const toggleResourceLinks = (resourceId: string) => {
     setExpandedResourceIds((prev) => ({
@@ -401,6 +451,84 @@ return (
               })}
             </div>
           </section>
+          {/* Quick Actions + Upcoming */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            {/* Quick Actions */}
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#1A1A2E', marginBottom: '12px' }}>
+                Quick Actions
+              </h2>
+              <div>
+                {quickActions.map((action, index) => {
+                  const Icon = action.icon;
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleQuickAction(action.action)}
+                      className="w-full flex items-center justify-between py-4 transition-all duration-200 hover:bg-[#FAF5FF] hover:-translate-y-px"
+                      style={{
+                        borderRadius: '10px',
+                        borderBottom: index !== quickActions.length - 1 ? '0.5px solid #F3F4F6' : 'none',
+                      }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" style={{ backgroundColor: '#F3E9FB' }}>
+                          <Icon size={18} strokeWidth={1.5} color="#7200CA" />
+                        </div>
+                        <span style={{ fontSize: '14px', color: '#1A1A2E', fontWeight: 400 }}>{action.label}</span>
+                      </div>
+                      <ChevronRight size={16} strokeWidth={1.5} color="#C4B5FD" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Upcoming */}
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
+              <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#1A1A2E', marginBottom: '12px' }}>
+                Upcoming
+              </h2>
+              <div>
+                {upcomingItems.map((item, index) => {
+                  const Icon = item.icon;
+                  const isToday = item.date.toLowerCase().includes('today');
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => item.type === 'reminder' ? navigate('/patient/reminders') : undefined}
+                      className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
+                      style={{
+                        borderBottom: index !== upcomingItems.length - 1 ? '0.5px solid #F3F4F6' : 'none',
+                        cursor: item.type === 'reminder' ? 'pointer' : 'default',
+                      }}
+                    >
+                      <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F3E9FB' }}>
+                        <Icon size={18} strokeWidth={1.5} color="#7200CA" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontSize: '14px', color: '#1A1A2E', marginBottom: '5px', fontWeight: 500 }}>{item.title}</p>
+                        <div className="flex items-center gap-2">
+                          <p style={{ fontSize: '12px', color: '#9CA3AF' }}>{item.date}</p>
+                          {item.date && (
+                            <span style={{
+                              fontSize: '11px', fontWeight: 500, borderRadius: '20px',
+                              padding: '3px 10px',
+                              backgroundColor: isToday ? '#EDE9FE' : '#F3E8FF',
+                              color: isToday ? '#4C1D95' : '#6B21A8',
+                            }}>
+                              {isToday ? 'Today' : 'Due soon'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
       </div>
     </div>
     </PatientSidebarShell>
