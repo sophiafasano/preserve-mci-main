@@ -9,6 +9,7 @@ import {
   NotebookPen,
   Settings,
   TrendingUp,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../contexts/useAuth';
 import SleepLogModal from '../SleepLogModal';
@@ -48,6 +49,7 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
     { label: 'Sleep Analysis', icon: BarChart2, path: '/patient/sleep-analytics', action: null },
     { label: 'My Progress', icon: TrendingUp, path: '/patient/progress', action: null },
     { label: 'Messages', icon: MessageCircle, path: '/patient/messages', action: null },
+    { label: 'Reminders', icon: Bell, path: '/patient/reminders', action: null },
   ];
 
   const handleSignOut = async () => {

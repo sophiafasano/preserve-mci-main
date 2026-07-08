@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Bell,
@@ -17,8 +17,11 @@ import {
 import { Button } from '../ui/button';
 import { useReminders } from '../../hooks/useReminders';
 import { useSleepLogs } from '../../hooks/useSleepLogs';
-import { useAllModulesProgress } from '../../hooks/useModuleProgress';
+// import { useAllModulesProgress } from '../../hooks/useModuleProgress';
+import { modulesAPI } from '../../utils/modulesAPI';
+import { moduleWeekOrder } from '../../data/moduleData';
 import { getReminderColor, getReminderIcon } from '../../utils/reminders';
+
 import PatientLayout from './PatientLayout';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -34,7 +37,11 @@ export default function RemindersCenter() {
   } = useReminders();
 
   const { logs, stats } = useSleepLogs();
-  const moduleProgress = useAllModulesProgress();
+  // const moduleProgress = useAllModulesProgress();
+  const [modulesData, setModulesData] = useState<any>(null);
+  useEffect(() => {
+    modulesAPI.getModules().then((res) => setModulesData(res)).catch(() => {});
+  }, []);
 
   // Refresh automatic reminders on mount and periodically
   useEffect(() => {
@@ -42,11 +49,11 @@ export default function RemindersCenter() {
       ? logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
       : null;
 
-    const incompleteModules = (moduleProgress.totalModules || 8) - (moduleProgress.completedCount || 0);
+    const incompleteModules = moduleWeekOrder.length - (modulesData?.summary.completedCount ?? 0);
 
     refreshAutomaticReminders(lastLogDate, stats.currentStreak, incompleteModules);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [logs.length, stats.currentStreak, moduleProgress.completedCount]);
+  }, [logs.length, stats.currentStreak, modulesData?.summary.completedCount]);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -102,7 +109,7 @@ export default function RemindersCenter() {
     return (
       <PatientLayout>
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl mb-6" style={{ color: '#1f1f3d' }}>
+          <h1 className="mb-2" style={{ fontSize: '22px', fontWeight: 700, color: '#1f1f3d' }}>
             Reminders & Notifications
           </h1>
           
@@ -144,7 +151,7 @@ export default function RemindersCenter() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl mb-2" style={{ color: '#1f1f3d' }}>
+            <h1 className="mb-2" style={{ fontSize: '22px', fontWeight: 700, color: '#1f1f3d' }}>
               Reminders & Notifications
             </h1>
             <p className="text-lg text-gray-600">
@@ -222,7 +229,7 @@ export default function RemindersCenter() {
                         </Button>
                       )}
                       
-                      <Button
+                      {/* <Button
                         onClick={() => completeReminder(reminder.id)}
                         variant="outline"
                         className="h-10 px-4 rounded-lg border-2 hover:bg-white"
@@ -238,15 +245,15 @@ export default function RemindersCenter() {
                       >
                         <X className="w-4 h-4 mr-2" />
                         Dismiss
-                      </Button>
+                      </Button> */}
 
-                      <Button
+                      {/* <Button
                         onClick={() => deleteReminder(reminder.id)}
                         variant="ghost"
                         className="h-10 px-3 rounded-lg hover:bg-white hover:bg-opacity-70 text-red-600 hover:text-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
-                      </Button>
+                      </Button> */}
                     </div>
 
                     {/* Created time */}

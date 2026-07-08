@@ -15,13 +15,15 @@ import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSleepLogs } from '../../hooks/useSleepLogs';
-import { useAllModulesProgress } from '../../hooks/useModuleProgress';
+// import { useAllModulesProgress } from '../../hooks/useModuleProgress';
+import { modulesAPI } from '../../utils/modulesAPI';
+import { moduleWeekOrder } from '../../data/moduleData';
 import PatientLayout from './PatientLayout';
 
 export default function MyProgress() {
   const navigate = useNavigate();
   const { logs: sleepLogs, stats: sleepStats, getChartData } = useSleepLogs();
-  const moduleProgressStats = useAllModulesProgress();
+  // const moduleProgressStats = useAllModulesProgress();
   const [timeRange, setTimeRange] = useState<7 | 14 | 30>(30);
 
   // Get chart data based on selected time range
@@ -31,6 +33,14 @@ export default function MyProgress() {
       uniqueId: `${item.fullDate}-${index}`,
     }));
   }, [getChartData, timeRange]);
+
+  const [modulesData, setModulesData] = useState<any>(null);
+
+  useEffect(() => {
+    modulesAPI.getModules().then((res) => {
+      setModulesData(res);
+    }).catch(() => {});
+  }, []);
 
   // Calculate achievements
   const achievements = useMemo(() => {
@@ -73,7 +83,7 @@ export default function MyProgress() {
     }
 
     // First module completed
-    if ((moduleProgressStats.completedCount || 0) >= 1) {
+    if ((modulesData?.summary.completedCount || 0) >= 1) {
       earned.push({
         id: 'first-module',
         name: 'Learning Begun',
@@ -85,7 +95,7 @@ export default function MyProgress() {
     }
 
     // Half modules completed
-    if ((moduleProgressStats.completedCount || 0) >= 4) {
+    if ((modulesData?.summary.completedCount || 0) >= 4) {
       earned.push({
         id: 'halfway',
         name: 'Halfway There',
@@ -97,7 +107,7 @@ export default function MyProgress() {
     }
 
     // All modules completed
-    if ((moduleProgressStats.completedCount || 0) === (moduleProgressStats.totalModules || 8)) {
+    if ((modulesData?.summary.completedCount || 0) === moduleWeekOrder.length) {
       earned.push({
         id: 'all-modules',
         name: 'Program Complete',
@@ -121,7 +131,7 @@ export default function MyProgress() {
     }
 
     return earned;
-  }, [sleepStats, moduleProgressStats]);
+  }, [sleepStats, modulesData?.summary.completedCount]);
 
   // Calculate weekly summary for past 4 weeks
   const weeklySummary = useMemo(() => {
@@ -189,10 +199,10 @@ export default function MyProgress() {
     },
     {
       label: 'Modules Completed',
-      value: `${moduleProgressStats.completedCount || 0}/${moduleProgressStats.totalModules || 8}`,
+      value: `${modulesData?.summary.completedCount ?? 0}/${moduleWeekOrder.length}`,
       icon: BookOpen,
       color: 'teal',
-      subtext: `${moduleProgressStats.averageProgress || 0}% complete`,
+      subtext: `${modulesData?.summary.overallPercent ?? 0}% complete`,
     },
     {
       label: 'Avg Sleep',
@@ -232,7 +242,7 @@ export default function MyProgress() {
               <Trophy size={16} color="#6B7280" />
             </div>
             <span style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A2E' }}>
-              {moduleProgressStats.averageProgress || 0}% Complete
+              {modulesData?.summary.overallPercent ?? 0}% Complete
             </span>
           </div>
         </div>
@@ -486,10 +496,10 @@ export default function MyProgress() {
                   Overall Completion
                 </span>
                 <span style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
-                  {moduleProgressStats.averageProgress || 0}%
+                  {modulesData?.summary.overallPercent ?? 0}%
                 </span>
               </div>
-              <Progress value={moduleProgressStats.averageProgress || 0} className="h-3" />
+              <Progress value={modulesData?.summary.overallPercent ?? 0} className="h-3" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -503,7 +513,7 @@ export default function MyProgress() {
                   </h3>
                 </div>
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E' }}>
-                  {moduleProgressStats.completedCount || 0}
+                  {modulesData?.summary.completedCount ?? 0}
                 </p>
                 <p style={{ fontSize: '13px', color: '#6B7280' }}>modules finished</p>
               </div>
@@ -518,7 +528,7 @@ export default function MyProgress() {
                   </h3>
                 </div>
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E' }}>
-                  {(moduleProgressStats.totalModules || 8) - (moduleProgressStats.completedCount || 0)}
+                  {moduleWeekOrder.length - (modulesData?.summary.completedCount ?? 0)}
                 </p>
                 <p style={{ fontSize: '13px', color: '#6B7280' }}>modules to go</p>
               </div>

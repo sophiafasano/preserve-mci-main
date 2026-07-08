@@ -21,6 +21,7 @@ import {
   X,
   BedDouble,
   Sparkles,
+  Bell
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useSleepLogs } from '../hooks/useSleepLogs';
@@ -304,6 +305,7 @@ export default function PatientDashboard() {
     { label: 'Sleep Analysis', icon: BarChart2,      path: '/patient/sleep-analytics' },
     { label: 'My Progress',    icon: TrendingUp,      path: '/patient/progress' },
     { label: 'Messages',       icon: MessageCircle,   path: '/patient/messages', badge: unreadCount },
+    { label: 'Reminders',      icon: Bell,                 path: '/patient/reminders' },
   ];
 
   // Suppress recharts duplicate key warning (known library issue)
@@ -920,11 +922,13 @@ export default function PatientDashboard() {
                   const Icon = item.icon;
                   const isToday = item.date.toLowerCase().includes('today');
                   return (
-                    <div
-                      key={index}
-                      className="flex items-start space-x-3 py-4"
+                    <button
+                      key={index} 
+                      onClick={() => item.type === 'reminder' ? navigate('/patient/reminders') : undefined}
+                      className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
                       style={{
                         borderBottom: index !== upcomingItems.length - 1 ? `0.5px solid ${token.divider}` : 'none',
+                        cursor: item.type === 'reminder' ? 'pointer' : 'default',
                       }}
                     >
                       <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" 
@@ -953,7 +957,7 @@ export default function PatientDashboard() {
                           </span>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
