@@ -135,7 +135,7 @@ export default function ModulesOverview() {
     const today = new Date().toISOString().split('T')[0];
     const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
     if (!hasLoggedToday) {
-      items.push({ type: 'reminder', title: "Log last night's sleep", date: 'Today', icon: Clock });
+      items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
     }
     if (activeCount > 0) {
       items.push({
@@ -498,7 +498,13 @@ return (
                   return (
                     <button
                       key={index}
-                      onClick={() => item.type === 'reminder' ? navigate('/patient/reminders') : undefined}
+                      onClick={() => {
+                        if (item.type === 'sleep-log') {
+                          window.dispatchEvent(new Event('open-sleep-log'));
+                        } else if (item.type === 'reminder') {
+                          navigate('/patient/reminders');
+                        }
+                      }}
                       className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
                       style={{
                         borderBottom: index !== upcomingItems.length - 1 ? '0.5px solid #F3F4F6' : 'none',

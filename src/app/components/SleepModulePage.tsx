@@ -791,9 +791,7 @@ export default function SleepModulePage() {
             
             {/* Previous Week Resources */}
             {(() => {
-              const weekIndex = moduleWeekOrder.indexOf(weekKey);
-              const prevWeekKey = weekIndex > 0 ? moduleWeekOrder[weekIndex - 1] : null;
-              const prevResources = prevWeekKey ? moduleData[prevWeekKey].resources : [];
+              const prevResources = moduleData[weekKey!].resources;
               if (prevResources.length === 0) return null;
               return (
                 <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>

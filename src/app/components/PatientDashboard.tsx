@@ -283,7 +283,7 @@ export default function PatientDashboard() {
     const today = new Date().toISOString().split('T')[0];
     const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
     if (!hasLoggedToday) {
-      items.push({ type: 'reminder', title: "Log last night's sleep", date: 'Today', icon: Clock });
+      items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
     }
     if (activeCount > 0) {
       items.push({
@@ -326,6 +326,18 @@ export default function PatientDashboard() {
     return () => {
       console.error = originalError;
     };
+  }, []);
+
+  useEffect(() => {
+    const handleOpenSleepLog = () => openSleepLogModal();
+    window.addEventListener('open-sleep-log', handleOpenSleepLog);
+    return () => window.removeEventListener('open-sleep-log', handleOpenSleepLog);
+  }, []);
+
+  useEffect(() => {
+    const handleOpenSleepTips = () => setSleepTipsOpen(true);
+    window.addEventListener('open-sleep-tips', handleOpenSleepTips);
+    return () => window.removeEventListener('open-sleep-tips', handleOpenSleepTips);
   }, []);
 
   const handleSignOut = async () => {
@@ -925,7 +937,13 @@ export default function PatientDashboard() {
                   return (
                     <button
                       key={index} 
-                      onClick={() => item.type === 'reminder' ? navigate('/patient/reminders') : undefined}
+                      onClick={() => {
+                        if (item.type === 'sleep-log') {
+                          window.dispatchEvent(new Event('open-sleep-log'));
+                        } else if (item.type === 'reminder') {
+                          navigate('/patient/reminders');
+                        }
+                      }}
                       className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
                       style={{
                         borderBottom: index !== upcomingItems.length - 1 ? `0.5px solid ${token.divider}` : 'none',
