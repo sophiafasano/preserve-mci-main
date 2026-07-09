@@ -122,14 +122,17 @@ export function useReminders() {
   const refreshAutomaticReminders = useCallback((
     lastSleepLogDate: string | null,
     currentStreak: number,
-    incompleteModules: number
+    incompleteModules: number,
+    currentModuleHasUnwatchedVideos: boolean = false,
+    nextModuleUnlocked: boolean = false,
   ) => {
-    // Generate new automatic reminders
     const newAutoReminders = generateAutomaticReminders(
       lastSleepLogDate,
       currentStreak,
       incompleteModules,
-      preferences
+      preferences,
+      currentModuleHasUnwatchedVideos,
+      nextModuleUnlocked,
     );
 
     // Remove old automatic reminders (keep custom ones)

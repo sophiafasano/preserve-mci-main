@@ -74,7 +74,24 @@ export default function PatientDashboard() {
 
     const incompleteModules = totalWeeks - (modulesData?.summary.completedCount ?? 0);
 
-    refreshAutomaticReminders(lastLogDate, sleepStats.currentStreak, incompleteModules);
+    // Get current module info from modulesData
+    // Find the first incomplete unlocked module (the one they should be working on)
+    const currentModule = modulesData?.modules.find((m: any) => !m.completed && m.unlocked);
+
+    // If all unlocked modules are done, check if next is locked (waiting 7 days)
+    const currentModuleHasUnwatchedVideos = currentModule
+      ? currentModule.queue.some((v: any) => !v.progress.watched)
+      : false;
+    const nextModuleIndex = modulesData?.modules.findIndex((m: any) => !m.completed && !m.isLocked && m.weekNumber > 1);
+    const nextModuleUnlocked = modulesData?.modules.some((m: any) => m.unlocked && !m.completed && m.weekNumber > 1);
+
+    refreshAutomaticReminders(
+      lastLogDate,
+      sleepStats.currentStreak,
+      incompleteModules,
+      currentModuleHasUnwatchedVideos,
+      nextModuleUnlocked ?? false,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sleepLogs.length, sleepStats.currentStreak, modulesData?.summary.completedCount]);
 

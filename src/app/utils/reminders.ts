@@ -55,7 +55,9 @@ export function generateAutomaticReminders(
   lastSleepLogDate: string | null,
   currentStreak: number,
   incompleteModules: number,
-  preferences: ReminderPreferences
+  preferences: ReminderPreferences,
+  currentModuleHasUnwatchedVideos: boolean = false,
+  nextModuleUnlocked: boolean = false,
 ): Reminder[] {
   const reminders: Reminder[] = [];
   const now = new Date();
@@ -111,21 +113,39 @@ export function generateAutomaticReminders(
     }
   }
 
-  // Module completion reminder
-  if (preferences.moduleReminders && incompleteModules > 0) {
-    reminders.push({
-      id: `module-${today}`,
-      type: 'module_completion',
-      title: 'Continue Your Learning',
-      message: `You have ${incompleteModules} module${incompleteModules > 1 ? 's' : ''} in progress. Keep building your sleep knowledge!`,
-      priority: 'low',
-      dueDate: today,
-      completed: false,
-      dismissed: false,
-      createdAt: now.toISOString(),
-      actionUrl: '/modules',
-      actionLabel: 'View Modules',
-    });
+  // Module reminder — only show if:
+  // 1. Current module has unwatched videos, OR
+  // 2. Next module is unlocked (7 days passed) but not started
+  if (preferences.moduleReminders) {
+    if (currentModuleHasUnwatchedVideos) {
+      reminders.push({
+        id: `module-${today}`,
+        type: 'module_completion',
+        title: 'Continue Your Module',
+        message: 'You have videos remaining in your current module. Keep going!',
+        priority: 'low',
+        dueDate: today,
+        completed: false,
+        dismissed: false,
+        createdAt: now.toISOString(),
+        actionUrl: '/modules',
+        actionLabel: 'View Modules',
+      });
+    } else if (nextModuleUnlocked) {
+      reminders.push({
+        id: `module-unlock-${today}`,
+        type: 'module_completion',
+        title: 'New Module Available',
+        message: 'Your next module is now unlocked. Ready to continue your sleep journey?',
+        priority: 'medium',
+        dueDate: today,
+        completed: false,
+        dismissed: false,
+        createdAt: now.toISOString(),
+        actionUrl: '/modules',
+        actionLabel: 'Start Next Module',
+      });
+    }
   }
 
   return reminders;
