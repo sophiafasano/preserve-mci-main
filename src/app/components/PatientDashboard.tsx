@@ -283,8 +283,9 @@ export default function PatientDashboard() {
 
   const upcomingItems = useMemo(() => {
     const items: { type: string; title: string; date: string; icon: typeof CalendarCheck }[] = [];
-    const today = new Date().toISOString().split('T')[0];
-    const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === todayStr);
     if (!hasLoggedToday) {
       items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
     }
