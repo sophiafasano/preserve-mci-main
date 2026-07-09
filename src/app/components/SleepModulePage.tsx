@@ -66,6 +66,7 @@ export default function SleepModulePage() {
   const shouldAutoplayNextRef = useRef(false);
   const placeholderEndedRef = useRef(false);
   const mockElapsedMsRef = useRef(0);
+  const [nextModuleData, setNextModuleData] = useState<any>(null);
 
   useEffect(() => {
     if (!moduleId) {
@@ -190,25 +191,57 @@ export default function SleepModulePage() {
   const nextQueueVideo = module && pendingNextIndex !== null ? module.queue[pendingNextIndex] : null;
   
   useEffect(() => {
-  if (!currentSelection || currentSelection.kind !== 'queue') return;
-  if (currentQueueVideo?.progress.watched) return;
+    if (!currentSelection || currentSelection.kind !== 'queue') return;
+    if (!currentSelection.videoUrl) return;
 
-  // YouTube: handled by IFrame API
-  if (currentSelection.videoUrl?.includes('youtube.com')) return;
+    const isWatched = currentQueueVideo?.progress.watched ?? false;
+    if (isWatched) return;
 
-  // SharePoint / any other URL: auto-complete after listed duration
-  const durationStr = currentSelection.duration ?? '';
-  const match = durationStr.match(/\d+/);
-  const durationMs = match ? Number(match[0]) * 60 * 1000 : 5 * 60 * 1000;
-  const completionMs = Math.floor(durationMs * 0.8);
+    // YouTube: use IFrame API for real completion detection
+    if (currentSelection.videoUrl.includes('youtube.com')) {
+      const initYTPlayer = () => {
+        if (!playerRef.current) return;
+        new (window as any).YT.Player(playerRef.current, {
+          events: {
+            onStateChange: (event: any) => {
+              if (event.data === 0) {
+                setIsRealPlaying(false);
+                if (currentSelection.kind === 'queue') void handleQueueVideoEnded();
+              } else if (event.data === 1) {
+                setIsRealPlaying(true);
+              } else if (event.data === 2) {
+                setIsRealPlaying(false);
+              }
+            },
+          },
+        });
+      };
 
+      if (!(window as any).YT) {
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.body.appendChild(tag);
+        (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+      } else if ((window as any).YT?.Player) {
+        initYTPlayer();
+      } else {
+        (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+      }
+      return;
+    }
 
-  const timer = window.setTimeout(() => {
-    void handleQueueVideoEnded();
-  }, completionMs);
+    // SharePoint / other: auto-complete timer
+    const durationStr = currentSelection.duration ?? '';
+    const match = durationStr.match(/\d+/);
+    const durationMs = match ? Number(match[0]) * 60 * 1000 : 5 * 60 * 1000;
+    const completionMs = durationMs;
+    const timer = window.setTimeout(() => {
+      console.log('Auto-complete fired:', currentSelection.title);
+      void handleQueueVideoEnded();
+    }, completionMs);
 
-  return () => window.clearTimeout(timer);
-}, [currentSelection?.videoUrl, currentQueueVideo?.progress.watched]);
+    return () => window.clearTimeout(timer);
+  }, [currentSelection?.id]);
 
   async function refreshWeek(keepQueueIndex = true) {
     if (!weekKey) return;
@@ -359,39 +392,6 @@ export default function SleepModulePage() {
     }, 80);
   }, [activeQueueIndex, module, selectedResource]);
 
-  useEffect(() => {
-    if (!currentSelection?.videoUrl?.includes('youtube.com')) return;
-
-    if (!(window as any).YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.body.appendChild(tag);
-    }
-
-    const initPlayer = () => {
-      if (!playerRef.current) return;
-      new (window as any).YT.Player(playerRef.current, {
-        events: {
-          onStateChange: (event: any) => {
-            if (event.data === 0) {
-              setIsRealPlaying(false);
-              if (currentSelection.kind === 'queue') {
-                void handleQueueVideoEnded();
-              }
-            } else if (event.data === 1) {
-              setIsRealPlaying(true);
-            }
-          },
-        },
-      });
-    };
-
-    if ((window as any).YT && (window as any).YT.Player) {
-      initPlayer();
-    } else {
-      (window as any).onYouTubeIframeAPIReady = initPlayer;
-    }
-  }, [currentSelection?.videoUrl]);
 
   if (!weekKey || !module || !currentSelection) {
     return (
@@ -713,7 +713,7 @@ export default function SleepModulePage() {
                   onClick={() => setActiveTab('queue')}
                   style={
                     activeTab === 'queue'
-                      ? { color: '#7200CA', borderBottom: '2px solid #7200CA', fontWeight: 600, fontSize: '13px' }
+                      ? { color: '#7200CA', borderBottom: '2px solid #7200CA', fontWeight: 600, fontSize: '14px' }
                       : { color: '#9CA3AF', fontSize: '13px' }
                   }
                   className="pb-1"
@@ -777,13 +777,13 @@ export default function SleepModulePage() {
               )}
             </aside>
               <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
-                <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
                   Sleep Prescription
                 </p>
                 <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
                   {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
                 </p>
-                <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+                <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
                   Recommended by your clinician
                 </p>
               </div>
@@ -859,32 +859,23 @@ export default function SleepModulePage() {
               You&apos;ve completed all videos for this week. Come back next week to continue your program.
             </p>
 
-            {nextWeekKey && (() => {
-              const [nextModuleData, setNextModuleData] = useState<any>(null);
-              useEffect(() => {
-                modulesAPI.getModuleWeek(nextWeekKey).then(res => setNextModuleData(res.module)).catch(() => {});
-              }, [nextWeekKey]);
-
-              if (nextModuleData?.unlocked) {
-                return (
-                  <button
-                    onClick={() => navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`)}
-                    className="mt-5 w-full rounded-[10px] py-2.5"
-                    style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
-                  >
-                    Start Week {weekNumberFromKey(nextWeekKey)}
-                  </button>
-                );
-              }
-
-              return (
+            {nextWeekKey && (
+              nextModuleData?.unlocked ? (
+                <button
+                  onClick={() => navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`)}
+                  className="mt-5 w-full rounded-[10px] py-2.5"
+                  style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
+                >
+                  Start Week {weekNumberFromKey(nextWeekKey)}
+                </button>
+              ) : (
                 <p className="mt-5 text-center" style={{ fontSize: '13px', color: '#9CA3AF' }}>
                   {nextModuleData?.daysUntilUnlock > 0
                     ? `Week ${weekNumberFromKey(nextWeekKey)} available in ${nextModuleData.daysUntilUnlock} day${nextModuleData.daysUntilUnlock !== 1 ? 's' : ''}`
                     : `Complete all videos to unlock Week ${weekNumberFromKey(nextWeekKey)}`}
                 </p>
-              );
-            })()}
+              )
+            )}
 
             <button
               onClick={() => navigate('/modules')}

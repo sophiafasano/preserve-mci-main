@@ -662,7 +662,7 @@ export default function PatientDashboard() {
                       <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '6px' }}>{stat.label}</p>
                       {isEmpty ? (
                         <>
-                          <p style={{ fontSize: '15px', color: '#D8B4FE', fontWeight: 400 }}>No sleep data</p>
+                          <p style={{ fontSize: '15px', color: '#1A1A2E', fontWeight: 400 }}>No sleep data</p>
                           <button className="mt-1 cursor-pointer transition-colors duration-200 hover:text-[#5B21B6] hover:underline" style={{ color: homepagePurple, fontSize: '12px' }}>
                             Start logging →
                           </button>
@@ -677,7 +677,7 @@ export default function PatientDashboard() {
                       <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '6px' }}>{stat.label}</p>
                       {isEmpty ? (
                         <>
-                          <p style={{ fontSize: '15px', color: '#D8B4FE', fontWeight: 400 }}>No sleep data</p>
+                          <p style={{ fontSize: '15px', color: '#1A1A2E', fontWeight: 400 }}>No sleep data</p>
                           <button className="mt-1 cursor-pointer transition-colors duration-200 hover:text-[#5B21B6] hover:underline" style={{ color: homepagePurple, fontSize: '12px' }}>
                             Start logging →
                           </button>

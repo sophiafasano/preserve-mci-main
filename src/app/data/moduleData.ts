@@ -32,7 +32,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
   week1: {
     title: 'Understanding Sleep and MCI; Introduction to Sleep Intervention',
     subtitle: 'The Foundation of Better Sleep and Cognitive Health',
-    duration: '25 min',
+    duration: '14 min',
     description:
       'Learn about the connection between sleep and cognitive function, and understand common sleep challenges faced by people with MCI.',
     queue: [
@@ -84,7 +84,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
   week2: {
     title: 'Techniques to Enhance Sleep',
     subtitle: 'Building Better Sleep Habits',
-    duration: '25 min',
+    duration: '30 min',
     description: 'Explore relaxation techniques and strategies to improve your sleep quality.',
     queue: [
       {
@@ -148,7 +148,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
   week3: {
     title: 'Managing Stress and Worry',
     subtitle: 'Strategies for Staying Asleep',
-    duration: '25 min',
+    duration: '9 min',
     description:
       'Learn to identify and manage maladaptive thoughts and worries that interfere with sleep.',
     queue: [
@@ -157,15 +157,15 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Week 3 Introduction',
         description:
           'Introduction to managing stress, worry, and maladaptive thinking patterns.',
-        duration: '~8 min',
+        duration: '~5 min',
         videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=5fde6eca-aa93-4f5f-bf7b-7324e3c2bb9d&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
         fileName: 'CBT- Week3 Video1_MCI',
       },
       {
         id: 'w3_maladaptive',
-        title: 'Maladaptive Thoughts Week 3',
+        title: 'Maladaptive Thoughts',
         description: 'Understanding and reframing thought patterns that disrupt sleep.',
-        duration: '~8 min',
+        duration: '~3 min',
         videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=3ec7ddaf-e2bc-45bc-9bec-a184298f5df6&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
         fileName: 'Maladaptive Thoughts Week 3',
       },
@@ -173,7 +173,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         id: 'w3_recap',
         title: 'Week 3 Recap',
         description: 'Summary of key concepts from Week 3.',
-        duration: '~3 min',
+        duration: '~1 min',
         videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=655f478b-c464-49fe-bfdc-f4d5acdd800c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
         fileName: 'Week 3 recap_MCI',
       },
@@ -213,7 +213,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
   week4: {
     title: 'Practical Recommendations',
     subtitle: 'Maintaining Long-Term Sleep Health',
-    duration: '30 min',
+    duration: '5 min',
     description:
       'Apply everything you have learned to build lasting sleep habits and maintain cognitive wellness.',
     queue: [
@@ -222,7 +222,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Week 4 Introduction',
         description:
           'Final week bringing together all strategies for long-term sleep health.',
-        duration: '~15 min',
+        duration: '~5 min',
         videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=050cfd94-3a62-410b-bb0b-0a50e892d08c&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
         fileName: 'Week 4 Video1_MCI',
       },
