@@ -71,7 +71,9 @@ export function generateAutomaticReminders(
     yesterday.setHours(0, 0, 0, 0);
 
     // If no log for yesterday, remind them
-    if (!lastLog || lastLog < yesterday) {
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
+    if (!lastLog || lastLog < todayStart) {
       reminders.push({
         id: `sleep-log-${today}`,
         type: 'sleep_log',
@@ -83,7 +85,7 @@ export function generateAutomaticReminders(
         completed: false,
         dismissed: false,
         createdAt: now.toISOString(),
-        actionUrl: '/patient/dashboard',
+        actionUrl: 'open-sleep-log',
         actionLabel: 'Log Sleep Now',
       });
     }

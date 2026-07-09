@@ -116,12 +116,13 @@ export default function RemindersCenter() {
   };
 
   const handleReminderAction = (reminder: any) => {
-    if (reminder.actionUrl) {
+    if (reminder.actionUrl === 'open-sleep-log') {
+      window.dispatchEvent(new Event('open-sleep-log'));
+    } else if (reminder.actionUrl) {
       navigate(reminder.actionUrl);
       completeReminder(reminder.id);
     }
   };
-
   if (reminders.length === 0) {
     return (
       <PatientLayout>
