@@ -257,15 +257,15 @@ export default function PatientDashboard() {
 };
 
   const quickActions = [
-    { label: 'Log Last Night\'s Sleep', icon: Moon, color: 'purple', action: 'log-sleep' },
+    { label: 'View Sleep Analytics', icon: BarChart2, action: 'analytics' },
     { label: 'View Sleep Tips', icon: BookOpen, color: 'purple', action: 'sleep-tips' },
     { label: 'Message Care Team', icon: MessageCircle, color: 'purple', action: 'messages' },
   ];
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case 'log-sleep':
-        openSleepLogModal();
+      case 'analytics':
+        navigate('/patient/sleep-analytics');
         break;
       case 'sleep-tips':
         setSleepTipsOpen(true);
