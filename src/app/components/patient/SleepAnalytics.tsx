@@ -100,27 +100,29 @@ export default function SleepAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                <Moon className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center"
+                style={{ backgroundColor: '#F3E9FB' }}>
+                <Moon className="w-5 h-5" style={{ color: '#7200CA' }}/>
               </div>
               {getTrendIcon(analytics.patterns.trend)}
             </div>
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Average Sleep</p>
+            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Average Sleep</p>
             <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E', marginBottom: '2px' }}>
               {analytics.averageHours} hrs
             </p>
-            <p style={{ fontSize: '13px', color: '#6B7280' }}>
+            <p style={{ fontSize: '16px', color: '#6B7280' }}>
               Target: {analytics.patterns.optimalRange.min}-{analytics.patterns.optimalRange.max} hrs
             </p>
           </div>
 
           <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                <Star className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center"
+                style={{ backgroundColor: '#F3E9FB' }}>
+                <Star className="w-5 h-5" style={{ color: '#7200CA' }} />
               </div>
             </div>
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Average Quality</p>
+            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Average Quality</p>
             <div className="flex items-center space-x-1 mb-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -133,18 +135,19 @@ export default function SleepAnalytics() {
                 />
               ))}
             </div>
-            <p style={{ fontSize: '13px', color: '#6B7280' }}>
+            <p style={{ fontSize: '16px', color: '#6B7280' }}>
               {analytics.averageQuality.toFixed(1)} / 10
             </p>
           </div>
 
           <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                <Target className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center"
+                style={{ backgroundColor: '#F3E9FB' }}>
+                <Target className="w-5 h-5" style={{ color: '#7200CA' }} />
               </div>
             </div>
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Consistency Score</p>
+            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Consistency Score</p>
             <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E', marginBottom: '8px' }}>
               {analytics.patterns.consistencyScore}
             </p>
@@ -153,15 +156,16 @@ export default function SleepAnalytics() {
 
           <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center"
+                style={{ backgroundColor: '#F3E9FB' }}>
+                <Calendar className="w-5 h-5" style={{ color: '#7200CA' }} />
               </div>
             </div>
-            <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Total Entries</p>
+            <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Total Entries</p>
             <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E', marginBottom: '2px' }}>
               {analytics.totalLogs}
             </p>
-            <p style={{ fontSize: '13px', color: '#6B7280' }}>
+            <p style={{ fontSize: '16px', color: '#6B7280' }}>
               {analytics.currentStreak} day streak
             </p>
           </div>
@@ -187,7 +191,7 @@ export default function SleepAnalytics() {
                   : 'No data'
                 }
               </p>
-              <p style={{ fontSize: '13px', color: '#6B7280' }}>Mon-Fri sleep duration</p>
+              <p style={{ fontSize: '16px', color: '#6B7280' }}>Mon-Fri sleep duration</p>
             </div>
 
             <div className="p-4 rounded-[10px] bg-white" style={{ border: '0.5px solid #E9D5FF' }}>
@@ -203,7 +207,7 @@ export default function SleepAnalytics() {
                   : 'No data'
                 }
               </p>
-              <p style={{ fontSize: '13px', color: '#6B7280' }}>Sat-Sun sleep duration</p>
+              <p style={{ fontSize: '16px', color: '#6B7280' }}>Sat-Sun sleep duration</p>
             </div>
 
             <div className="p-4 rounded-[10px] bg-white" style={{ border: '0.5px solid #E9D5FF' }}>
@@ -216,7 +220,7 @@ export default function SleepAnalytics() {
               <p style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E', marginBottom: '2px' }}>
                 {getTrendLabel(analytics.patterns.trend)}
               </p>
-              <p style={{ fontSize: '13px', color: '#6B7280' }}>
+              <p style={{ fontSize: '16px', color: '#6B7280' }}>
                 {analytics.patterns.trend === 'improving' 
                   ? 'Sleep duration is increasing'
                   : analytics.patterns.trend === 'declining'
@@ -252,13 +256,13 @@ export default function SleepAnalytics() {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Avg Sleep</p>
+                      <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '4px' }}>Avg Sleep</p>
                       <p style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
                         {week.avgHours > 0 ? `${week.avgHours} hrs` : 'No data'}
                       </p>
                     </div>
                     <div>
-                      <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Avg Quality</p>
+                      <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '4px' }}>Avg Quality</p>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -298,9 +302,9 @@ export default function SleepAnalytics() {
                   >
                     <div className="flex items-start space-x-4">
                       <div
-                        className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0 bg-gray-100 text-gray-600"
-                      >
-                        <Icon className="w-5 h-5" />
+                        className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0 text-gray-600"
+                          style={{ backgroundColor: '#F3E9FB' }}>
+                        <Icon className="w-5 h-5" style={{ color: '#7200CA' }}/>
                       </div>
                       <div className="flex-1">
                         <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A2E', marginBottom: '4px' }}>

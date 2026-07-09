@@ -264,6 +264,9 @@ export default function PatientDashboard() {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
+      case 'log-sleep':
+        openSleepLogModal();
+        break;
       case 'analytics':
         navigate('/patient/sleep-analytics');
         break;
