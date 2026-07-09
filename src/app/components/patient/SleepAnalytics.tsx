@@ -129,7 +129,7 @@ export default function SleepAnalytics() {
                   key={star}
                   className={`w-5 h-5 ${
                     star <= Math.round(analytics.averageQuality / 2)
-                    ? 'text-gray-600 fill-gray-600'
+                    ? 'text-yellow-400 fill-yellow-400'
                       : 'text-gray-300'
                   }`}
                 />
@@ -269,7 +269,7 @@ export default function SleepAnalytics() {
                             key={star}
                             className={`w-4 h-4 ${
                               star <= Math.round(week.avgQuality / 2)
-                              ? 'text-gray-600 fill-gray-600'
+                              ? 'text-yellow-400 fill-yellow-400'
                                 : 'text-gray-300'
                             }`}
                           />
@@ -316,7 +316,7 @@ export default function SleepAnalytics() {
                         {insight.recommendation && (
                           <div className="flex items-start space-x-2 p-3 rounded-lg" style={{ backgroundColor: '#F9FAFB' }}>
                             <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
-                            <p style={{ fontSize: '13px', color: '#374151' }}>
+                            <p style={{ fontSize: '14px', color: '#374151' }}>
                               <strong>Recommendation:</strong> {insight.recommendation}
                             </p>
                           </div>

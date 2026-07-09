@@ -238,8 +238,8 @@ export default function MyProgress() {
             className="flex items-center space-x-2 rounded-[10px] px-4 py-2 bg-white"
             style={{ border: '0.5px solid #E9D5FF' }}
           >
-            <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
-              <Trophy size={16} color="#6B7280" />
+            <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: '#F3E9FB' }}>
+              <Trophy size={16} color="#7200CA" />
             </div>
             <span style={{ fontSize: '14px', fontWeight: 600, color: '#1A1A2E' }}>
               {modulesData?.summary.overallPercent ?? 0}% Complete
@@ -258,15 +258,16 @@ export default function MyProgress() {
                 style={{ border: '0.5px solid #E9D5FF' }}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 rounded-[8px] flex items-center justify-center bg-gray-100">
-                    <Icon className="w-5 h-5 text-gray-600" />
+                  <div className="w-10 h-10 rounded-[8px] flex items-center justify-center" 
+                    style={{ backgroundColor: '#F3E9FB' }}>
+                    <Icon className="w-5 h-5" style={{ color: '#7200CA' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>{stat.label}</p>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>{stat.label}</p>
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E', marginBottom: '2px' }}>
                   {stat.value}
                 </p>
-                <p style={{ fontSize: '13px', color: '#6B7280' }}>{stat.subtext}</p>
+                <p style={{ fontSize: '16px', color: '#6B7280' }}>{stat.subtext}</p>
               </div>
             );
           })}
@@ -276,8 +277,9 @@ export default function MyProgress() {
         {achievements.length > 0 && (
           <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center" 
+                style={{ backgroundColor: '#F3E9FB' }}>
+                <Trophy className="w-5 h-5" style={{ color: '#7200CA' }} />
               </div>
               <div>
                 <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>
@@ -299,8 +301,8 @@ export default function MyProgress() {
                     style={{ border: '0.5px solid #E9D5FF' }}
                   >
                     <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0 bg-gray-100 text-gray-600">
-                        <Icon className="w-5 h-5" />
+                      <div className="w-10 h-10 rounded-[8px] flex items-center justify-center" style={{ backgroundColor: '#F3E9FB' }}>
+  <Icon className="w-5 h-5" style={{ color: '#7200CA' }} />
                       </div>
                       <div className="flex-1">
                         <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A2E', marginBottom: '4px' }}>
@@ -457,13 +459,13 @@ export default function MyProgress() {
                   </div>
                   <div className="space-y-3">
                     <div>
-                      <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Avg Sleep</p>
+                      <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Avg Sleep</p>
                       <p style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
                         {week.avgHours > 0 ? `${week.avgHours} hrs` : 'No data'}
                       </p>
                     </div>
                     <div>
-                      <p style={{ fontSize: '12px', color: '#9CA3AF', marginBottom: '4px' }}>Avg Quality</p>
+                      <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>Avg Quality</p>
                       <div className="flex items-center space-x-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -499,14 +501,15 @@ export default function MyProgress() {
                   {modulesData?.summary.overallPercent ?? 0}%
                 </span>
               </div>
-              <Progress value={modulesData?.summary.overallPercent ?? 0} className="h-3" />
+              <Progress value={modulesData?.summary.overallPercent ?? 0} className="h-3 [&>div]:bg-[#7200CA]" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="p-4 rounded-[10px] bg-white" style={{ border: '0.5px solid #E9D5FF' }}>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-8 h-8 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-gray-600" />
+                  <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" 
+                    style={{ backgroundColor: '#F3E9FB' }}>
+                    <CheckCircle className="w-4 h-4" style={{ color: '#7200CA' }} />
                   </div>
                   <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A2E' }}>
                     Completed
@@ -515,13 +518,14 @@ export default function MyProgress() {
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E' }}>
                   {modulesData?.summary.completedCount ?? 0}
                 </p>
-                <p style={{ fontSize: '13px', color: '#6B7280' }}>modules finished</p>
+                <p style={{ fontSize: '14px', color: '#6B7280' }}>modules finished</p>
               </div>
 
               <div className="p-4 rounded-[10px] bg-white" style={{ border: '0.5px solid #E9D5FF' }}>
                 <div className="flex items-center space-x-3 mb-2">
-                  <div className="w-8 h-8 rounded-[8px] bg-gray-100 flex items-center justify-center">
-                    <Target className="w-4 h-4 text-gray-600" />
+                  <div className="w-8 h-8 rounded-[8px] flex items-center justify-center" 
+                    style={{ backgroundColor: '#F3E9FB' }}>
+                    <Target className="w-4 h-4" style={{ color: '#7200CA' }} />
                   </div>
                   <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1A1A2E' }}>
                     Remaining
@@ -530,7 +534,7 @@ export default function MyProgress() {
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E' }}>
                   {moduleWeekOrder.length - (modulesData?.summary.completedCount ?? 0)}
                 </p>
-                <p style={{ fontSize: '13px', color: '#6B7280' }}>modules to go</p>
+                <p style={{ fontSize: '14px', color: '#6B7280' }}>modules to go</p>
               </div>
             </div>
 
