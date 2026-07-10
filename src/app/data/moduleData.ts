@@ -42,7 +42,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         description:
           'Introduction to the sleep intervention program and what to expect over the coming weeks.',
         duration: '~5 min',
-        videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=43996a81-0a79-42d4-965d-8b5d0a6ea021&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
+        videoUrl: 'https://drive.google.com/file/d/1yrBx4kXQGR0EwkQ2C87vgteHItFKLJba/preview',
         fileName: 'CBTi Week1 Video1_MCI',
       },
       {
@@ -50,7 +50,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Activities that Interfere with Sleep',
         description: 'Common habits and behaviors that disrupt healthy sleep patterns.',
         duration: '~1 min',
-        videoUrl: 'https://usfedu-my.sharepoint.com/personal/priscillaamofaho_usf_edu/_layouts/15/embed.aspx?UniqueId=c0c0dda6-8949-4009-a04e-283206a85a57&embed=%7B%22ust%22%3Atrue%2C%22hv%22%3A%22CopyEmbedCode%22%7D&referrer=StreamWebApp&referrerScenario=EmbedDialog.Create',
+        videoUrl: 'https://drive.google.com/file/d/1YPYaLYR6vioRfL7ozlhk4T4GRBTcrlac/preview',
         fileName: 'Activities that Interfere with sleep',
       },
       {
@@ -102,14 +102,6 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         duration: '~6 min',
         videoUrl: 'https://www.youtube.com/embed/H62t26iYF9o?si=zchGwlBqCObJ7GcT&enablejsapi=1',
         fileName: 'Week 2 auto_relax'
-      },
-      {
-        id: 'w2_v3',
-        title: 'Progressive Muscle Relaxation',
-        description: 'Progressive Muscle Relaxation',
-        duration: '~16 min',
-        videoUrl: 'https://www.youtube.com/embed/Pgay-cVYLjI?si=ZwEKbjV2Cc-aMdAD&enablejsapi=1',
-        fileName: 'Week 2 muscle_relax'
       },
       {
         id: 'w2_recap',

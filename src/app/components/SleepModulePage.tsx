@@ -259,11 +259,13 @@ export default function SleepModulePage() {
 
   async function markCurrentQueueVideo(watchedPercent: number) {
     if (!module || !currentQueueVideo) return;
+    console.log('markCurrentQueueVideo called:', currentQueueVideo.id, watchedPercent);
     try {
       await modulesAPI.postVideoProgress(module.weekKey, currentQueueVideo.id, { watchedPercent });
+      console.log('postVideoProgress succeeded');
       await refreshWeek(true);
-    } catch {
-      // Silently ignore — progress will sync on next load.
+    } catch (err) {
+      console.error('markCurrentQueueVideo failed:', err);
     }
   }
 
@@ -323,8 +325,11 @@ export default function SleepModulePage() {
   }
 
   async function handleQueueVideoEnded() {
-    console.log('handleQueueVideoEnded - activeQueueIndex:', activeQueueIndex, 'module.queue.length:', module?.queue.length);
-    if (!module || !currentQueueVideo) return;
+    console.log('handleQueueVideoEnded called, currentQueueVideo:', currentQueueVideo?.id);
+    if (!module || !currentQueueVideo) {
+      console.log('early return - module or currentQueueVideo is null');
+      return;
+    }
 
     await markCurrentQueueVideo(100);
     stopPlaceholderSimulation();
