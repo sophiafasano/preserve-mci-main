@@ -327,7 +327,7 @@ export default function PatientDashboard() {
     { label: 'Sleep Analysis', icon: BarChart2,      path: '/patient/sleep-analytics' },
     { label: 'My Progress',    icon: TrendingUp,      path: '/patient/progress' },
     { label: 'Messages',       icon: MessageCircle,   path: '/patient/messages', badge: unreadCount },
-    { label: 'Reminders',      icon: Bell,                 path: '/patient/reminders' },
+    { label: 'Reminders',      icon: Bell,                 path: '/patient/reminders', badge: activeCount },
   ];
 
   // Suppress recharts duplicate key warning (known library issue)

@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../../contexts/useAuth';
 import SleepLogModal from '../SleepLogModal';
 import { useSleepLogs } from '../../hooks/useSleepLogs';
+import { useReminders } from '../../hooks/useReminders';
 import { toast } from 'sonner';
 
 interface PatientSidebarShellProps {
@@ -36,6 +37,7 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
   const [sleepLogOpen, setSleepLogOpen] = useState(false);
   const { logs, addSleepLog } = useSleepLogs();
   const [sleepTipsOpen, setSleepTipsOpen] = useState(false);
+  const { activeCount } = useReminders();
 
   useEffect(() => {
     const handler = () => setSleepTipsOpen(true);
@@ -57,7 +59,13 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
     return () => window.removeEventListener('open-sleep-log', handleOpenSleepLog);
   }, [logs]);
 
-  const navigationItems = [
+  const navigationItems: Array<{
+    label: string;
+    icon: typeof Bell;
+    path: string | null;
+    action: (() => void) | null;
+    badge?: number;
+  }> = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/patient/dashboard', action: null },
     { label: 'Weekly Sleep Modules', icon: BookOpen, path: '/modules', action: null },
     { label: 'Sleep Log', icon: NotebookPen, path: null, action: () => {
@@ -73,7 +81,7 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
     { label: 'Sleep Analysis', icon: BarChart2, path: '/patient/sleep-analytics', action: null },
     { label: 'My Progress', icon: TrendingUp, path: '/patient/progress', action: null },
     { label: 'Messages', icon: MessageCircle, path: '/patient/messages', action: null },
-    { label: 'Reminders', icon: Bell, path: '/patient/reminders', action: null },
+    { label: 'Reminders', icon: Bell, path: '/patient/reminders', action: null, badge: activeCount },
   ];
 
   const handleSignOut = async () => {
@@ -118,7 +126,14 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
                 className="w-full flex items-center justify-start space-x-3 rounded-xl transition-all duration-200 hover:bg-[#F3E8FF]"
                 style={navButtonStyle(isActive)}
               >
-                <Icon size={18} strokeWidth={1.5} color={isActive ? '#6D28D9' : '#6B7280'} className="flex-shrink-0" />
+                <div className="relative flex-shrink-0">
+                  <Icon size={18} strokeWidth={1.5} color={isActive ? '#6D28D9' : '#6B7280'} />
+                  {item.badge != null && item.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-[#6D28D9] rounded-full flex items-center justify-center text-[11px] text-white font-bold">
+                      {item.badge > 9 ? '9+' : item.badge}
+                    </span>
+                  )}
+                </div>
                 <span className="whitespace-nowrap">{item.label}</span>
               </button>
             );
