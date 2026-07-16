@@ -192,13 +192,10 @@ export default function SleepModulePage() {
   
   useEffect(() => {
     if (!currentSelection || currentSelection.kind !== 'queue') return;
-    if (!currentSelection.videoUrl) return;
+    if (currentQueueVideo?.progress.watched) return;
 
-    const isWatched = currentQueueVideo?.progress.watched ?? false;
-    if (isWatched) return;
-
-    // YouTube: use IFrame API for real completion detection
-    if (currentSelection.videoUrl.includes('youtube.com')) {
+    // YouTube: use IFrame API
+    if (currentSelection.videoUrl?.includes('youtube.com')) {
       const initYTPlayer = () => {
         if (!playerRef.current) return;
         new (window as any).YT.Player(playerRef.current, {
@@ -206,7 +203,7 @@ export default function SleepModulePage() {
             onStateChange: (event: any) => {
               if (event.data === 0) {
                 setIsRealPlaying(false);
-                if (currentSelection.kind === 'queue') void handleQueueVideoEnded();
+                void handleQueueVideoEnded();
               } else if (event.data === 1) {
                 setIsRealPlaying(true);
               } else if (event.data === 2) {
@@ -230,18 +227,41 @@ export default function SleepModulePage() {
       return;
     }
 
-    // SharePoint / other: auto-complete timer
-    const durationStr = currentSelection.duration ?? '';
-    const match = durationStr.match(/\d+/);
-    const durationMs = match ? Number(match[0]) * 60 * 1000 : 5 * 60 * 1000;
-    const completionMs = durationMs;
-    const timer = window.setTimeout(() => {
-      console.log('Auto-complete fired:', currentSelection.title);
-      void handleQueueVideoEnded();
-    }, completionMs);
+    // Google Drive / other: use placeholder interval
+    if (!currentSelection.videoUrl) return;
 
-    return () => window.clearTimeout(timer);
-  }, [currentSelection?.id]);
+    const durationStr = currentSelection.duration ?? '';
+    const match = durationStr.match(/(\d+):(\d+)/);
+    const durationMs = match
+      ? (Number(match[1]) * 60 + Number(match[2])) * 1000
+      : 5 * 60 * 1000;
+    const targetMs = durationMs + 3000;
+
+    mockElapsedMsRef.current = 0;
+    placeholderEndedRef.current = false;
+    // Remove setIsPlaceholderSimulating(true) — causes re-run
+
+    placeholderTimerRef.current = window.setInterval(() => {
+      mockElapsedMsRef.current = Math.min(targetMs, mockElapsedMsRef.current + 100);
+      setMockElapsedMs(mockElapsedMsRef.current);
+
+      if (mockElapsedMsRef.current >= targetMs && !placeholderEndedRef.current) {
+        placeholderEndedRef.current = true;
+        if (placeholderTimerRef.current) {
+          window.clearInterval(placeholderTimerRef.current);
+          placeholderTimerRef.current = null;
+        }
+        void handleQueueVideoEnded();
+      }
+    }, 100);
+
+    return () => {
+      if (placeholderTimerRef.current) {
+        window.clearInterval(placeholderTimerRef.current);
+        placeholderTimerRef.current = null;
+      }
+    };
+  }, [currentSelection?.id]); 
 
   async function refreshWeek(keepQueueIndex = true) {
     if (!weekKey) return;
@@ -259,13 +279,11 @@ export default function SleepModulePage() {
 
   async function markCurrentQueueVideo(watchedPercent: number) {
     if (!module || !currentQueueVideo) return;
-    console.log('markCurrentQueueVideo called:', currentQueueVideo.id, watchedPercent);
     try {
       await modulesAPI.postVideoProgress(module.weekKey, currentQueueVideo.id, { watchedPercent });
-      console.log('postVideoProgress succeeded');
       await refreshWeek(true);
-    } catch (err) {
-      console.error('markCurrentQueueVideo failed:', err);
+    } catch {
+      // Silently ignore — progress will sync on next load.
     }
   }
 
@@ -325,11 +343,8 @@ export default function SleepModulePage() {
   }
 
   async function handleQueueVideoEnded() {
-    console.log('handleQueueVideoEnded called, currentQueueVideo:', currentQueueVideo?.id);
-    if (!module || !currentQueueVideo) {
-      console.log('early return - module or currentQueueVideo is null');
-      return;
-    }
+    console.log('handleQueueVideoEnded - activeQueueIndex:', activeQueueIndex, 'module.queue.length:', module?.queue.length);
+    if (!module || !currentQueueVideo) return;
 
     await markCurrentQueueVideo(100);
     stopPlaceholderSimulation();
