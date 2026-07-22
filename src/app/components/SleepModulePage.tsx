@@ -193,9 +193,11 @@ export default function SleepModulePage() {
   
   useEffect(() => {
     if (!currentSelection || currentSelection.kind !== 'queue') return;
-    if (currentQueueVideo?.progress.watched) return;
 
-    // All videos are hosted on YouTube 
+    // Note: no early-return for already-watched videos — the countdown/auto-advance
+    // should still fire on replay, not just the first time through.
+
+    // All videos are hosted on YouTube — use the IFrame API for real completion detection.
     if (!currentSelection.videoUrl?.includes('youtube.com')) return;
 
     const initYTPlayer = () => {
