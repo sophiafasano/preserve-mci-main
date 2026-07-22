@@ -61,6 +61,7 @@ export default function SleepModulePage() {
   const countdownTimerRef = useRef<number | null>(null);
   const placeholderTimerRef = useRef<number | null>(null);
   const playerRef = useRef<HTMLIFrameElement | null>(null);
+  const ytPlayerRef = useRef<any>(null);
   const fullscreenContainerRef = useRef<HTMLDivElement | null>(null);
   const playerContainerRef = useRef<HTMLDivElement | null>(null);
   const shouldAutoplayNextRef = useRef(false);
@@ -194,74 +195,46 @@ export default function SleepModulePage() {
     if (!currentSelection || currentSelection.kind !== 'queue') return;
     if (currentQueueVideo?.progress.watched) return;
 
-    // YouTube: use IFrame API
-    if (currentSelection.videoUrl?.includes('youtube.com')) {
-      const initYTPlayer = () => {
-        if (!playerRef.current) return;
-        new (window as any).YT.Player(playerRef.current, {
-          events: {
-            onStateChange: (event: any) => {
-              if (event.data === 0) {
-                setIsRealPlaying(false);
-                void handleQueueVideoEnded();
-              } else if (event.data === 1) {
-                setIsRealPlaying(true);
-              } else if (event.data === 2) {
-                setIsRealPlaying(false);
-              }
-            },
+    // All videos are hosted on YouTube 
+    if (!currentSelection.videoUrl?.includes('youtube.com')) return;
+
+    const initYTPlayer = () => {
+      if (!playerRef.current) return;
+      new (window as any).YT.Player(playerRef.current, {
+        events: {
+          onReady: (event: any) => {
+            ytPlayerRef.current = event.target;
+            // auto-advance-to-next-video playback is triggered from here
+            if (shouldAutoplayNextRef.current) {
+              shouldAutoplayNextRef.current = false;
+              event.target.playVideo();
+            }
           },
-        });
-      };
-
-      if (!(window as any).YT) {
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.body.appendChild(tag);
-        (window as any).onYouTubeIframeAPIReady = initYTPlayer;
-      } else if ((window as any).YT?.Player) {
-        initYTPlayer();
-      } else {
-        (window as any).onYouTubeIframeAPIReady = initYTPlayer;
-      }
-      return;
-    }
-
-    // Google Drive / other: use placeholder interval
-    if (!currentSelection.videoUrl) return;
-
-    const durationStr = currentSelection.duration ?? '';
-    const match = durationStr.match(/(\d+):(\d+)/);
-    const durationMs = match
-      ? (Number(match[1]) * 60 + Number(match[2])) * 1000
-      : 5 * 60 * 1000;
-    const targetMs = durationMs + 3000;
-
-    mockElapsedMsRef.current = 0;
-    placeholderEndedRef.current = false;
-    // Remove setIsPlaceholderSimulating(true) — causes re-run
-
-    placeholderTimerRef.current = window.setInterval(() => {
-      mockElapsedMsRef.current = Math.min(targetMs, mockElapsedMsRef.current + 100);
-      setMockElapsedMs(mockElapsedMsRef.current);
-
-      if (mockElapsedMsRef.current >= targetMs && !placeholderEndedRef.current) {
-        placeholderEndedRef.current = true;
-        if (placeholderTimerRef.current) {
-          window.clearInterval(placeholderTimerRef.current);
-          placeholderTimerRef.current = null;
-        }
-        void handleQueueVideoEnded();
-      }
-    }, 100);
-
-    return () => {
-      if (placeholderTimerRef.current) {
-        window.clearInterval(placeholderTimerRef.current);
-        placeholderTimerRef.current = null;
-      }
+          onStateChange: (event: any) => {
+            if (event.data === 0) {
+              setIsRealPlaying(false);
+              void handleQueueVideoEnded();
+            } else if (event.data === 1) {
+              setIsRealPlaying(true);
+            } else if (event.data === 2) {
+              setIsRealPlaying(false);
+            }
+          },
+        },
+      });
     };
-  }, [currentSelection?.id]); 
+
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+      (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+    } else if ((window as any).YT?.Player) {
+      initYTPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+    }
+  }, [currentSelection?.id]);
 
   async function refreshWeek(keepQueueIndex = true) {
     if (!weekKey) return;
@@ -393,23 +366,14 @@ export default function SleepModulePage() {
     if (!module || selectedResource) return;
     if (!shouldAutoplayNextRef.current) return;
 
-    shouldAutoplayNextRef.current = false;
-
     const queueVideo = module.queue[activeQueueIndex];
     if (!queueVideo) return;
 
+    // YouTube videos autoplay
     if (!queueVideo.videoUrl) {
+      shouldAutoplayNextRef.current = false;
       playPlaceholder();
-      return;
     }
-
-    window.setTimeout(() => {
-      const player = playerRef.current;
-      if (!player) return;
-      void player.play().catch(() => {
-        // Browser autoplay policies can block play; controls remain available.
-      });
-    }, 80);
   }, [activeQueueIndex, module, selectedResource]);
 
 
@@ -428,6 +392,9 @@ export default function SleepModulePage() {
   const isQueueSelection = currentSelection.kind === 'queue';
   const queueHasPrevious = isQueueSelection && activeQueueIndex > 0;
   const queueHasNext = isQueueSelection && activeQueueIndex < module.queue.length - 1;
+  // Next video is only allowed once everything through the current one has been watched
+  const nextQueueUnlocked =
+    queueHasNext && module.queue.slice(0, activeQueueIndex + 1).every((v) => v.progress.watched);
   const isPlaceholderMode = !currentSelection.videoUrl;
   const isPlaying = isPlaceholderMode ? isPlaceholderSimulating : isRealPlaying;
 
@@ -440,7 +407,7 @@ export default function SleepModulePage() {
   }
 
   function goToNext() {
-    if (!queueHasNext) return;
+    if (!nextQueueUnlocked) return;
     stopPlaceholderSimulation();
     stopCountdown();
     setSelectedResource(null);
@@ -455,13 +422,13 @@ export default function SleepModulePage() {
       return;
     }
 
-    const player = playerRef.current;
-    if (!player) return;
+    const ytPlayer = ytPlayerRef.current;
+    if (!ytPlayer) return;
 
-    if (player.paused) {
-      void player.play();
+    if (isRealPlaying) {
+      ytPlayer.pauseVideo();
     } else {
-      player.pause();
+      ytPlayer.playVideo();
     }
   }
 
@@ -622,23 +589,24 @@ export default function SleepModulePage() {
                       <button
                         onClick={goToPrevious}
                         disabled={!queueHasPrevious}
-                        className="rounded px-2 py-1"
+                        className="rounded px-2 py-1 cursor-pointer disabled:cursor-not-allowed"
                         style={{ color: queueHasPrevious ? '#7200CA' : '#C4B5FD' }}
                       >
                         <SkipBack size={16} />
                       </button>
                       <button
                         onClick={togglePlayback}
-                        className="rounded px-2 py-1"
+                        className="rounded px-2 py-1 cursor-pointer"
                         style={{ color: '#7200CA' }}
                       >
                         {isPlaying ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}
                       </button>
                       <button
                         onClick={goToNext}
-                        disabled={!queueHasNext}
-                        className="rounded px-2 py-1"
-                        style={{ color: queueHasNext ? '#7200CA' : '#C4B5FD' }}
+                        disabled={!nextQueueUnlocked}
+                        className="rounded px-2 py-1 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ color: nextQueueUnlocked ? '#7200CA' : '#C4B5FD' }}
+                        title={!queueHasNext ? undefined : nextQueueUnlocked ? undefined : 'Finish the current video to unlock the next one'}
                       >
                         <SkipForward size={16} />
                       </button>
@@ -651,11 +619,9 @@ export default function SleepModulePage() {
                         onChange={(event) => {
                           const speed = Number.parseFloat(event.target.value);
                           setMockSpeed(speed);
-                          if (playerRef.current) {
-                            playerRef.current.playbackRate = speed;
-                          }
+                          ytPlayerRef.current?.setPlaybackRate?.(speed);
                         }}
-                        className="rounded px-2 py-1"
+                        className="rounded px-2 py-1 cursor-pointer"
                         style={{ border: '0.5px solid #C4B5FD', fontSize: '12px', color: '#1A1A2E' }}
                       >
                         <option value={0.5}>0.5x</option>
@@ -666,7 +632,7 @@ export default function SleepModulePage() {
                       </select>
                       <button
                         onClick={requestFullSize}
-                        className="rounded px-2 py-1"
+                        className="rounded px-2 py-1 cursor-pointer"
                         style={{ color: '#7200CA' }}
                       >
                         <Maximize2 size={16} />
