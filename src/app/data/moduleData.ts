@@ -158,7 +158,7 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Maladaptive Thoughts',
         description: 'Understanding and reframing thought patterns that disrupt sleep.',
         duration: '~4 min',
-        videoUrl: 'https://www.youtube.com/embed/YKsqSgtHp4M?enablejsapi=1&rel=0&controls=0',
+        videoUrl: 'https://www.youtube.com/embed/YKsqSgtHp4M?enablejsapi=1&rel=0',
         fileName: 'Maladaptive Thoughts Week 3',
       },
       {
