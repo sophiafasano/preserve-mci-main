@@ -13,7 +13,6 @@ export interface SleepLogData {
   date: string;
   hoursSlept: number;
   sleepQuality: number;
-  notes: string;
   bedtime?: string;
   waketime?: string;
   timeOutOfBed?: string;
@@ -249,7 +248,6 @@ export default function SleepLogModal({
       date: new Date().toISOString(),
       hoursSlept: computedHoursSlept,
       sleepQuality: sleepQuality!,
-      notes: '',
       bedtime: bedtime || undefined,
       waketime: waketime || undefined,
       timeOutOfBed: timeOutOfBed || undefined,
