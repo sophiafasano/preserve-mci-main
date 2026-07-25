@@ -84,7 +84,6 @@ export default function SleepModulePage() {
     if (!weekKey) return;
     let mounted = true;
 
-    // Route changes reuse this component instance, so clear transient UI state.
     setShowCompletionModal(false);
     setSelectedResource(null);
     setActiveTab('queue');
@@ -147,7 +146,7 @@ export default function SleepModulePage() {
   }, []);
 
   useEffect(() => {
-    // Reset playback UI for each newly selected video.
+    // Reset playback UI for each newly selected video
     mockElapsedMsRef.current = 0;
     setMockElapsedMs(0);
     setIsPlaceholderSimulating(false);
@@ -194,10 +193,7 @@ export default function SleepModulePage() {
   useEffect(() => {
     if (!currentSelection || currentSelection.kind !== 'queue') return;
 
-    // Note: no early-return for already-watched videos — the countdown/auto-advance
-    // should still fire on replay, not just the first time through.
-
-    // All videos are hosted on YouTube — use the IFrame API for real completion detection.
+    // All videos are hosted on YouTube 
     if (!currentSelection.videoUrl?.includes('youtube.com')) return;
 
     const initYTPlayer = () => {

@@ -8,7 +8,6 @@ export interface SleepLogData {
   date: string;
   hoursSlept: number;
   sleepQuality: number;
-  notes: string;
   bedtime?: string;
   waketime?: string;
   timeOutOfBed?: string;
@@ -67,7 +66,6 @@ function toSleepLogRow(log: SleepLogData, userId: string) {
     date: log.date,
     hours_slept: log.hoursSlept,
     sleep_quality: log.sleepQuality,
-    notes: log.notes ?? '',
     bedtime: log.bedtime ?? null,
     waketime: log.waketime ?? null,
     time_out_of_bed: log.timeOutOfBed ?? null,
@@ -151,7 +149,6 @@ const SLEEP_LOG_FIELD_MAP: Partial<Record<keyof SleepLogData, string>> = {
   date: 'date',
   hoursSlept: 'hours_slept',
   sleepQuality: 'sleep_quality',
-  notes: 'notes',
   bedtime: 'bedtime',
   waketime: 'waketime',
   timeOutOfBed: 'time_out_of_bed',
