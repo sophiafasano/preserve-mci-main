@@ -1,6 +1,6 @@
 -- ============================================================
--- Complete Supabase Schema — Sleep Tracker Web App
--- Run this in the Supabase SQL Editor 
+-- Complete Supabase Schema — PRESERVE 
+-- ============================================================
 
 -- ── 0. Custom types ────────────────────────────────────────
 DO $$ BEGIN
@@ -71,6 +71,17 @@ RETURNS boolean LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public AS
     SELECT 1 FROM public.caregiver_patients cvp
     WHERE cvp.patient_id = patient_uuid AND cvp.caregiver_id = member_uuid
   );
+$$;
+
+-- Fills in patient_name on sleep_logs and the questionnaire tables from
+-- profiles.full_name. SECURITY DEFINER so it isn't blocked by RLS on
+-- profiles when it runs inside an INSERT/UPDATE trigger.
+CREATE OR REPLACE FUNCTION public.set_sleep_log_patient_name()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  SELECT full_name INTO NEW.patient_name FROM public.profiles WHERE id = NEW.user_id;
+  RETURN NEW;
+END;
 $$;
 
 -- ── 2. profiles ────────────────────────────────────────────
@@ -262,18 +273,38 @@ CREATE POLICY "clinician_notes: patient marks read" ON public.clinician_notes FO
 
 
 -- ── 6. sleep_logs ──────────────────────────────────────────
+-- Core sleep diary entry. Stimulus Control, Sleep Hygiene, and Thought
+-- Record answers live in their own tables (sections 9-11), linked back
+-- here via (user_id, local_id).
 CREATE TABLE IF NOT EXISTS public.sleep_logs (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id       UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  date          TIMESTAMP WITH TIME ZONE NOT NULL,
-  hours_slept   NUMERIC DEFAULT 0,
-  sleep_quality INTEGER DEFAULT 0 CHECK (sleep_quality >= 0 AND sleep_quality <= 10),
-  notes         TEXT DEFAULT '',
-  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  local_id      TEXT UNIQUE
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                  UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date                     TIMESTAMP WITH TIME ZONE NOT NULL,
+  hours_slept              NUMERIC(4, 2) DEFAULT 0,
+  sleep_quality            INTEGER DEFAULT 0 CHECK (sleep_quality >= 0 AND sleep_quality <= 10),
+  created_at               TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  local_id                 TEXT UNIQUE,
+  bedtime                  TEXT,
+  waketime                 TEXT,
+  time_out_of_bed          TEXT,
+  nap_minutes              INTEGER,
+  nap_time_of_day          TEXT,
+  time_to_fall_asleep      INTEGER,
+  night_awakenings         INTEGER,
+  time_awake_during_night  INTEGER,
+  total_sleep_minutes      INTEGER,
+  sleep_efficiency         INTEGER,
+  total_wake_minutes       INTEGER,
+  patient_name             TEXT,
+  UNIQUE (user_id, local_id)
 );
 
 ALTER TABLE public.sleep_logs ENABLE ROW LEVEL SECURITY;
+
+DROP TRIGGER IF EXISTS trg_set_sleep_log_patient_name ON public.sleep_logs;
+CREATE TRIGGER trg_set_sleep_log_patient_name
+  BEFORE INSERT OR UPDATE ON public.sleep_logs
+  FOR EACH ROW EXECUTE FUNCTION public.set_sleep_log_patient_name();
 
 DROP POLICY IF EXISTS "sleep_logs: patient own" ON public.sleep_logs;
 CREATE POLICY "sleep_logs: patient own" ON public.sleep_logs FOR ALL
@@ -377,3 +408,113 @@ CREATE POLICY "app_data: caregiver/clinician reads module progress" ON public.ap
       OR EXISTS (SELECT 1 FROM public.clinician_patients cp WHERE cp.clinician_id = auth.uid() AND cp.patient_id = app_data.user_id)
     )
   );
+
+
+-- ── 9. stimulus_control_responses ───────────────────────────
+-- One row per sleep_logs entry, linked via (user_id, local_id).
+CREATE TABLE IF NOT EXISTS public.stimulus_control_responses (
+  id                          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                     UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sleep_log_local_id          TEXT NOT NULL,
+  avoid_bedroom_activities    BOOLEAN,
+  fell_asleep_within_20min    BOOLEAN,
+  got_up_if_couldnt_sleep     BOOLEAN,
+  slept_through_night         BOOLEAN,
+  got_up_after_awakening      BOOLEAN,
+  avoided_napping             BOOLEAN,
+  patient_name                TEXT,
+  created_at                  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE (user_id, sleep_log_local_id),
+  FOREIGN KEY (user_id, sleep_log_local_id) REFERENCES public.sleep_logs (user_id, local_id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.stimulus_control_responses ENABLE ROW LEVEL SECURITY;
+
+DROP TRIGGER IF EXISTS trg_set_stimulus_control_patient_name ON public.stimulus_control_responses;
+CREATE TRIGGER trg_set_stimulus_control_patient_name
+  BEFORE INSERT OR UPDATE ON public.stimulus_control_responses
+  FOR EACH ROW EXECUTE FUNCTION public.set_sleep_log_patient_name();
+
+DROP POLICY IF EXISTS "stimulus_control_responses: patient own" ON public.stimulus_control_responses;
+CREATE POLICY "stimulus_control_responses: patient own" ON public.stimulus_control_responses FOR ALL
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "stimulus_control_responses: clinician reads patient" ON public.stimulus_control_responses;
+CREATE POLICY "stimulus_control_responses: clinician reads patient" ON public.stimulus_control_responses FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.clinician_patients cp WHERE cp.clinician_id = auth.uid() AND cp.patient_id = stimulus_control_responses.user_id));
+
+DROP POLICY IF EXISTS "stimulus_control_responses: caregiver reads patient" ON public.stimulus_control_responses;
+CREATE POLICY "stimulus_control_responses: caregiver reads patient" ON public.stimulus_control_responses FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.caregiver_patients cvp WHERE cvp.caregiver_id = auth.uid() AND cvp.patient_id = stimulus_control_responses.user_id));
+
+
+-- ── 10. sleep_hygiene_responses ──────────────────────────────
+CREATE TABLE IF NOT EXISTS public.sleep_hygiene_responses (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sleep_log_local_id  TEXT NOT NULL,
+  avoided_caffeine    BOOLEAN,
+  avoided_exercise    BOOLEAN,
+  avoided_nicotine    BOOLEAN,
+  avoided_alcohol     BOOLEAN,
+  avoided_heavy_meals BOOLEAN,
+  pleasant_activity   BOOLEAN,
+  patient_name        TEXT,
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE (user_id, sleep_log_local_id),
+  FOREIGN KEY (user_id, sleep_log_local_id) REFERENCES public.sleep_logs (user_id, local_id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.sleep_hygiene_responses ENABLE ROW LEVEL SECURITY;
+
+DROP TRIGGER IF EXISTS trg_set_sleep_hygiene_patient_name ON public.sleep_hygiene_responses;
+CREATE TRIGGER trg_set_sleep_hygiene_patient_name
+  BEFORE INSERT OR UPDATE ON public.sleep_hygiene_responses
+  FOR EACH ROW EXECUTE FUNCTION public.set_sleep_log_patient_name();
+
+DROP POLICY IF EXISTS "sleep_hygiene_responses: patient own" ON public.sleep_hygiene_responses;
+CREATE POLICY "sleep_hygiene_responses: patient own" ON public.sleep_hygiene_responses FOR ALL
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "sleep_hygiene_responses: clinician reads patient" ON public.sleep_hygiene_responses;
+CREATE POLICY "sleep_hygiene_responses: clinician reads patient" ON public.sleep_hygiene_responses FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.clinician_patients cp WHERE cp.clinician_id = auth.uid() AND cp.patient_id = sleep_hygiene_responses.user_id));
+
+DROP POLICY IF EXISTS "sleep_hygiene_responses: caregiver reads patient" ON public.sleep_hygiene_responses;
+CREATE POLICY "sleep_hygiene_responses: caregiver reads patient" ON public.sleep_hygiene_responses FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.caregiver_patients cvp WHERE cvp.caregiver_id = auth.uid() AND cvp.patient_id = sleep_hygiene_responses.user_id));
+
+
+-- ── 11. thought_records ───────────────────────────────────────
+CREATE TABLE IF NOT EXISTS public.thought_records (
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  sleep_log_local_id  TEXT NOT NULL,
+  situation           TEXT,
+  automatic_thoughts  TEXT,
+  emotion             TEXT,
+  emotion_intensity   INTEGER,
+  patient_name        TEXT,
+  created_at          TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  UNIQUE (user_id, sleep_log_local_id),
+  FOREIGN KEY (user_id, sleep_log_local_id) REFERENCES public.sleep_logs (user_id, local_id) ON DELETE CASCADE
+);
+
+ALTER TABLE public.thought_records ENABLE ROW LEVEL SECURITY;
+
+DROP TRIGGER IF EXISTS trg_set_thought_record_patient_name ON public.thought_records;
+CREATE TRIGGER trg_set_thought_record_patient_name
+  BEFORE INSERT OR UPDATE ON public.thought_records
+  FOR EACH ROW EXECUTE FUNCTION public.set_sleep_log_patient_name();
+
+DROP POLICY IF EXISTS "thought_records: patient own" ON public.thought_records;
+CREATE POLICY "thought_records: patient own" ON public.thought_records FOR ALL
+  USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "thought_records: clinician reads patient" ON public.thought_records;
+CREATE POLICY "thought_records: clinician reads patient" ON public.thought_records FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.clinician_patients cp WHERE cp.clinician_id = auth.uid() AND cp.patient_id = thought_records.user_id));
+
+DROP POLICY IF EXISTS "thought_records: caregiver reads patient" ON public.thought_records;
+CREATE POLICY "thought_records: caregiver reads patient" ON public.thought_records FOR SELECT
+  USING (EXISTS (SELECT 1 FROM public.caregiver_patients cvp WHERE cvp.caregiver_id = auth.uid() AND cvp.patient_id = thought_records.user_id));
