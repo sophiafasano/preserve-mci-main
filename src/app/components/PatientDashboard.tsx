@@ -1051,7 +1051,7 @@ export default function PatientDashboard() {
                 <BedDouble size={16} strokeWidth={1.5} color="#6B7280" />
                 Stimulus Control
               </summary>
-              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.7 }}>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '16px', lineHeight: 1.7 }}>
                 <li>Don&apos;t use your bed for anything other than sleep and sex</li>
                 <li>If you can&apos;t fall asleep within 15–20 min, leave the bed and do something relaxing in another room. Return only when sleepy</li>
                 <li>If you wake up and can&apos;t fall back asleep within 20 minutes, follow the rule above</li>
@@ -1074,7 +1074,7 @@ export default function PatientDashboard() {
                 <Sparkles size={16} strokeWidth={1.5} color="#6B7280" />
                 Sleep Hygiene
               </summary>
-              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '13px', lineHeight: 1.7 }}>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '16px', lineHeight: 1.7 }}>
                 <li>Avoid caffeine after noon</li>
                 <li>Avoid exercise within 2 hours of bedtime</li>
                 <li>Avoid nicotine within 2 hours of bedtime</li>

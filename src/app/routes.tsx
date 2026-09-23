@@ -24,6 +24,15 @@ import ClinicianMessagesCenter from "./components/clinician/ClinicianMessagesCen
 import NotFound from "./components/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
+import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
+import MyProgressCaregiver from "./components/caregiver/MyProgress";
+import CaregiverSleepAnalytics from "./components/caregiver/SleepAnalytics";
+import CaregiverRemindersCenter from "./components/caregiver/RemindersCenter";
+import CaregiverSettingsPage from "./components/caregiver/SettingsPage";
+import CaregiverSleepTips from "./components/caregiver/SleepTips";
+
+
 /**
  * Application routing configuration
  * Includes both protected routes (require auth) and preview routes (no auth for development)
@@ -144,10 +153,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "caregiver/sleep-data",
+        path: "caregiver/sleep-analytics",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverSleepAnalytics />
           </ProtectedRoute>
         ),
       },
@@ -155,7 +164,23 @@ export const router = createBrowserRouter([
         path: "caregiver/messages",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverMessagesCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/my-progress",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <MyProgressCaregiver />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/reminders",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverRemindersCenter />
           </ProtectedRoute>
         ),
       },
@@ -171,7 +196,7 @@ export const router = createBrowserRouter([
         path: "caregiver/settings",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverSettingsPage />
           </ProtectedRoute>
         ),
       },
@@ -220,7 +245,7 @@ export const router = createBrowserRouter([
         path: "care-partner/sleep-data",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverSleepAnalytics />
           </ProtectedRoute>
         ),
       },
@@ -236,7 +261,7 @@ export const router = createBrowserRouter([
         path: "care-partner/messages",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverMessagesCenter />
           </ProtectedRoute>
         ),
       },
@@ -252,7 +277,7 @@ export const router = createBrowserRouter([
         path: "care-partner/settings",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <CaregiverSettingsPage />
           </ProtectedRoute>
         ),
       },
@@ -317,7 +342,7 @@ export const router = createBrowserRouter([
       {
         path: "modules",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <ModulesOverview />
           </ProtectedRoute>
         ),
@@ -325,7 +350,7 @@ export const router = createBrowserRouter([
       {
         path: "sleep-modules",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <ModulesOverview />
           </ProtectedRoute>
         ),
@@ -333,7 +358,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/:moduleId",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <SleepModulePage />
           </ProtectedRoute>
         ),
@@ -341,7 +366,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/resources/progressive-muscle-relaxation",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <ProgressiveMuscleRelaxationPage />
           </ProtectedRoute>
         ),
@@ -349,7 +374,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/resources/autogenic-relaxation",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <AutogenicRelaxationPage />
           </ProtectedRoute>
         ),
@@ -357,7 +382,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/resources/:resourceId",
         element: (
-          <ProtectedRoute allowedRoles={['patient']}>
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <SleepResourceDetailPage />
           </ProtectedRoute>
         ),

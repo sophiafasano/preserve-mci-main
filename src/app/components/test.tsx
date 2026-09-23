@@ -35,7 +35,7 @@ import SleepLogModal, { SleepLogData } from './SleepLogModal';
 import { supabase } from '../utils/supabaseClient';
 import { toast } from 'sonner';
 
-export default function CarePartnerDashboard() {
+export default function CaregiverDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signout } = useAuth();
@@ -99,8 +99,8 @@ export default function CarePartnerDashboard() {
     addSleepLog(data);
   };
 
-  const userName = user?.name || 'Caregiver'|| 'Care_Partner';
-  const firstName = userName.trim().split(/\s+/)[0] || 'Caregiver' || 'Care_Partner';
+  const userName = user?.name || 'Caregiver';
+  const firstName = userName.trim().split(/\s+/)[0] || 'Caregiver';
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
 
@@ -285,13 +285,13 @@ export default function CarePartnerDashboard() {
         openSleepLogModal();
         break;
       case 'analytics':
-        navigate('/caregiver/sleep-analytics');
+        navigate('/patient/sleep-analytics');
         break;
       case 'sleep-tips':
         setSleepTipsOpen(true);
         break;
       case 'messages':
-        navigate('/caregiver/messages');
+        navigate('/patient/messages');
         break;
       default:
         break;
@@ -483,7 +483,7 @@ export default function CarePartnerDashboard() {
                 showSidebarLabels ? 'justify-start space-x-3 px-4' : 'justify-center px-2'
               }`}
               style={{ fontSize: '15px', color: token.sidebarInactive, paddingTop: '10px', paddingBottom: '10px' }}
-              onClick={() => navigate('/caregiver/settings')}
+              onClick={() => navigate('/patient/settings')}
             >
               <Settings size={18} strokeWidth={1.5} color="#6B7280" className="flex-shrink-0" />
               <span
@@ -962,7 +962,7 @@ export default function CarePartnerDashboard() {
                         if (item.type === 'sleep-log') {
                           window.dispatchEvent(new Event('open-sleep-log'));
                         } else if (item.type === 'reminder') {
-                          navigate('/caregiver/reminders');
+                          navigate('/patient/reminders');
                         }
                       }}
                       className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
