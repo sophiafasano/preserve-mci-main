@@ -15,13 +15,13 @@ import {
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import {
   moduleWeekOrder,
-  caregiverModuleData,
+  moduleData,
   toWeekKeyFromSlug,
   weekNumberFromKey,
   weekSlugFromKey,
   type ModuleWeekKey,
-} from '../data/caregiverModuleData';
-import { modulesAPI, type ModuleWithProgress } from '../utils/caregiverModulesAPI';
+} from '../data/moduleData';
+import { modulesAPI, type ModuleWithProgress } from '../utils/modulesAPI';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/useAuth'; 
 
@@ -35,7 +35,7 @@ interface PlayerSelection {
   kind: 'queue' | 'resource';
 }
 
-export default function CaregiverSleepModulePage() {
+export default function SleepModulePage() {
   const navigate = useNavigate();
   const { moduleId } = useParams();
 
@@ -79,12 +79,12 @@ export default function CaregiverSleepModulePage() {
   
   useEffect(() => {
     if (!moduleId) {
-      navigate('/caregiver/modules', { replace: true });
+      navigate('/modules', { replace: true });
       return;
     }
 
     if (!toWeekKeyFromSlug(moduleId)) {
-      navigate('/caregiver/modules', { replace: true });
+      navigate('/modules', { replace: true });
     }
   }, [moduleId, navigate]);
 
@@ -103,7 +103,7 @@ export default function CaregiverSleepModulePage() {
         if (!mounted) return;
 
         if (!response.module.unlocked) {
-          navigate('/caregiver/modules');
+          navigate('/modules');
           return;
         }
 
@@ -111,7 +111,7 @@ export default function CaregiverSleepModulePage() {
         const firstUnwatchedIndex = response.module.queue.findIndex((item) => !item.progress.watched);
         setActiveQueueIndex(firstUnwatchedIndex >= 0 ? firstUnwatchedIndex : Math.max(response.module.queue.length - 1, 0));
       } catch {
-        if (mounted) navigate('/caregiver/modules');
+        if (mounted) navigate('/modules');
       }
     }
 
@@ -804,7 +804,7 @@ export default function CaregiverSleepModulePage() {
             
             {/* Previous Week Resources */}
             {(() => {
-              const prevResources = caregiverModuleData[weekKey!].resources;
+              const prevResources = moduleData[weekKey!].resources;
               if (prevResources.length === 0) return null;
               return (
                 <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
