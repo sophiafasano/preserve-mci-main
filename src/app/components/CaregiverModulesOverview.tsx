@@ -21,9 +21,10 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
+import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/caregiverModulesAPI';
+import { moduleWeekOrder, weekSlugFromKey } from '../data/caregiverModuleData';
 import CaregiverLayout from './caregiver/CaregiverLayout';
+
 
 type ResourceLink = {
   label: string;
@@ -45,35 +46,35 @@ const staticResources: StaticResource[] = [
     title: 'Relaxation and Wind-Down Techniques',
     description: 'Guided progressive relaxation exercises to ease tension before sleep.',
     icon: Dumbbell,
-    path: '/modules/resources/progressive-muscle-relaxation',
+    path: 'caregiver/modules/resources/progressive-muscle-relaxation',
   },
   {
     id: 'res_sleep_hygiene',
     title: 'Sleep Hygiene Fundamentals',
     description: 'Build a healthier sleep environment and bedtime habits.',
     icon: House,
-    path: '/modules/resources/sleep-hygiene',
+    path: 'caregiver/modules/resources/sleep-hygiene',
   },
   {
     id: 'res_relaxation',
     title: 'Managing Worry and Racing Thoughts',
     description: 'Short calming exercises to quiet body and mind before sleep.',
     icon: Wind,
-    path: '/modules/resources/autogenic-relaxation',
+    path: 'caregiver/modules/resources/autogenic-relaxation',
   },
   {
     id: 'res_stimulus_control',
     title: 'Stimulus Control',
     description: 'Practical steps to strengthen your bed-sleep association.',
     icon: BedDouble,
-    path: '/modules/resources/stimulus-control',
+    path: 'caregiver/modules/resources/stimulus-control',
   },
   {
     id: 'res_activities_interfer_sleep',
     title: 'Activities That Interfere with Sleep',
     description: 'Identify daily habits that can delay or disturb sleep.',
     icon: AlertTriangle,
-    path: '/modules/resources/activities-that-interfere-with-sleep',
+    path: 'caregiver/modules/resources/activities-that-interfere-with-sleep',
   },
   {
     id: 'res_community_resources',
@@ -122,7 +123,7 @@ export default function CaregiverModulesOverview() {
         window.dispatchEvent(new Event('open-sleep-tips'));
         break;
       case 'messages':
-        navigate('/patient/messages');
+        navigate('/caregiver/messages');
         break;
     }
   };
@@ -186,7 +187,7 @@ export default function CaregiverModulesOverview() {
   }, [modules]);
 
   return (
-    //<CaregiverLayout>
+    <CaregiverLayout>
     <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
       <div className="mx-auto max-w-6xl">
           <header className="mb-6">
@@ -340,7 +341,7 @@ export default function CaregiverModulesOverview() {
   
                       <button
                         disabled={!module.unlocked}
-                        onClick={() => navigate(`/modules/${weekSlugFromKey(module.weekKey)}`)}
+                        onClick={() => navigate(`/caregiver/modules/${weekSlugFromKey(module.weekKey)}`)}
                         className="w-full rounded-[10px] py-2.5"
                         style={
                           module.completed
@@ -502,7 +503,7 @@ export default function CaregiverModulesOverview() {
                           if (item.type === 'sleep-log') {
                             window.dispatchEvent(new Event('open-sleep-log'));
                           } else if (item.type === 'reminder') {
-                            navigate('/patient/reminders');
+                            navigate('/caregiver/reminders');
                           }
                         }}
                         className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
@@ -539,7 +540,7 @@ export default function CaregiverModulesOverview() {
   
         </div>
       </div>
-      //</CaregiverLayout>
+      </CaregiverLayout>
     );
   }
   

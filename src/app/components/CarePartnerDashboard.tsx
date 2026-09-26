@@ -27,7 +27,7 @@ import { Button } from './ui/button';
 import { useSleepLogs } from '../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../hooks/useModuleProgress';
 import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../utils/modulesAPI';
-import { moduleData, moduleWeekOrder } from '../data/moduleData';
+import { caregiverModuleData, moduleWeekOrder } from '../data/caregiverModuleData';
 import { useReminders } from '../hooks/useReminders';
 import { useAuth } from '../contexts/useAuth';
 import { useMessaging } from '../hooks/useMessaging';
@@ -111,7 +111,7 @@ export default function CarePartnerDashboard() {
   const currentWeekIndex = modulesData?.modules.findIndex(m => !m.completed || m.isLocked) ?? 0;
   const safeCurrentWeekIndex = currentWeekIndex === -1 ? totalWeeks - 1 : currentWeekIndex;
   const currentWeekKey = moduleWeekOrder[safeCurrentWeekIndex];  
-  const currentModuleData = moduleData[currentWeekKey];
+  const currentModuleData = caregiverModuleData[currentWeekKey];
   const currentModuleInProgress = modulesData?.modules.find(m => m.weekKey === currentWeekKey);
   const lessonsCompleted = currentModuleInProgress
     ? currentModuleInProgress.queue.filter(v => v.progress.watched).length
@@ -322,10 +322,10 @@ export default function CarePartnerDashboard() {
 
   const navigationItems: Array<{ label: string; icon: React.ElementType; path: string; action?: string; badge?: number }> = [
     { label: 'Dashboard',      icon: LayoutDashboard, path: '/caregiver/dashboard' },
-    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: '/modules' },
+    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: '/caregiver/modules' },
     { label: 'Sleep Log',      icon: NotebookPen,     path: 'null', action: 'log-sleep' },
     { label: 'Sleep Analysis', icon: BarChart2,      path: '/caregiver/sleep-analytics' },
-    { label: 'My Progress',    icon: TrendingUp,      path: '/caregiver/progress' },
+    { label: 'My Progress',    icon: TrendingUp,      path: '/caregiver/my-progress' },
     { label: 'Messages',       icon: MessageCircle,   path: '/caregiver/messages', badge: unreadCount },
     { label: 'Reminders',      icon: Bell,                 path: '/caregiver/reminders', badge: activeCount },
   ];
@@ -625,7 +625,7 @@ export default function CarePartnerDashboard() {
                     fontSize: '14px',
                     fontWeight: 500,
                   }}
-                  onClick={() => navigate(`/modules/${currentWeekKey.replace('week', 'week-')}`)}
+                  onClick={() => navigate(`caregiver/modules/${currentWeekKey.replace('week', 'week-')}`)}
                 >
                   Continue Module
                   <ChevronRight size={16} strokeWidth={1.5} color="#6B7280" className="ml-2" />
@@ -1026,9 +1026,14 @@ export default function CarePartnerDashboard() {
       {sleepTipsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSleepTipsOpen(false)}></div>
-          <div className="relative w-full max-w-[480px] rounded-2xl bg-white p-7">
+          <div className="relative w-full max-w-[850px] rounded-2xl bg-white p-5" style={{border: `6px solid ${token.purple200}`, backgroundColor: '#fbf5ff' }}>
             <div className="mb-4 flex items-center justify-between">
-              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#1A1A2E' }}>Sleep Tips</h3>
+              <h3 style={{ 
+                fontSize: '21px', 
+                fontWeight: 700, 
+                color: '#5018a9', 
+                }}>
+                  Sleep Tips</h3>
               <button
                 onClick={() => setSleepTipsOpen(false)}
                 className="rounded-md p-1 transition-all duration-200 hover:bg-[#F3E8FF] hover:scale-105 active:scale-100"
@@ -1041,19 +1046,24 @@ export default function CarePartnerDashboard() {
               <summary
                 className="flex cursor-pointer items-center gap-2"
                 style={{
-                  fontSize: '14px',
+                  fontSize: '20px',
                   fontWeight: 600,
-                  color: '#1A1A2E',
+                  color: '#5018a9',
                   padding: '12px 0',
-                  borderBottom: '0.5px solid #F3E8FF',
+                  borderBottom: '0.5px solid #060708',
                 }}
               >
-                <BedDouble size={16} strokeWidth={1.5} color="#6B7280" />
+                <BedDouble size={16} strokeWidth={1.5} color="#060708" />
                 Stimulus Control
               </summary>
-              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '16px', lineHeight: 1.7 }}>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
                 <li>Don&apos;t use your bed for anything other than sleep and sex</li>
-                <li>If you can&apos;t fall asleep within 15–20 min, leave the bed and do something relaxing in another room. Return only when sleepy</li>
+                <li>If you can&apos;t fall asleep within 15–20 min: 
+                  <ul className="list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
+                    <li>Leave the bed and do something relaxing in another room</li>
+                    <li>Return only when sleepy</li>
+                  </ul>
+                  </li>
                 <li>If you wake up and can&apos;t fall back asleep within 20 minutes, follow the rule above</li>
                 <li>Avoid napping during the day</li>
                 <li>Maintain a regular bedtime and wake time every day</li>
@@ -1064,17 +1074,18 @@ export default function CarePartnerDashboard() {
               <summary
                 className="flex cursor-pointer items-center gap-2"
                 style={{
-                  fontSize: '14px',
+                  fontSize: '20px',
                   fontWeight: 600,
-                  color: '#1A1A2E',
+                  color: '#5018a9',
                   padding: '12px 0',
-                  borderBottom: '0.5px solid #F3E8FF',
+                  borderBottom: '0.5px solid #060708',
+                  //backgroundColor: token.purple100,
                 }}
               >
-                <Sparkles size={16} strokeWidth={1.5} color="#6B7280" />
+                <Sparkles size={16} strokeWidth={1.5} color="#060708" />
                 Sleep Hygiene
               </summary>
-              <ul className="mt-3 list-disc pl-6" style={{ color: '#4B5563', fontSize: '16px', lineHeight: 1.7 }}>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
                 <li>Avoid caffeine after noon</li>
                 <li>Avoid exercise within 2 hours of bedtime</li>
                 <li>Avoid nicotine within 2 hours of bedtime</li>

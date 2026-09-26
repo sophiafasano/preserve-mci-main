@@ -460,7 +460,7 @@ export default function CaregiverSleepModulePage() {
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-center justify-between">
             <button
-              onClick={() => navigate('/modules')}
+              onClick={() => navigate('/caregiver/modules')}
               className="inline-flex items-center gap-1.5 hover:opacity-90 cursor-pointer"
               style={{ color: '#7200CA', fontSize: '16px', fontWeight: 500 }}
             >
@@ -875,7 +875,7 @@ export default function CaregiverSleepModulePage() {
             {nextWeekKey && (
               nextModuleData?.unlocked ? (
                 <button
-                  onClick={() => navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`)}
+                  onClick={() => navigate(`/caregiver/modules/${weekSlugFromKey(nextWeekKey)}`)}
                   className="mt-5 w-full rounded-[10px] py-2.5"
                   style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
                 >
@@ -891,7 +891,7 @@ export default function CaregiverSleepModulePage() {
             )}
 
             <button
-              onClick={() => navigate('/modules')}
+              onClick={() => navigate('/caregiver/modules')}
               className="mt-3 w-full rounded-[10px] py-2.5"
               style={{
                 border: '1px solid #7200CA',

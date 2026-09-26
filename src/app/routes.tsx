@@ -23,6 +23,8 @@ import CarePartnerMessagesCenter from "./components/care-partner/CarePartnerMess
 import ClinicianMessagesCenter from "./components/clinician/ClinicianMessagesCenter";
 import NotFound from "./components/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CaregiverModulesOverview from './components/CaregiverModulesOverview';
+import CaregiverSleepModulePage from './components/CaregiverSleepModulePage'
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -193,6 +195,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "caregiver/modules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "caregiver/settings",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -342,7 +352,7 @@ export const router = createBrowserRouter([
       {
         path: "modules",
         element: (
-          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+          <ProtectedRoute allowedRoles={['patient']}>
             <ModulesOverview />
           </ProtectedRoute>
         ),
@@ -358,7 +368,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/:moduleId",
         element: (
-          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+          <ProtectedRoute allowedRoles={['patient']}>
             <SleepModulePage />
           </ProtectedRoute>
         ),
@@ -384,6 +394,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <SleepResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSleepModulePage />
           </ProtectedRoute>
         ),
       },

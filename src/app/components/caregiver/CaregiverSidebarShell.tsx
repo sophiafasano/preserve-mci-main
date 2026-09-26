@@ -67,7 +67,7 @@ export default function CaregiverSidebarShell({ children }: CaregiverSidebarShel
     badge?: number;
   }> = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/caregiver/dashboard', action: null },
-    { label: 'Weekly Sleep Modules', icon: BookOpen, path: '/modules', action: null },
+    { label: 'Weekly Sleep Modules', icon: BookOpen, path: '/caregiver/modules', action: null },
     { label: 'Sleep Log', icon: NotebookPen, path: null, action: () => {
       console.log(logs)
       const today = new Date().toDateString();
