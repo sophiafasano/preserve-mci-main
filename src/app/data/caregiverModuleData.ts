@@ -1,14 +1,15 @@
-import CBTi_Week_1_Video_1_CG from '../components/videos/CBTi_Week_1_Video_1_CG.mov'
-import CBTi_Week_2_Video_1_CG from '../components/videos/CBTi_Week_2_Video_1_CG.mov'
-import CBTi_Week_3_Video_1_CG from '../components/videos/CBTi_Week_3_Video_1_CG.mov'
-import CBTi_Week_4_Video_1_CG from '../components/videos/CBTi_Week_4_Video_1_CG.mov'
-import Activities_that_Interfer_with_sleep from '../components/videos/Activities_that_Interfer_with_sleep.mov'
-import Maladaptive_Thoughts_Week_3 from '../components/videos/Maladaptive_Thoughts_Week_3.mov'
-import Sleep_Hygiene_E from '../components/videos/Sleep_Hygiene_E.mov'
-import Stimulus_Control_E from '../components/videos/Stimulus_Control_E.mov'
-import Week_1_recap_E from '../components/videos/Week_1_recap_E.mov'
 import Week_2_recap_E from '../components/videos/Week_2_recap_E.mov'
 import Week_3_Recap from '../components/videos/Week_3_Recap.mov'
+
+const CBTi_Week_1_Video_1_CG = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_1_Video_1_CG.mov'
+const CBTi_Week_2_Video_1_CG = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_2_Video_1_CG.mov'
+const CBTi_Week_3_Video_1_CG = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_3_Video_1_CG.mov'
+const CBTi_Week_4_Video_1_CG = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_4_Video_1_CG.mov'
+const Maladaptive_Thoughts_Week_3 = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Maladaptive_Thoughts_Week_3_CG.mov'
+const Sleep_Hygiene_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Sleep_Hygiene_E_CG.mov'
+const Stimulus_Control_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Stimulus_Control_E_CG.mov'
+const Week_1_recap_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Week_1_recap_E_CG.mov'
+const Activities_Video = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Activities_that_Interfer_with_sleep.mov'
 
 
 export type ModuleWeekKey = 'week1' | 'week2' | 'week3' | 'week4';
@@ -63,7 +64,7 @@ export const caregiverModuleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Activities that Interfere with Sleep',
         description: 'Common habits and behaviors that disrupt healthy sleep patterns.',
         duration: '~1 min',
-        videoUrl: Activities_that_Interfer_with_sleep,
+        videoUrl: Activities_Video,
         fileName: 'Activities_that_Interfer_with_sleep',
       },
       {

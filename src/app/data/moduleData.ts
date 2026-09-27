@@ -1,14 +1,15 @@
-import CBTi_Week_1_Video_1_P from '../components/videos/CBTi_Week_1_Video_1_P.mov'
-import CBTi_Week_2_Video_1_P from '../components/videos/CBTi_Week_2_Video_1_P.mov'
-import CBTi_Week_3_Video_1_P from '../components/videos/CBTi_Week_3_Video_1_P.mov'
-import CBTi_Week_4_Video_1_P from '../components/videos/CBTi_Week_4_Video_1_P.mov'
-import Activities_that_Interfer_with_sleep_P from '../components/videos/Activities_that_Interfer_with_sleep_P.mov'
-import Maladaptive_Thoughts_Week_3_P from '../components/videos/Maladaptive_Thoughts_Week_3_P.mov'
-import Sleep_Hygiene_E_P from '../components/videos/Sleep_Hygiene_E_P.mov'
-import Stimulus_Control_E_P from '../components/videos/Stimulus_Control_E_P.mov'
-import Week_1_recap_E_P from '../components/videos/Week_1_recap_E_P.mov'
-import Week_2_recap_E_P from '../components/videos/Week_2_recap_E_P.mov'
-import Week_3_Recap_P from '../components/videos/Week_3_Recap_P.mov'
+import Week_2_recap_E from '../components/videos/Week_2_recap_E.mov'
+import Week_3_Recap from '../components/videos/Week_3_Recap.mov'
+
+const CBTi_Week_1_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_1_Video_1_P.mov'
+const CBTi_Week_2_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_2_Video_1_P.mov'
+const CBTi_Week_3_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_3_Video_1_P.mov'
+const CBTi_Week_4_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_4_Video_1_P.mov'
+const Maladaptive_Thoughts_Week_3 = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Maladaptive_Thoughts_Week_3_CG.mov'
+const Sleep_Hygiene_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Sleep_Hygiene_E_CG.mov'
+const Stimulus_Control_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Stimulus_Control_E_CG.mov'
+const Week_1_recap_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Week_1_recap_E_CG.mov'
+const Activities_Video = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Activities_that_Interfer_with_sleep.mov'
 
 export type ModuleWeekKey = 'week1' | 'week2' | 'week3' | 'week4';
 
@@ -62,32 +63,32 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Activities that Interfere with Sleep',
         description: 'Common habits and behaviors that disrupt healthy sleep patterns.',
         duration: '~1 min',
-        videoUrl: Activities_that_Interfer_with_sleep_P,
-        fileName: 'Activities_that_Interfer_with_sleep_P',
+        videoUrl: Activities_Video,
+        fileName: 'Activities_Video',
       },
       {
         id: 'w1_v3',
         title: 'Sleep Hygiene',
         description: 'Essential practices and environmental factors that promote quality sleep.',
         duration: '~4 min',
-        videoUrl: Sleep_Hygiene_E_P,
-        fileName: 'Sleep_Hygiene_E_P',
+        videoUrl: Sleep_Hygiene_E,
+        fileName: 'Sleep_Hygiene_E',
       },
       {
         id: 'w1_v4',
         title: 'Stimulus Control',
         description: 'Evidence-based techniques to strengthen the bed-sleep association.',
         duration: '~2 min',
-        videoUrl: Stimulus_Control_E_P,
-        fileName: 'Stimulus_Control_E_P',
+        videoUrl: Stimulus_Control_E,
+        fileName: 'Stimulus_Control_E',
       },
       {
         id: 'w1_recap',
         title: 'Week 1 Recap',
         description: 'Summary of key concepts from Week 1.',
         duration: '~2 min',
-        videoUrl: Week_1_recap_E_P,
-        fileName: 'Week_1_recap_E_P',
+        videoUrl: Week_1_recap_E,
+        fileName: 'Week_1_recap_E',
       },
     ],
     resources: [],
@@ -120,23 +121,23 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Week 2 Recap',
         description: 'Summary of key concepts from Week 2.',
         duration: '~1 min',
-        videoUrl: Week_2_recap_E_P,
-        fileName: 'Week_2_recap_E_P',
+        videoUrl: Week_2_recap_E,
+        fileName: 'Week_2_recap_E',
       },
     ],
     resources: [
       {
         id: 'r_stimulus',
         title: 'Stimulus Control',
-        videoUrl: Stimulus_Control_E_P,
-        fileName: 'Stimulus_Control_E_P',
+        videoUrl: Stimulus_Control_E,
+        fileName: 'Stimulus_Control_E',
         icon: 'BedDouble',
       },
       {
         id: 'r_hygiene',
         title: 'Sleep Hygiene',
-        videoUrl: Sleep_Hygiene_E_P,
-        fileName: 'Sleep_Hygiene_E_P',
+        videoUrl: Sleep_Hygiene_E,
+        fileName: 'Sleep_Hygiene_E',
         icon: 'Moon',
       },
       {
@@ -170,31 +171,31 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
         title: 'Maladaptive Thoughts',
         description: 'Understanding and reframing thought patterns that disrupt sleep.',
         duration: '~4 min',
-        videoUrl: Maladaptive_Thoughts_Week_3_P,
-        fileName: 'Maladaptive_Thoughts_Week_3_P',
+        videoUrl: Maladaptive_Thoughts_Week_3,
+        fileName: 'Maladaptive_Thoughts_Week_3',
       },
       {
         id: 'w3_recap',
         title: 'Week 3 Recap',
         description: 'Summary of key concepts from Week 3.',
         duration: '~1 min',
-        videoUrl: Week_3_Recap_P,
-        fileName: 'Week_3_Recap_P',
+        videoUrl: Week_3_Recap,
+        fileName: 'Week_3_Recap',
       },
     ],
     resources: [
       {
         id: 'r_stimulus',
         title: 'Stimulus Control',
-        videoUrl: Stimulus_Control_E_P,
-        fileName: 'Stimulus_Control_E_P',
+        videoUrl: Stimulus_Control_E,
+        fileName: 'Stimulus_Control_E',
         icon: 'BedDouble',
       },
       {
         id: 'r_hygiene',
         title: 'Sleep Hygiene',
-        videoUrl: Sleep_Hygiene_E_P,
-        fileName: 'Sleep_Hygiene_E_P',
+        videoUrl: Sleep_Hygiene_E,
+        fileName: 'Sleep_Hygiene_E',
         icon: 'Moon',
       },
       {
@@ -235,8 +236,8 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
       {
         id: 'r_stimulus',
         title: 'Stimulus Control',
-        videoUrl: Stimulus_Control_E_P,
-        fileName: 'Stimulus_Control_E_P',
+        videoUrl: Stimulus_Control_E,
+        fileName: 'Stimulus_Control_E',
         icon: 'BedDouble',
       },
       {
