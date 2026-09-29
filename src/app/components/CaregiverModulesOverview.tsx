@@ -90,6 +90,34 @@ const staticResources: StaticResource[] = [
         label: 'Alzheimer\'s Association resources (Early stages of cognitive impairment)',
         url: 'https://www.alz.org/alzheimers-dementia/stages',
       },
+      {
+        label: 'Alzheimer’s and Dementia Support partner Support',
+        url: 'https://www.alz.org/help-support/caregiving'
+      },
+      {
+        label: 'Resources for early-stage caregiving',
+        url: 'https://www.alz.org/help-support/caregiving/stages-behaviors/early-stage'
+      },
+      {
+        label: 'Resources for support partner health',
+        url: 'https://www.alz.org/help-support/caregiving/caregiver-health'
+      },
+      {
+        label: 'Local chapter resources',
+        url: 'https://www.alz.org/local_resources/find_your_local_chapter'
+      },
+      {
+        label: 'Community Resource Finder',
+        url: 'https://www.communityresourcefinder.org/?_gl=1*1973rru*_ga*MTcwNjU0MDEyLjE3Njg4NzUwMzA.*_ga_9JTEWVX24V*czE3NzA0MzIxNDQkbzgkZzAkdDE3NzA0MzIxNDQkajYwJGwwJGgw'
+      },
+      {
+        label: 'Online interactive tools – ALZNavigator',
+        url: 'https://www.alz.org/help-support/resources/alznavigator'
+      },
+      {
+        label: 'Care Team Calendar',
+        url: 'https://www.alz.org/help-support/caregiving/care-options/care-team-calendar'
+      }
     ],
   },
 ];
