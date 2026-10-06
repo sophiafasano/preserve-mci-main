@@ -30,9 +30,13 @@ export default function AutogenicRelaxationPage() {
               className="relative mt-5 overflow-hidden rounded-[12px]"
               style={{ backgroundColor: '#1A1A2E', aspectRatio: '16 / 9' }}
             >
-              <div className="flex h-full items-center justify-center">
-                <Play size={52} color="white" fill="white" opacity={0.65} />
-              </div>
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/H62t26iYF9o?si=AYYpRUhN2oBkuor9"
+                title="Progressive Muscle Relaxation"
+                allow="acceleromete; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                />
             </div>
           </div>
         </div>

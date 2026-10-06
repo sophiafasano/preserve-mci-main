@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useReminders } from '../hooks/useReminders';
-import { useSleepLogs } from '../hooks/useSleepLogs';
+import { useReminders } from '../../hooks/useReminders';
+import { useSleepLogs } from '../../hooks/useSleepLogs';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -21,9 +21,9 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/caregiverModulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/caregiverModuleData';
-import CaregiverLayout from './caregiver/CaregiverLayout';
+import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../../utils/caregiverModulesAPI';
+import { moduleWeekOrder, weekSlugFromKey } from '../../data/caregiverModuleData';
+import CaregiverLayout from './CaregiverLayout';
 
 
 type ResourceLink = {
@@ -46,35 +46,35 @@ const staticResources: StaticResource[] = [
     title: 'Relaxation and Wind-Down Techniques',
     description: 'Guided progressive relaxation exercises to ease tension before sleep.',
     icon: Dumbbell,
-    path: 'caregiver/modules/resources/progressive-muscle-relaxation',
+    path: '/caregiver/modules/resources/progressive-muscle-relaxation',
   },
   {
     id: 'res_sleep_hygiene',
     title: 'Sleep Hygiene Fundamentals',
     description: 'Build a healthier sleep environment and bedtime habits.',
     icon: House,
-    path: 'caregiver/modules/resources/sleep-hygiene',
+    path: '/caregiver/modules/resources/sleep-hygiene',
   },
   {
     id: 'res_relaxation',
     title: 'Managing Worry and Racing Thoughts',
     description: 'Short calming exercises to quiet body and mind before sleep.',
     icon: Wind,
-    path: 'caregiver/modules/resources/autogenic-relaxation',
+    path: '/caregiver/modules/resources/autogenic-relaxation',
   },
   {
     id: 'res_stimulus_control',
     title: 'Stimulus Control',
     description: 'Practical steps to strengthen your bed-sleep association.',
     icon: BedDouble,
-    path: 'caregiver/modules/resources/stimulus-control',
+    path: '/caregiver/modules/resources/stimulus-control',
   },
   {
     id: 'res_activities_interfer_sleep',
     title: 'Activities That Interfere with Sleep',
     description: 'Identify daily habits that can delay or disturb sleep.',
     icon: AlertTriangle,
-    path: 'caregiver/modules/resources/activities-that-interfere-with-sleep',
+    path: '/caregiver/modules/resources/activities-that-interfere-with-sleep',
   },
   {
     id: 'res_community_resources',

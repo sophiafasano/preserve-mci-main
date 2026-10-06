@@ -6,7 +6,7 @@ import RegistrationPage from "./components/RegistrationPage";
 import ForgotPasswordFlow from "./components/ForgotPasswordFlow";
 import SignOut from "./components/SignOut";
 import PatientDashboard from "./components/PatientDashboard";
-import CarePartnerDashboard from "./components/CarePartnerDashboard";
+import CarePartnerDashboard from "./components/caregiver/CarePartnerDashboard";
 import ClinicianDashboard from "./components/ClinicianDashboard";
 import ModulesOverview from "./components/ModulesOverview";
 import SleepModulePage from "./components/SleepModulePage";
@@ -23,8 +23,8 @@ import CarePartnerMessagesCenter from "./components/care-partner/CarePartnerMess
 import ClinicianMessagesCenter from "./components/clinician/ClinicianMessagesCenter";
 import NotFound from "./components/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
-import CaregiverModulesOverview from './components/CaregiverModulesOverview';
-import CaregiverSleepModulePage from './components/CaregiverSleepModulePage'
+import CaregiverModulesOverview from './components/caregiver/CaregiverModulesOverview';
+import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModulePage'
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -33,6 +33,8 @@ import CaregiverSleepAnalytics from "./components/caregiver/SleepAnalytics";
 import CaregiverRemindersCenter from "./components/caregiver/RemindersCenter";
 import CaregiverSettingsPage from "./components/caregiver/SettingsPage";
 import CaregiverSleepTips from "./components/caregiver/SleepTips";
+import CaregiverAutogenicRelaxationPage from "./components/caregiver/CaregiverAutogenicRelaxationPage";
+import CaregiverProgressiveMuscleRelaxation from "./components/caregiver/CaregiverProgressiveMuscleRelaxationPage";
 
 
 /**
@@ -268,6 +270,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "patient/sleep-logs",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <PatientDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "care-partner/messages",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -376,7 +386,7 @@ export const router = createBrowserRouter([
       {
         path: "modules/resources/progressive-muscle-relaxation",
         element: (
-          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+          <ProtectedRoute allowedRoles={['patient',]}>
             <ProgressiveMuscleRelaxationPage />
           </ProtectedRoute>
         ),
@@ -398,6 +408,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "caregiver/modules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <SleepResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "caregiver/modules/:moduleId",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -405,6 +423,23 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      {
+        path: "caregiver/modules/resources/autogenic-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverAutogenicRelaxationPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/resources/progressive-muscle-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverProgressiveMuscleRelaxation/>
+          </ProtectedRoute>
+        ),
+      },
+      
       // Development Preview Routes (bypass auth for page selector)
       {
         path: "preview/patient-dashboard",

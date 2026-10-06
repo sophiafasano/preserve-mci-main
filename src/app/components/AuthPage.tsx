@@ -19,13 +19,21 @@ export default function AuthPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string; role?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
 
+
   useEffect(() => {
     const rememberedEmail = localStorage.getItem('remembered_email');
     if (rememberedEmail) {
       setEmail(rememberedEmail);
       setRememberMe(true);
     }
+
   }, []);
+
+  useEffect(() => {
+    if (selectedRole) {
+      localStorage.setItem("role", selectedRole);
+    }
+  }, [selectedRole])
 
   const clearFieldError = (field: keyof typeof errors) => {
     if (errors[field]) {
@@ -78,6 +86,8 @@ export default function AuthPage() {
         setErrors({
           role: `This account is registered as "${roleLabelMap[signedInUser.role]}". Please select that role and try again.`,
         });
+
+        
 
         // Sign out in background — do not await (prevents UI freeze on slow network)
         signout(false).catch(() => {});

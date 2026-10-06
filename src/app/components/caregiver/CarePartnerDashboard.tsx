@@ -23,16 +23,16 @@ import {
   Sparkles,
   Bell
 } from 'lucide-react';
-import { Button } from './ui/button';
-import { useSleepLogs } from '../hooks/useSleepLogs';
+import { Button } from '../ui/button';
+import { useSleepLogs } from '../../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../hooks/useModuleProgress';
-import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../utils/modulesAPI';
-import { caregiverModuleData, moduleWeekOrder } from '../data/caregiverModuleData';
-import { useReminders } from '../hooks/useReminders';
-import { useAuth } from '../contexts/useAuth';
-import { useMessaging } from '../hooks/useMessaging';
-import SleepLogModal, { SleepLogData } from './SleepLogModal';
-import { supabase } from '../utils/supabaseClient';
+import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../../utils/modulesAPI';
+import { caregiverModuleData, moduleWeekOrder } from '../../data/caregiverModuleData';
+import { useReminders } from '../../hooks/useReminders';
+import { useAuth } from '../../contexts/useAuth';
+import { useMessaging } from '../../hooks/useMessaging';
+import SleepLogModal, { SleepLogData } from '../SleepLogModal';
+import { supabase } from '../../utils/supabaseClient';
 import { toast } from 'sonner';
 
 export default function CarePartnerDashboard() {
@@ -411,7 +411,7 @@ export default function CarePartnerDashboard() {
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
         <aside
-          className="relative flex flex-col w-72 min-h-screen"
+          className="relative flex flex-col w-72 h-screen shrink-0 sticky top-0"
           style={{ backgroundColor: token.white, borderRight: `0.5px solid ${token.purple100}` }}
         >
           <div className={`px-4 pb-2 ${showSidebarLabels ? 'block' : 'hidden'}`}></div>

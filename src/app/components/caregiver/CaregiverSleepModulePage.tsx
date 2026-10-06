@@ -12,7 +12,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react';
-import PatientSidebarShell from './patient/PatientSidebarShell';
+import PatientSidebarShell from '../patient/PatientSidebarShell';
 import {
   moduleWeekOrder,
   caregiverModuleData,
@@ -20,10 +20,10 @@ import {
   weekNumberFromKey,
   weekSlugFromKey,
   type ModuleWeekKey,
-} from '../data/caregiverModuleData';
-import { modulesAPI, type ModuleWithProgress } from '../utils/caregiverModulesAPI';
-import { supabase } from '../utils/supabaseClient';
-import { useAuth } from '../contexts/useAuth'; 
+} from '../../data/caregiverModuleData';
+import { modulesAPI, type ModuleWithProgress } from '../../utils/caregiverModulesAPI';
+import { supabase } from '../../utils/supabaseClient';
+import { useAuth } from '../../contexts/useAuth'; 
 
 interface PlayerSelection {
   id: string;

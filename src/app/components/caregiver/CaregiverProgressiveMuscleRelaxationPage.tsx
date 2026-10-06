@@ -1,16 +1,16 @@
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Play } from 'lucide-react';
-import PatientSidebarShell from './patient/PatientSidebarShell';
+import CaregiverSidebarShell from './CaregiverSidebarShell';
 
-export default function ProgressiveMuscleRelaxationPage() {
+export default function CaregiverProgressiveMuscleRelaxation() {
   const navigate = useNavigate();
 
   return (
-    <PatientSidebarShell>
+    <CaregiverSidebarShell>
       <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="mx-auto max-w-6xl">
           <button
-            onClick={() => navigate('/modules')}
+            onClick={() => navigate('/caregiver/modules')}
             className="mb-6 inline-flex items-center gap-1.5 hover:opacity-90"
             style={{ color: '#7200CA', fontSize: '13px', fontWeight: 500 }}
           >
@@ -41,6 +41,6 @@ export default function ProgressiveMuscleRelaxationPage() {
           </div>
         </div>
       </div>
-    </PatientSidebarShell>
+    </CaregiverSidebarShell>
   );
 }

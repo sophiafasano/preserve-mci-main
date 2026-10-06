@@ -105,7 +105,7 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
   return (
     <div className="flex min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       <aside
-        className="relative flex flex-col w-72 min-h-screen shrink-0"
+        className="relative flex flex-col w-72 h-screen shrink-0 sticky top-0"
         style={{ backgroundColor: token.white, borderRight: `0.5px solid ${token.purple100}` }}
       >
         <nav className="p-4 space-y-2 flex-1 overflow-y-auto">
@@ -162,6 +162,16 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
       </aside>
 
       <main className="flex-1 min-w-0">{children}</main>
+
+      <SleepLogModal
+          isOpen={sleepLogOpen}
+          onClose={() => setSleepLogOpen(false)}
+          onSubmit={async (data) => {
+            await addSleepLog(data);
+            setSleepLogOpen(false);
+          }}
+        />
+
       {/* Sleep Tips Modal */}
                   {sleepTipsOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

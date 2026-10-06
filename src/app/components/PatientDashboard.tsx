@@ -263,6 +263,8 @@ export default function PatientDashboard() {
     };
   }, [isSamplePreview, sampleTrendSeries, sleepTrendMetric, sleepTrendSeries]);
 
+  
+
   const openSleepLogModal = () => {
   const today = new Date().toDateString();
   const hasLoggedToday = sleepLogs.some((log) => new Date(log.date).toDateString() === today);
@@ -411,7 +413,7 @@ export default function PatientDashboard() {
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
         <aside
-          className="relative flex flex-col w-72 min-h-screen"
+          className="relative flex flex-col w-72 h-screen shrink-0 sticky top-0"
           style={{ backgroundColor: token.white, borderRight: `0.5px solid ${token.purple100}` }}
         >
           <div className={`px-4 pb-2 ${showSidebarLabels ? 'block' : 'hidden'}`}></div>
@@ -1014,6 +1016,13 @@ export default function PatientDashboard() {
                 onClick={() => setSidebarOpen(false)}
               />
             )}
+
+      {/* Sleep Log Modal */}
+            <SleepLogModal
+              isOpen={sleepLogModalOpen}
+              onClose={() => setSleepLogModalOpen(false)}
+              onSubmit={handleSleepLogSubmit}
+            />
       
       {/* Sleep Tips Modal */}
         {sleepTipsOpen && (

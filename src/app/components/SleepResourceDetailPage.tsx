@@ -129,6 +129,7 @@ const resourceContentMap: Record<string, ResourceContent> = {
 export default function SleepResourceDetailPage() {
   const navigate = useNavigate();
   const { resourceId } = useParams();
+  const role = localStorage.getItem("role");
 
   const content = useMemo(() => {
     if (!resourceId) return null;
@@ -140,7 +141,7 @@ export default function SleepResourceDetailPage() {
       <div className="min-h-screen px-6 py-6 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="mx-auto max-w-6xl">
           <button
-            onClick={() => navigate('/modules')}
+            onClick={() => ( role === "patient" ? navigate('/modules') : navigate('/caregiver/modules'))}
             className="mb-6 inline-flex items-center gap-1.5 hover:opacity-90"
             style={{ color: '#7200CA', fontSize: '13px', fontWeight: 500 }}
           >
@@ -163,7 +164,7 @@ export default function SleepResourceDetailPage() {
     <div className="min-h-screen px-6 py-6 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
       <div className="mx-auto max-w-6xl">
         <button
-          onClick={() => navigate('/modules')}
+          onClick={() => ( role === "patient" ? navigate('/modules') : navigate('/caregiver/modules'))}
           className="mb-6 inline-flex items-center gap-1.5 hover:opacity-90"
           style={{ color: '#7200CA', fontSize: '13px', fontWeight: 500 }}
         >
