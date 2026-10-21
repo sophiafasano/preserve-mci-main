@@ -12,7 +12,7 @@ import {
   SkipBack,
   SkipForward,
 } from 'lucide-react';
-import PatientSidebarShell from '../patient/PatientSidebarShell';
+import CaregiverSidebarShell from './CaregiverSidebarShell';
 import {
   moduleWeekOrder,
   caregiverModuleData,
@@ -389,13 +389,13 @@ export default function CaregiverSleepModulePage() {
 
   if (!weekKey || !module || !currentSelection) {
     return (
-      <PatientSidebarShell>
+      <CaregiverSidebarShell>
         <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
           <div className="mx-auto max-w-5xl rounded-xl bg-white p-8 text-center" style={{ border: '0.5px solid #E9D5FF' }}>
             <h1 style={{ color: '#1A1A2E', fontSize: '20px', fontWeight: 700 }}>Loading module...</h1>
           </div>
         </div>
-      </PatientSidebarShell>
+      </CaregiverSidebarShell>
     );
   }
 
@@ -455,7 +455,7 @@ export default function CaregiverSleepModulePage() {
   }
 
   return (
-    <PatientSidebarShell>
+    <CaregiverSidebarShell>
       <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-center justify-between">
@@ -906,6 +906,6 @@ export default function CaregiverSleepModulePage() {
           </div>
         </div>
       )}
-    </PatientSidebarShell>
+    </CaregiverSidebarShell>
   );
 }

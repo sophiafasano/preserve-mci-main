@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
+import DietLogModal from './DietLogModal'
 
 interface SleepLogModalProps {
   isOpen: boolean;
@@ -8,6 +10,8 @@ interface SleepLogModalProps {
   onSubmit: (data: SleepLogData) => void;
   existingLogs?: { date: string }[];
 }
+
+
 
 export interface SleepLogData {
   date: string;
@@ -137,6 +141,14 @@ export default function SleepLogModal({
   existingLogs = [],
 }: SleepLogModalProps) {
   const [step, setStep] = useState(0);
+  const navigate = useNavigate();
+
+  const [activeLog, setActiveLog] = useState<'sleep' | 'diet' | null >('sleep');
+
+
+  //otherLogs
+  const [dietModalOpen, setDietModalOpen] = useState(false);
+
 
   // Step 1 — Sleep Diary
   const [napMinutes, setNapMinutes] = useState('');
@@ -170,6 +182,85 @@ export default function SleepLogModal({
   const [trThoughts, setTrThoughts] = useState('');
   const [trEmotion, setTrEmotion] = useState('');
   const [trIntensity, setTrIntensity] = useState<number | null>(null);
+
+
+  useEffect(() => {
+  const saved = sessionStorage.getItem('sleepDraft');
+
+  if (saved) {
+    const data = JSON.parse(saved);
+
+    setNapMinutes(data.napMinutes ?? '');
+    setNapTimeOfDay(data.napTimeOfDay ?? 'Did not nap');
+    setBedtime(data.bedtime ?? '');
+    setTimeToFallAsleep(data.timeToFallAsleep ?? '');
+    setNightAwakenings(data.nightAwakenings ?? '');
+    setTimeAwakeDuringNight(data.timeAwakeDuringNight ?? '');
+    setWaketime(data.waketime ?? '');
+    setTimeOutOfBed(data.timeOutOfBed ?? '');
+    setSleepQuality(data.sleepQuality ?? null);
+
+    setScAvoidBedroom(data.scAvoidBedroom ?? null);
+    setScFellAsleep(data.scFellAsleep ?? null);
+    setScGotUpCantSleep(data.scGotUpCantSleep ?? null);
+    setScSleptThrough(data.scSleptThrough ?? null);
+    setScGotUpAwakening(data.scGotUpAwakening ?? null);
+    setScAvoidedNapping(data.scAvoidedNapping ?? null);
+
+    setShCaffeine(data.shCaffeine ?? null);
+    setShExercise(data.shExercise ?? null);
+    setShNicotine(data.shNicotine ?? null);
+    setShAlcohol(data.shAlcohol ?? null);
+    setShHeavyMeals(data.shHeavyMeals ?? null);
+    setShPleasantActivity(data.shPleasantActivity ?? null);
+
+    setTrSituation(data.trSituation ?? '');
+    setTrThoughts(data.trThoughts ?? '');
+    setTrEmotion(data.trEmotion ?? '');
+    setTrIntensity(data.trIntensity ?? null);
+  }
+}, []);
+
+useEffect(() => {
+  sessionStorage.setItem(
+    'sleepDraft',
+    JSON.stringify({
+      napMinutes,
+      napTimeOfDay,
+      bedtime,
+      timeToFallAsleep,
+      nightAwakenings,
+      timeAwakeDuringNight,
+      waketime,
+      timeOutOfBed,
+      sleepQuality,
+      scAvoidBedroom,
+      scFellAsleep,
+      scGotUpCantSleep,
+      scSleptThrough,
+      scGotUpAwakening,
+      scAvoidedNapping,
+      shCaffeine,
+      shExercise,
+      shNicotine,
+      shAlcohol,
+      shHeavyMeals,
+      shPleasantActivity,
+      trSituation,
+      trThoughts,
+      trEmotion,
+      trIntensity,
+    })
+  );
+}, [
+  napMinutes, napTimeOfDay, bedtime, timeToFallAsleep,
+  nightAwakenings, timeAwakeDuringNight, waketime,
+  timeOutOfBed, sleepQuality, scAvoidBedroom, scFellAsleep,
+  scGotUpCantSleep, scSleptThrough, scGotUpAwakening,
+  scAvoidedNapping, shCaffeine, shExercise, shNicotine,
+  shAlcohol, shHeavyMeals, shPleasantActivity,
+  trSituation, trThoughts, trEmotion, trIntensity,
+]);
 
   const hoursSlept = useMemo(() => toHours(bedtime, waketime), [bedtime, waketime]);
 
@@ -284,19 +375,43 @@ export default function SleepLogModal({
     });
 
     resetForm();
+    sessionStorage.removeItem('sleepDraft');
     onClose();
   };
 
   if (!isOpen) return null;
 
+  const homepageButtonGradient = 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)';
+  const token = {
+    white: '#FFFFFF',
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <>
+    {activeLog === 'sleep' ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       <div className="relative w-full max-w-[560px] rounded-2xl bg-white p-8 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
           <div>
+            <button
+            type="button"
+            onClick={() => setActiveLog('diet')}
+            className="transition-all duration-200 hover:brightness-95 hover:-translate-y-px active:translate-y-0"
+            style={{
+                  color: token.white,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  padding: '9px 16px',
+                  border: 'none',
+                  backgroundImage: homepageButtonGradient,
+                  marginBottom: '20px', 
+                }}>
+                  Diet Log
+            </button>
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1A1A2E' }}>
               Daily Sleep Log
             </h2>
@@ -584,7 +699,18 @@ export default function SleepLogModal({
             </div>
           </>
         )}
+        </div>
       </div>
-    </div>
+    ) : (
+      <DietLogModal
+        isOpen={true}
+        onClose={onClose}
+        onSubmit={(data) => {
+          // Replace this with your diet log save function
+          setActiveLog('diet');
+        }}
+      />
+    )}
+  </>
   );
 }

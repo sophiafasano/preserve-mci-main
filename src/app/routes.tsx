@@ -10,9 +10,11 @@ import CarePartnerDashboard from "./components/caregiver/CarePartnerDashboard";
 import ClinicianDashboard from "./components/ClinicianDashboard";
 import ModulesOverview from "./components/ModulesOverview";
 import SleepModulePage from "./components/SleepModulePage";
+import DietModulePage from "./components/DietModulePage";
 import ProgressiveMuscleRelaxationPage from "./components/ProgressiveMuscleRelaxationPage";
 import AutogenicRelaxationPage from "./components/AutogenicRelaxationPage";
 import SleepResourceDetailPage from "./components/SleepResourceDetailPage";
+import DietResourceDetailPage from "./components/DietResourceDetailPage";
 import PatientMessagesCenter from "./components/patient/MessagesCenter";
 import MyProgress from "./components/patient/MyProgress";
 import SleepAnalytics from "./components/patient/SleepAnalytics";
@@ -25,6 +27,8 @@ import NotFound from "./components/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CaregiverModulesOverview from './components/caregiver/CaregiverModulesOverview';
 import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModulePage'
+import DietModulesOverview from './components/DietModulesOverview';
+import MindDietPage from './components/MindDietPage';
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -35,6 +39,11 @@ import CaregiverSettingsPage from "./components/caregiver/SettingsPage";
 import CaregiverSleepTips from "./components/caregiver/SleepTips";
 import CaregiverAutogenicRelaxationPage from "./components/caregiver/CaregiverAutogenicRelaxationPage";
 import CaregiverProgressiveMuscleRelaxation from "./components/caregiver/CaregiverProgressiveMuscleRelaxationPage";
+
+
+//testing
+import TestDashboard from "./components/caregiver/TestDashboard"
+import TestModulesOverview from "./components/caregiver/TestModulesOverview"
 
 
 /**
@@ -141,6 +150,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "caregiver/testdashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "caregiver/patients",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -201,6 +218,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
             <CaregiverModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/testmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestModulesOverview />
           </ProtectedRoute>
         ),
       },
@@ -376,6 +401,38 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "caregiver/dietmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <DietModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <DietModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["patient"]}>
+            <DietModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["care_partner", "caregiver"]}>
+            <DietModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "modules/:moduleId",
         element: (
           <ProtectedRoute allowedRoles={['patient']}>
@@ -383,6 +440,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+      
       {
         path: "modules/resources/progressive-muscle-relaxation",
         element: (
@@ -404,6 +462,38 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <SleepResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <DietResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/resources/mind-diet",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <MindDietPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/resources/mind-diet",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <MindDietPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <DietResourceDetailPage />
           </ProtectedRoute>
         ),
       },

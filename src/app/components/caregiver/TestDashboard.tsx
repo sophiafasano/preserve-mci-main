@@ -1,0 +1,1136 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  Moon,
+  Star,
+  Flame,
+  BookOpen,
+  MessageCircle,
+  CalendarCheck,
+  ClipboardList,
+  Clock,
+  LayoutDashboard,
+  NotebookPen,
+  BarChart2,
+  TrendingUp,
+  Settings,
+  LogOut,
+  ChevronRight,
+  Menu,
+  X,
+  BedDouble,
+  Sparkles,
+  Bell
+} from 'lucide-react';
+import { Button } from '../ui/button';
+import { useSleepLogs } from '../../hooks/useSleepLogs';
+// import { useAllModulesProgress } from '../hooks/useModuleProgress';
+import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../../utils/modulesAPI';
+import { caregiverModuleData, moduleWeekOrder } from '../../data/caregiverModuleData';
+import { useReminders } from '../../hooks/useReminders';
+import { useAuth } from '../../contexts/useAuth';
+import { useMessaging } from '../../hooks/useMessaging';
+// import SleepLogModal, { SleepLogData } from '../SleepLogModal';
+import { supabase } from '../../utils/supabaseClient';
+import { toast } from 'sonner';
+import CaregiverLayout from "./CaregiverLayout"
+
+export default function TestDashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user, signout } = useAuth();
+  const { unreadCount } = useMessaging();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  // const [sleepLogModalOpen, setSleepLogModalOpen] = useState(false);
+  const [sleepTipsOpen, setSleepTipsOpen] = useState(false);
+  const [sleepTrendMetric, setSleepTrendMetric] = useState<'duration' | 'efficiency' | 'wakeTime'>('duration');
+  
+  // Use localStorage-backed sleep logs
+  const { logs: sleepLogs, addSleepLog, stats: sleepStats, getChartData } = useSleepLogs();
+  
+  // Use localStorage-backed module progress
+  // const moduleProgressStats = useAllModulesProgress();
+
+  // Use app_data module progress
+  const [modulesData, setModulesData] = useState<{
+    modules: ModuleWithProgress[];
+    summary: ModulesSummary;
+  } | null>(null);
+
+  useEffect(() => {
+    modulesAPI.getModules().then((res) => {
+      setModulesData({ modules: res.modules, summary: res.summary });
+    }).catch(() => {});
+  }, []);
+
+  // Reminders system
+  const { activeCount, refreshAutomaticReminders } = useReminders();
+
+  // Refresh reminders when sleep logs or module progress changes
+  useEffect(() => {
+    const lastLogDate = sleepLogs.length > 0
+      ? sleepLogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
+      : null;
+
+    const incompleteModules = totalWeeks - (modulesData?.summary.completedCount ?? 0);
+
+    // Get current module info from modulesData
+    // Find the first incomplete unlocked module (the one they should be working on)
+    const currentModule = modulesData?.modules.find((m: any) => !m.completed && m.unlocked);
+
+    // If all unlocked modules are done, check if next is locked (waiting 7 days)
+    const currentModuleHasUnwatchedVideos = currentModule
+      ? currentModule.queue.some((v: any) => !v.progress.watched)
+      : false;
+    const nextModuleIndex = modulesData?.modules.findIndex((m: any) => !m.completed && !m.isLocked && m.weekNumber > 1);
+    const nextModuleUnlocked = modulesData?.modules.some((m: any) => m.unlocked && !m.completed && m.weekNumber > 1);
+
+    refreshAutomaticReminders(
+      lastLogDate,
+      sleepStats.currentStreak,
+      incompleteModules,
+      currentModuleHasUnwatchedVideos,
+      nextModuleUnlocked ?? false,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sleepLogs.length, sleepStats.currentStreak, modulesData?.summary.completedCount]);
+
+  // const handleSleepLogSubmit = (data: SleepLogData) => {
+  //   addSleepLog(data);
+  // };
+
+  const userName = user?.name || 'Caregiver'|| 'Care_Partner';
+  const firstName = userName.trim().split(/\s+/)[0] || 'Caregiver' || 'Care_Partner';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 18 ? 'Good Afternoon' : 'Good Evening';
+
+  // Module progress from app_data
+  const totalWeeks = moduleWeekOrder.length;
+  const completedCount = modulesData?.summary.completedCount ?? 0;
+  const currentWeek = Math.min(completedCount + 1, totalWeeks);
+  const currentWeekIndex = modulesData?.modules.findIndex(m => !m.completed || m.isLocked) ?? 0;
+  const safeCurrentWeekIndex = currentWeekIndex === -1 ? totalWeeks - 1 : currentWeekIndex;
+  const currentWeekKey = moduleWeekOrder[safeCurrentWeekIndex];  
+  const currentModuleData = caregiverModuleData[currentWeekKey];
+  const currentModuleInProgress = modulesData?.modules.find(m => m.weekKey === currentWeekKey);
+  const lessonsCompleted = currentModuleInProgress
+    ? currentModuleInProgress.queue.filter(v => v.progress.watched).length
+    : 0;
+  const totalLessons = currentModuleData.queue.length;
+  const moduleProgress = modulesData?.summary.overallPercent ?? 0;
+
+  const currentModule = {
+    title: currentModuleData.title,
+    description: currentModuleData.description,
+    lessonsCompleted,
+    totalLessons,
+    estimatedTime: currentModuleData.duration,
+  };
+
+  // Sleep prescription — set by the clinician, fetched from clinician_patients
+  const [prescribedSleepHours, setPrescribedSleepHours] = useState<number | null>(null);
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('clinician_patients')
+      .select('prescribed_sleep_hours')
+      .eq('patient_id', user.id)
+      .eq('status', 'active')
+      .order('assigned_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.prescribed_sleep_hours != null) {
+          setPrescribedSleepHours(Number(data.prescribed_sleep_hours));
+        }
+      });
+  }, [user]);
+
+  const sleepStatsData = [
+    {
+      label: 'Avg Sleep',
+      value: sleepStats.averageHours > 0 ? `${sleepStats.averageHours} hrs` : 'No data',
+      icon: Moon,
+      trend: sleepStats.averageHours >= 7 ? '+0.5' : 'Track more',
+    },
+    { 
+      label: 'Sleep Quality', 
+      value: sleepStats.averageQuality > 0 ? `${Math.round(sleepStats.averageQuality * 10)}%` : 'No data',
+      icon: Star,
+      trend: sleepStats.totalLogs > 3 ? '+5%' : 'Keep logging' 
+    },
+    { 
+      label: 'Current Streak', 
+      value: `${sleepStats.currentStreak} day${sleepStats.currentStreak !== 1 ? 's' : ''}`, 
+      icon: Flame,
+      trend: sleepStats.currentStreak > 0 ? 'Great!' : 'Start now' 
+    },
+  ];
+
+  // Real chart data from localStorage (last 7 days) - memoized for stability
+  const sleepTrendData = useMemo(() => {
+    return getChartData(7).map((item, index) => ({
+      ...item,
+      // Ensure each item has a truly unique key for recharts
+      uniqueId: `${item.fullDate}-${index}`,
+    }));
+  }, [getChartData]);
+
+  const sleepTrendSeries = useMemo(() => {
+    return sleepTrendData.map((item) => {
+      if (sleepTrendMetric === 'duration') {
+        return {
+          ...item,
+          value: item.hasData ? item.hours : null,
+        };
+      }
+
+      if (sleepTrendMetric === 'efficiency') {
+        return {
+          ...item,
+          value: typeof item.sleepEfficiency === 'number' ? item.sleepEfficiency : null,
+        };
+      }
+
+      return {
+        ...item,
+        value: typeof item.totalWakeMinutes === 'number' ? item.totalWakeMinutes : null,
+      };
+    });
+  }, [sleepTrendData, sleepTrendMetric]);
+
+  const hasTrendDataForMetric = useMemo(() => {
+    return sleepTrendSeries.some((item) => typeof item.value === 'number');
+  }, [sleepTrendSeries]);
+
+  const sampleTrendSeries = useMemo(() => {
+    const sampleDuration = [6.6, 7.1, 6.9, 7.4, 7.2, 7.6, 7.3];
+    const sampleEfficiency = [74, 78, 81, 83, 85, 87, 84];
+    const sampleWakeTime = [52, 46, 42, 38, 34, 30, 33];
+
+    const sampleValues =
+      sleepTrendMetric === 'duration'
+        ? sampleDuration
+        : sleepTrendMetric === 'efficiency'
+          ? sampleEfficiency
+          : sampleWakeTime;
+
+    const fallbackDates = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const sourceDates = sleepTrendData.length > 0 ? sleepTrendData.map((item) => item.date) : fallbackDates;
+
+    return sourceDates.slice(0, 7).map((date, index) => ({
+      date,
+      value: sampleValues[index] ?? sampleValues[sampleValues.length - 1],
+    }));
+  }, [sleepTrendData, sleepTrendMetric]);
+
+  const displayedTrendSeries = hasTrendDataForMetric ? sleepTrendSeries : sampleTrendSeries;
+  const isSamplePreview = !hasTrendDataForMetric;
+
+  const chartConfig = useMemo(() => {
+    if (sleepTrendMetric === 'efficiency') {
+      return {
+        domain: [0, 100] as [number, number],
+        ticks: [0, 20, 40, 60, 80, 100],
+        label: '%',
+        legend: 'Sleep Efficiency',
+      };
+    }
+
+    if (sleepTrendMetric === 'wakeTime') {
+      const sourceValues = isSamplePreview ? sampleTrendSeries : sleepTrendSeries;
+      const maxWake = Math.max(30, ...sourceValues.map((item) => item.value || 0));
+      const roundedMax = Math.ceil(maxWake / 10) * 10;
+      const step = Math.max(10, Math.ceil(roundedMax / 5 / 10) * 10);
+      const ticks: number[] = [];
+      for (let value = 0; value <= roundedMax; value += step) {
+        ticks.push(value);
+      }
+
+      return {
+        domain: [0, roundedMax] as [number, number],
+        ticks,
+        label: 'Minutes',
+        legend: 'Wake Time',
+      };
+    }
+
+    return {
+      domain: [0, 10] as [number, number],
+      ticks: [0, 2, 4, 6, 8, 10],
+      label: 'Hours',
+      legend: 'Sleep Hours',
+    };
+  }, [isSamplePreview, sampleTrendSeries, sleepTrendMetric, sleepTrendSeries]);
+
+//   const openSleepLogModal = () => {
+//   const today = new Date().toDateString();
+//   const hasLoggedToday = sleepLogs.some((log) => new Date(log.date).toDateString() === today);
+//   if (hasLoggedToday) {
+//     toast.error("You've already logged your sleep for today");
+//   } else {
+//     setSleepLogModalOpen(true);
+//   }
+// };
+
+  const quickActions = [
+    { label: 'View Sleep Tips', icon: BookOpen, color: 'purple', action: 'sleep-tips' },
+    { label: 'Message Care Team', icon: MessageCircle, color: 'purple', action: 'messages' },
+  ];
+
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case 'log-sleep':
+        window.dispatchEvent(new Event('open-sleep-log'));
+        break;
+      case 'analytics':
+        navigate('/caregiver/sleep-analytics');
+        break;
+      case 'sleep-tips':
+        setSleepTipsOpen(true);
+        break;
+      case 'messages':
+        navigate('/caregiver/messages');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const upcomingItems = useMemo(() => {
+    const items: { type: string; title: string; date: string; icon: typeof CalendarCheck }[] = [];
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === todayStr);
+    if (!hasLoggedToday) {
+      items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
+    }
+    if (activeCount > 0) {
+      items.push({
+        type: 'reminder',
+        title: `${activeCount} active reminder${activeCount !== 1 ? 's' : ''}`,
+        date: 'Pending',
+        icon: ClipboardList,
+      });
+    }
+    if (items.length === 0) {
+      items.push({ type: 'info', title: 'All caught up! Keep logging your sleep.', date: '', icon: CalendarCheck });
+    }
+    return items;
+  }, [sleepLogs, activeCount]);
+
+  const navigationItems: Array<{ label: string; icon: React.ElementType; path: string; action?: string; badge?: number }> = [
+    { label: 'Dashboard',      icon: LayoutDashboard, path: '/caregiver/dashboard' },
+    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: '/caregiver/modules' },
+    { label: 'Sleep Log',      icon: NotebookPen,     path: 'null', action: 'log-sleep' },
+    { label: 'Sleep Analysis', icon: BarChart2,      path: '/caregiver/sleep-analytics' },
+    { label: 'My Progress',    icon: TrendingUp,      path: '/caregiver/my-progress' },
+    { label: 'Messages',       icon: MessageCircle,   path: '/caregiver/messages', badge: unreadCount },
+    { label: 'Reminders',      icon: Bell,                 path: '/caregiver/reminders', badge: activeCount },
+  ];
+
+  // Suppress recharts duplicate key warning (known library issue)
+  useEffect(() => {
+    const originalError = console.error;
+    console.error = (...args) => {
+      if (
+        typeof args[0] === 'string' &&
+        (args[0].includes('Encountered two children with the same key') ||
+         args[0].includes('width(0) and height(0)'))
+      ) {
+        return;
+      }
+      originalError.apply(console, args);
+    };
+
+    return () => {
+      console.error = originalError;
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   const handleOpenSleepLog = () => openSleepLogModal();
+  //   window.addEventListener('open-sleep-log', handleOpenSleepLog);
+  //   return () => window.removeEventListener('open-sleep-log', handleOpenSleepLog);
+  // }, [sleepLogs]);
+
+  useEffect(() => {
+    const handleOpenSleepTips = () => setSleepTipsOpen(true);
+    window.addEventListener('open-sleep-tips', handleOpenSleepTips);
+    return () => window.removeEventListener('open-sleep-tips', handleOpenSleepTips);
+  }, []);
+
+  const handleSignOut = async () => {
+    await signout();
+    navigate('/');
+  };
+
+  const showSidebarLabels = true;
+  const homepagePurple = '#6D28D9';
+  const homepageButtonGradient = 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)';
+  const homepageGradientClass = 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800';
+  const token = {
+    purple900: '#6D28D9',
+    purple800: '#6D28D9',
+    purple600: '#6D28D9',
+    purple400: '#6D28D9',
+    purple200: '#DAB6F2',
+    purple100: '#F3E9FB',
+    purple50: '#FBF5FF',
+    white: '#FFFFFF',
+    sidebarInactive: '#888780',
+    label: '#AFA9EC',
+    divider: '#F3F2FE',
+    textBlack: '#000000',
+  };
+
+  const cardStyle = {
+    backgroundColor: token.white,
+    border: `0.5px solid ${token.purple100}`,
+    borderRadius: '14px',
+    padding: '18px 20px',
+  } as const;
+  const contentScale = 1.08;
+
+  return (
+    <CaregiverLayout>
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#F9FAFB' }}>
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-40 lg:hidden p-2.5 rounded-lg transition-all duration-200 hover:bg-[#F3E8FF] hover:shadow-sm active:scale-95"
+        style={{ backgroundColor: token.white, border: `0.5px solid ${token.purple100}`, color: token.purple600 }}
+        aria-label="Toggle menu"
+      >
+        {sidebarOpen ? (
+          <X size={18} strokeWidth={1.5} color="#6B7280" />
+        ) : (
+          <Menu size={18} strokeWidth={1.5} color="#6B7280" />
+        )}
+      </button>
+
+      <div className="flex min-h-screen">
+        {/* Sidebar Navigation */}
+        
+
+        {/* Main Content */}
+        <main
+          className="w-full lg:pl-24 p-6 lg:p-8 max-w-7xl mx-auto w-full"
+          style={{
+            zoom: contentScale,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            paddingBottom: '72px',
+          }}
+        >
+          {/* Welcome Section */}
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div>
+              <h1 className="mb-2" style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>
+              {greeting}, {firstName}!
+              </h1>
+              <p style={{ fontSize: '14px', color: '#6B7280', fontWeight: 400 }}>
+                You&apos;re doing great. Let&apos;s continue your wellness journey.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-flex items-center rounded-full"
+                style={{
+                  backgroundColor: token.purple100,
+                  border: `0.5px solid ${token.purple200}`,
+                  color: token.textBlack,
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  padding: '6px 14px',
+                }}
+              >
+                Week {currentWeek} of {totalWeeks}
+              </span>
+              <button
+                 onClick={() => window.dispatchEvent(new Event('open-sleep-log'))}
+                className="transition-all duration-200 hover:brightness-95 hover:-translate-y-px active:translate-y-0"
+                style={{
+                  color: token.white,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  padding: '9px 16px',
+                  border: 'none',
+                  backgroundImage: homepageButtonGradient,
+                }}
+              >
+                Log Wellness
+              </button>
+            </div>
+          </div>
+
+          {/* Current Week's Module - Main Focus */}
+          <div className="mb-3">
+            <div style={{ ...cardStyle, border: `6px solid ${token.purple200}`, backgroundColor: '#F3E9FB' }}>
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-full">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="w-[44px] h-[44px] rounded-[12px] flex items-center justify-center"
+                      style={{ backgroundColor: '#F3F4F6', color: '#6B7280' }}
+                    >
+                      <BookOpen size={18} strokeWidth={1.5} color="#9333EA" />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: '#9333EA', letterSpacing: '0.08em' }}>
+                        CURRENT MODULE
+                      </p>
+                      <h2 style={{ fontSize: '18px', fontWeight: 500, color: token.textBlack }}>{currentModule.title}</h2>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '15px', color: token.textBlack }}>
+                    {currentModule.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1">
+                  <span style={{ fontSize: '13px', color: token.textBlack }}>
+                    {currentModule.lessonsCompleted} of {currentModule.totalLessons} lessons
+                    completed
+                  </span>
+                  <span style={{ fontSize: '13px', color: token.textBlack }}>
+                    {totalLessons > 0 ? Math.round((lessonsCompleted / totalLessons) * 100) : 0}%
+                  </span>
+                </div>
+                <div className="h-2 rounded-[4px] overflow-hidden" style={{ backgroundColor: '#F3F4F6' }}>
+                  <div
+                    className={`h-full rounded-[2px] transition-all duration-500 ${homepageGradientClass}`}
+                    style={{ width: `${totalLessons > 0 ? Math.round((lessonsCompleted / totalLessons) * 100) : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* CTA and Time */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center space-x-2" style={{ color: token.textBlack }}>
+                  <Clock size={15} strokeWidth={1.5} color="#6B7280" />
+                  <span style={{ fontSize: '13px' }}>{currentModule.estimatedTime}</span>
+                </div>
+                <Button
+                  className="h-11 px-5 rounded-lg transition-all duration-200 ease-out hover:bg-[#F3E8FF] hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
+                  style={{
+                    border: `1px solid ${homepagePurple}`,
+                    backgroundColor: token.white,
+                    color: homepagePurple,
+                    fontSize: '14px',
+                    fontWeight: 500,
+                  }}
+                  onClick={() => navigate(`caregiver/modules/${currentWeekKey.replace('week', 'week-')}`)}
+                >
+                  Continue Module
+                  <ChevronRight size={16} strokeWidth={1.5} color="#6B7280" className="ml-2" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          
+          {/* Sleep Prescription */}
+          <div style={{ ...cardStyle, marginBottom: '12px' }}>
+            <p style={{ fontSize: '16px', color: token.textBlack, marginBottom: '4px' }}>
+              Prescriptions
+            </p>
+            <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
+              {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
+            </p>
+            <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '2px' }}>
+              Recommended by your clinician
+            </p>
+          </div>
+
+          {/* Sleep Trend Chart */}
+          <div style={{ ...cardStyle, marginBottom: '12px' }}>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 gap-3">
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: 500, color: token.textBlack, marginBottom: '4px' }}>
+                  Sleep Trend
+                </h2>
+                <p style={{ fontSize: '13px', color: token.textBlack }}>Last 7 days</p>
+              </div>
+              <div className="flex items-center space-x-2 flex-wrap">
+                <button
+                  onClick={() => setSleepTrendMetric('duration')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'duration'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'duration' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'duration' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'duration' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Total Sleep
+                </button>
+                <button
+                  onClick={() => setSleepTrendMetric('efficiency')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'efficiency'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'efficiency' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'efficiency' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'efficiency' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Sleep Efficiency
+                </button>
+                <button
+                  onClick={() => setSleepTrendMetric('wakeTime')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'wakeTime'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'wakeTime' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'wakeTime' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'wakeTime' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Total Wake Time
+                </button>
+              </div>
+            </div>
+
+            {displayedTrendSeries.length > 0 ? (
+              <>
+                <div className="w-full" style={{ height: '340px', maxHeight: '340px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart 
+                      data={displayedTrendSeries}
+                      margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3E8FF" vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        stroke="#AFA9EC"
+                        style={{ fontSize: '12px' }}
+                        tick={{ fill: '#AFA9EC' }}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        stroke="#AFA9EC"
+                        style={{ fontSize: '14px' }}
+                        tick={{ fill: '#AFA9EC', fontSize: 14 }}
+                        width={56}
+                        interval={0}
+                        domain={chartConfig.domain}
+                        ticks={chartConfig.ticks}
+                        label={{
+                          value: chartConfig.label,
+                          angle: -90,
+                          position: 'insideLeft',
+                          style: { fill: '#AFA9EC', fontSize: '14px' },
+                        }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: token.white,
+                          border: `0.5px solid ${token.purple100}`,
+                          borderRadius: '12px',
+                          padding: '12px',
+                        }}
+                        labelStyle={{ color: token.textBlack, fontWeight: 500 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#6D28D9"
+                        strokeWidth={3}
+                        dot={{ fill: '#6D28D9', r: 5 }}
+                        activeDot={{ r: 7 }}
+                        name={chartConfig.legend}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 flex items-center justify-center space-x-2" style={{ fontSize: '14px', color: token.textBlack }}>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: token.purple600 }}></div>
+                    <span>{chartConfig.legend}</span>
+                  </div>
+                </div>
+
+                {isSamplePreview && (
+                  <div className="mt-3 flex flex-col items-center gap-2 text-center">
+                    <span
+                      className="rounded-full"
+                      style={{
+                        backgroundColor: '#F3E8FF',
+                        color: '#6D28D9',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '4px 10px',
+                      }}
+                    >
+                      Sample Preview Data
+                    </span>
+                    <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                      This is a demo graph preview. Start logging sleep to see your real trends.
+                    </p>
+                    <button
+                       onClick={() => window.dispatchEvent(new Event('open-sleep-log'))}
+                      className="rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        backgroundImage: homepageButtonGradient,
+                      }}
+                    >
+                      Log last night&apos;s sleep
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div
+                className="flex flex-col items-center justify-center text-center"
+                style={{
+                  backgroundColor: '#F9F7FF',
+                  border: '0.5px solid #E9D5FF',
+                  borderRadius: '12px',
+                  padding: '40px 24px',
+                  minHeight: '160px',
+                }}
+              >
+                <Moon size={28} strokeWidth={1.5} color="#C4B5FD" />
+                <h3 style={{ fontSize: '15px', marginTop: '12px', color: '#1A1A2E', fontWeight: 600 }}>
+                  No sleep data yet
+                </h3>
+                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '6px' }}>
+                  Log your first night to see your sleep trends appear here
+                </p>
+                <button
+                   onClick={() => window.dispatchEvent(new Event('open-sleep-log'))}
+                  className="mt-4 rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundImage: homepageButtonGradient,
+                  }}
+                >
+                  Log last night&apos;s sleep
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Sleep Trend Chart */}
+          <div style={{ ...cardStyle, marginBottom: '12px' }}>
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-3 gap-3">
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: 500, color: token.textBlack, marginBottom: '4px' }}>
+                  Diet Trend
+                </h2>
+                <p style={{ fontSize: '13px', color: token.textBlack }}>Last 7 days</p>
+              </div>
+              <div className="flex items-center space-x-2 flex-wrap">
+                <button
+                  onClick={() => setSleepTrendMetric('duration')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'duration'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'duration' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'duration' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'duration' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Total Sleep
+                </button>
+                <button
+                  onClick={() => setSleepTrendMetric('efficiency')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'efficiency'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'efficiency' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'efficiency' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'efficiency' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Sleep Efficiency
+                </button>
+                <button
+                  onClick={() => setSleepTrendMetric('wakeTime')}
+                  className={`px-3 py-1 transition-all duration-200 hover:opacity-90 hover:-translate-y-px active:translate-y-0 ${
+                    sleepTrendMetric === 'wakeTime'
+                      ? ''
+                      : ''
+                  }`}
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundColor: sleepTrendMetric === 'wakeTime' ? homepagePurple : '#FFFFFF',
+                    color: sleepTrendMetric === 'wakeTime' ? '#FFFFFF' : '#6B7280',
+                    border: sleepTrendMetric === 'wakeTime' ? 'none' : '0.5px solid #E9D5FF',
+                    borderRadius: '20px',
+                  }}
+                >
+                  Total Wake Time
+                </button>
+              </div>
+            </div>
+
+            {displayedTrendSeries.length > 0 ? (
+              <>
+                <div className="w-full" style={{ height: '340px', maxHeight: '340px' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart 
+                      data={displayedTrendSeries}
+                      margin={{ top: 5, right: 5, left: -20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3E8FF" vertical={false} />
+                      <XAxis
+                        dataKey="date"
+                        stroke="#AFA9EC"
+                        style={{ fontSize: '12px' }}
+                        tick={{ fill: '#AFA9EC' }}
+                        interval="preserveStartEnd"
+                      />
+                      <YAxis
+                        stroke="#AFA9EC"
+                        style={{ fontSize: '14px' }}
+                        tick={{ fill: '#AFA9EC', fontSize: 14 }}
+                        width={56}
+                        interval={0}
+                        domain={chartConfig.domain}
+                        ticks={chartConfig.ticks}
+                        label={{
+                          value: chartConfig.label,
+                          angle: -90,
+                          position: 'insideLeft',
+                          style: { fill: '#AFA9EC', fontSize: '14px' },
+                        }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: token.white,
+                          border: `0.5px solid ${token.purple100}`,
+                          borderRadius: '12px',
+                          padding: '12px',
+                        }}
+                        labelStyle={{ color: token.textBlack, fontWeight: 500 }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#6D28D9"
+                        strokeWidth={3}
+                        dot={{ fill: '#6D28D9', r: 5 }}
+                        activeDot={{ r: 7 }}
+                        name={chartConfig.legend}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 flex items-center justify-center space-x-2" style={{ fontSize: '14px', color: token.textBlack }}>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: token.purple600 }}></div>
+                    <span>{chartConfig.legend}</span>
+                  </div>
+                </div>
+
+                {isSamplePreview && (
+                  <div className="mt-3 flex flex-col items-center gap-2 text-center">
+                    <span
+                      className="rounded-full"
+                      style={{
+                        backgroundColor: '#F3E8FF',
+                        color: '#6D28D9',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '4px 10px',
+                      }}
+                    >
+                      Sample Preview Data
+                    </span>
+                    <p style={{ fontSize: '12px', color: '#9CA3AF' }}>
+                      This is a demo graph preview. Start logging sleep to see your real trends.
+                    </p>
+                    <button
+                      onClick={() => window.dispatchEvent(new Event('open-sleep-log'))}
+                      className="rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        backgroundImage: homepageButtonGradient,
+                      }}
+                    >
+                      Log last night&apos;s sleep
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div
+                className="flex flex-col items-center justify-center text-center"
+                style={{
+                  backgroundColor: '#F9F7FF',
+                  border: '0.5px solid #E9D5FF',
+                  borderRadius: '12px',
+                  padding: '40px 24px',
+                  minHeight: '160px',
+                }}
+              >
+                <Moon size={28} strokeWidth={1.5} color="#C4B5FD" />
+                <h3 style={{ fontSize: '15px', marginTop: '12px', color: '#1A1A2E', fontWeight: 600 }}>
+                  No sleep data yet
+                </h3>
+                <p style={{ fontSize: '13px', color: '#9CA3AF', marginTop: '6px' }}>
+                  Log your first night to see your sleep trends appear here
+                </p>
+                <button
+                  onClick={() => window.dispatchEvent(new Event('open-sleep-log'))}
+                  className="mt-4 rounded-lg px-5 py-2 text-white transition-all duration-200 ease-out hover:brightness-95 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-lg active:translate-y-0 active:scale-100"
+                  style={{
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    backgroundImage: homepageButtonGradient,
+                  }}
+                >
+                  Log last night&apos;s sleep
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+            {/* Quick Actions */}
+            <div style={cardStyle}>
+              <h2 style={{ fontSize: '16px', fontWeight: 500, color: token.textBlack, marginBottom: '12px' }}>
+                Quick Actions
+              </h2>
+              <div>
+                {quickActions.map((action, index) => {
+                  const Icon = action.icon;
+                  const handleClick = () => {
+                    handleQuickAction(action.action);
+                  };
+                  const isActiveAction = index === 0;
+                  
+                  return (
+                    <button
+                      key={index}
+                      onClick={handleClick}
+                      className="w-full flex items-center justify-between py-4 transition-all duration-200 hover:bg-[#FAF5FF] hover:-translate-y-px"
+                      style={{
+                        borderRadius: '10px',
+                        borderBottom: index !== quickActions.length - 1 ? `0.5px solid ${token.divider}` : 'none',
+                      }}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" 
+                        style={{ backgroundColor: '#F3E9FB', color: '#6D28D9' }}
+                        >
+                          <Icon size={18} strokeWidth={1.5} color="#7200CA" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: isActiveAction ? token.purple400 : token.purple200 }}
+                          />
+                          <span style={{ fontSize: '14px', color: '#1A1A2E', fontWeight: 400 }}>
+                          {action.label}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight size={16} strokeWidth={1.5} color="#C4B5FD" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Upcoming Reminders & Appointments */}
+            <div style={cardStyle}>
+              <h2 style={{ fontSize: '16px', fontWeight: 500, color: token.textBlack, marginBottom: '12px' }}>
+                Upcoming
+              </h2>
+              <div>
+                {upcomingItems.map((item, index) => {
+                  const Icon = item.icon;
+                  const isToday = item.date.toLowerCase().includes('today');
+                  return (
+                    <button
+                      key={index} 
+                      onClick={() => {
+                        if (item.type === 'sleep-log') {
+                          window.dispatchEvent(new Event('open-sleep-log'));
+                        } else if (item.type === 'reminder') {
+                          navigate('/caregiver/reminders');
+                        }
+                      }}
+                      className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
+                      style={{
+                        borderBottom: index !== upcomingItems.length - 1 ? `0.5px solid ${token.divider}` : 'none',
+                        cursor: item.type === 'reminder' ? 'pointer' : 'default',
+                      }}
+                    >
+                      <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" 
+                      style={{ backgroundColor: '#F3E9FB', color: '#6D28D9' }}
+                      >
+                        <Icon size={18} strokeWidth={1.5} color="#7200CA" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontSize: '14px', color: '#1A1A2E', marginBottom: '5px', fontWeight: 500 }}>
+                          {item.title}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <p style={{ fontSize: '12px', color: '#9CA3AF' }}>{item.date}</p>
+                          <span
+                            className="rounded-full"
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 500,
+                              borderRadius: '20px',
+                              padding: '3px 10px',
+                              backgroundColor: isToday ? '#EDE9FE' : '#F3E8FF',
+                              color: isToday ? '#4C1D95' : '#6B21A8',
+                            }}
+                          >
+                            {isToday ? 'Today' : 'Due soon'}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-20 lg:hidden"
+          style={{ backgroundColor: 'rgba(38, 33, 92, 0.35)' }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+{/* 
+      <SleepLogModal
+        isOpen={sleepLogModalOpen}
+        onClose={() => setSleepLogModalOpen(false)}
+        onSubmit={handleSleepLogSubmit}
+      /> */}
+
+      {/* Sleep Tips Modal */}
+      {sleepTipsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSleepTipsOpen(false)}></div>
+          <div className="relative w-full max-w-[850px] rounded-2xl bg-white p-5" style={{border: `6px solid ${token.purple200}`, backgroundColor: '#fbf5ff' }}>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 style={{ 
+                fontSize: '21px', 
+                fontWeight: 700, 
+                color: '#5018a9', 
+                }}>
+                  Sleep Tips</h3>
+              <button
+                onClick={() => setSleepTipsOpen(false)}
+                className="rounded-md p-1 transition-all duration-200 hover:bg-[#F3E8FF] hover:scale-105 active:scale-100"
+              >
+                <X size={18} strokeWidth={1.5} color="#1A1A2E" />
+              </button>
+            </div>
+
+            <details open className="mb-4">
+              <summary
+                className="flex cursor-pointer items-center gap-2"
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  color: '#5018a9',
+                  padding: '12px 0',
+                  borderBottom: '0.5px solid #060708',
+                }}
+              >
+                <BedDouble size={16} strokeWidth={1.5} color="#060708" />
+                Stimulus Control
+              </summary>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
+                <li>Don&apos;t use your bed for anything other than sleep and sex</li>
+                <li>If you can&apos;t fall asleep within 15–20 min: 
+                  <ul className="list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
+                    <li>Leave the bed and do something relaxing in another room</li>
+                    <li>Return only when sleepy</li>
+                  </ul>
+                  </li>
+                <li>If you wake up and can&apos;t fall back asleep within 20 minutes, follow the rule above</li>
+                <li>Avoid napping during the day</li>
+                <li>Maintain a regular bedtime and wake time every day</li>
+              </ul>
+            </details>
+
+            <details open>
+              <summary
+                className="flex cursor-pointer items-center gap-2"
+                style={{
+                  fontSize: '20px',
+                  fontWeight: 600,
+                  color: '#5018a9',
+                  padding: '12px 0',
+                  borderBottom: '0.5px solid #060708',
+                  //backgroundColor: token.purple100,
+                }}
+              >
+                <Sparkles size={16} strokeWidth={1.5} color="#060708" />
+                Sleep Hygiene
+              </summary>
+              <ul className="mt-3 list-disc pl-6" style={{ color: '#060708', fontSize: '20px', lineHeight: 1.7 }}>
+                <li>Avoid caffeine after noon</li>
+                <li>Avoid exercise within 2 hours of bedtime</li>
+                <li>Avoid nicotine within 2 hours of bedtime</li>
+                <li>Avoid alcohol within 2 hours of bedtime</li>
+                <li>Avoid heavy meals within 2 hours of bedtime</li>
+                <li>Avoid screen time within 1 hour of bedtime</li>
+              </ul>
+            </details>
+          </div>
+        </div>
+      )}
+    </div>
+    </CaregiverLayout>
+  );
+}

@@ -34,6 +34,7 @@ import { useMessaging } from '../../hooks/useMessaging';
 import SleepLogModal, { SleepLogData } from '../SleepLogModal';
 import { supabase } from '../../utils/supabaseClient';
 import { toast } from 'sonner';
+import CaregiverLayout from "./CaregiverLayout"
 
 export default function CarePartnerDashboard() {
   const navigate = useNavigate();
@@ -394,6 +395,7 @@ export default function CarePartnerDashboard() {
   const contentScale = 1.08;
 
   return (
+    <CaregiverLayout>
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#F9FAFB' }}>
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -410,110 +412,7 @@ export default function CarePartnerDashboard() {
 
       <div className="flex min-h-screen">
         {/* Sidebar Navigation */}
-        <aside
-          className="relative flex flex-col w-72 h-screen shrink-0 sticky top-0"
-          style={{ backgroundColor: token.white, borderRight: `0.5px solid ${token.purple100}` }}
-        >
-          <div className={`px-4 pb-2 ${showSidebarLabels ? 'block' : 'hidden'}`}></div>
-          <nav className="p-4 space-y-2 w-full overflow-y-auto">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = !item.action && location.pathname === item.path;
-              return (
-                <button
-                  key={item.label}
-                  title={item.label}
-                  onClick={() => {
-                    if (item.action) {
-                      handleQuickAction(item.action);
-                    } else {
-                      navigate(item.path);
-                    }
-                    setSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center py-3 rounded-xl transition-all duration-200 hover:bg-[#F3E8FF] hover:translate-x-0.5 ${showSidebarLabels ? 'justify-start space-x-3 px-4' : 'justify-center px-2'}`}
-                  style={{
-                    fontSize: '15px',
-                    fontWeight: 400,
-                    color: isActive ? '#6D28D9' : token.sidebarInactive,
-                    borderLeft: isActive ? '2px solid #6D28D9' : '2px solid transparent',
-                    borderRadius: '10px',
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    paddingLeft: showSidebarLabels ? '16px' : '8px',
-                    paddingRight: showSidebarLabels ? '16px' : '8px',
-                  }}
-                >
-                  <div className="relative flex-shrink-0">
-                    <Icon size={18} strokeWidth={1.5} color={isActive ? '#6D28D9' : '#6B7280'} />
-                    {item.badge != null && item.badge > 0 && (
-                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-[#6D28D9] rounded-full flex items-center justify-center text-[9px] text-white font-bold">
-                        {item.badge > 9 ? '9+' : item.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className={`whitespace-nowrap overflow-hidden transition-all duration-200 ${
-                      showSidebarLabels ? 'max-w-[160px] opacity-100' : 'max-w-0 opacity-0'
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Bottom Actions */}
-          <div
-            className="mt-auto p-4 space-y-2 shrink-0"
-            style={{ borderTop: `0.5px solid ${token.purple100}` }}
-          >
-            <div className={`pb-1 ${showSidebarLabels ? 'block' : 'hidden'}`}>
-              <p
-                className="text-[10px]"
-                style={{ color: token.textBlack, letterSpacing: '0.07em', fontWeight: 500 }}
-              >
-                ACCOUNT
-              </p>
-            </div>
-            <button 
-              title="Settings"
-              className={`w-full flex items-center py-3 rounded-xl transition-all duration-200 hover:bg-[#F3E8FF] hover:translate-x-0.5 ${
-                showSidebarLabels ? 'justify-start space-x-3 px-4' : 'justify-center px-2'
-              }`}
-              style={{ fontSize: '15px', color: token.sidebarInactive, paddingTop: '10px', paddingBottom: '10px' }}
-              onClick={() => navigate('/caregiver/settings')}
-            >
-              <Settings size={18} strokeWidth={1.5} color="#6B7280" className="flex-shrink-0" />
-              <span
-                className={`whitespace-nowrap overflow-hidden transition-all duration-200 ${
-                  showSidebarLabels ? 'max-w-[160px] opacity-100' : 'max-w-0 opacity-0'
-                }`}
-              >
-                Settings
-              </span>
-            </button>
-            <button
-              title="Sign Out"
-              className={`w-full flex items-center py-3 rounded-xl transition-all duration-200 hover:bg-[#F3E8FF] hover:translate-x-0.5 ${
-                showSidebarLabels ? 'justify-start space-x-3 px-4' : 'justify-center px-2'
-              }`}
-              style={{ fontSize: '15px', color: token.sidebarInactive, paddingTop: '10px', paddingBottom: '10px' }}
-              onClick={handleSignOut}
-            >
-              <LogOut size={18} strokeWidth={1.5} color="#6B7280" className="flex-shrink-0" />
-              <span
-                className={`whitespace-nowrap overflow-hidden transition-all duration-200 ${
-                  showSidebarLabels ? 'max-w-[160px] opacity-100' : 'max-w-0 opacity-0'
-                }`}
-              >
-                Sign Out
-              </span>
-            </button>
-          </div>
-        </aside>
-
+        
         {/* Main Content */}
         <main
           className="w-full lg:pl-24 p-6 lg:p-8 max-w-7xl mx-auto w-full"
@@ -1098,5 +997,6 @@ export default function CarePartnerDashboard() {
         </div>
       )}
     </div>
+    </CaregiverLayout>
   );
 }
