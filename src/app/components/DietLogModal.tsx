@@ -28,6 +28,12 @@ export interface DietLogData {
   sweets: number;
   wine: number;
 
+  wakeUp: string;
+  firstMealTime: string;
+  lastSnack: string;
+  bedTime: string;
+  consumeCal: boolean;
+
 
   date: string;
   }
@@ -56,7 +62,7 @@ const EMOTIONS = [
   'Happiness', 'Fear', 'Surprise', 'Disgust',
 ];
 
-const STEPS = ['Brain-Healthy Foods', 'Foods to Limit'];
+const STEPS = ['Brain-Healthy Foods', 'Foods to Limit', 'Time Restricted Eatting'];
 
 const purple = '#6D28D9';
 const purpleHover = '#5B21B6';
@@ -68,7 +74,7 @@ function YesNoButtons({
   onChange,
   disabled = false,
 }: {
-  value: boolean | null | undefined;
+  value: string | boolean | null | undefined ;
   onChange: (v: boolean) => void;
   disabled?: boolean;
 }) {
@@ -152,6 +158,13 @@ export default function DietLogModal({
   const [sweets, setSweets] = useState<number | null>(null);
   const [wine, setWine] = useState<number | null>(null);
 
+  const [wakeUp, setWakeUp] = useState('');
+  const [firstMealTime, setFirstMealTime] = useState('');
+  const [lastSnack, setLastSnack] = useState('');
+  const [bedTime, setBedTime] = useState('');
+
+  const [consumeCal, setConsumeCal] = useState<boolean | null>(null);
+
 
   useEffect(() => {
     const saved = sessionStorage.getItem('dietDraft');
@@ -174,6 +187,11 @@ export default function DietLogModal({
       setFriedFood(data.friedFood ?? null);
       setSweets(data.sweets ?? null);
       setWine(data.wine ?? null);
+      setWakeUp(data.wakeUp ?? '');
+      setFirstMealTime(data.firstMealTime ?? '');
+      setLastSnack(data.lastSnack ?? '');
+      setBedTime(data.bedTime ?? '');
+      setConsumeCal(data.consumeCal ?? '');
     }
   }, []);
   
@@ -196,6 +214,11 @@ export default function DietLogModal({
         friedFood,
         sweets,
         wine,
+        wakeUp,
+        firstMealTime,
+        lastSnack,
+        bedTime,
+        consumeCal,
       })
     );
   }, [
@@ -214,6 +237,11 @@ export default function DietLogModal({
     friedFood,
     sweets,
     wine,
+    wakeUp,
+    firstMealTime,
+    lastSnack,
+    bedTime,
+    consumeCal,
   ]);
   
 
@@ -235,6 +263,11 @@ export default function DietLogModal({
     setFriedFood(null);
     setSweets(null);
     setWine(null);
+    setWakeUp('');
+    setFirstMealTime('');
+    setLastSnack('');
+    setBedTime('');
+    setConsumeCal(null);
       };
 
 
@@ -263,7 +296,12 @@ export default function DietLogModal({
       processedMeat: processedMeat!,
       friedFood: friedFood!,
       sweets: sweets!,
-      wine: wine!
+      wine: wine!,
+      wakeUp: wakeUp!,
+      firstMealTime: firstMealTime!,
+      lastSnack: lastSnack!,
+      bedTime: bedTime!,
+      consumeCal: consumeCal!,
     });
 
     toast.success('Diet log saved', {
@@ -352,7 +390,7 @@ export default function DietLogModal({
           </div>
         ) : (
           <>
-            {/* ── STEP 1: Sleep Diary ── */}
+            {/* ── STEP 1: Good Foods ── */}
             {step === 0 && (
               <div className="space-y-5">
                 <div>
@@ -538,7 +576,7 @@ export default function DietLogModal({
               </div>
             )}
 
-            {/* ── STEP 2: Stimulus Control ── */}
+            {/* ── STEP 2: Bad Foods ── */}
             {step === 1 && (
               <div>
                   <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>Butter or stick margarine today:</label>
@@ -658,6 +696,48 @@ export default function DietLogModal({
                 </div>
 
                 </div>
+            )}
+            {/* ── STEP 3: Time Restricted Eating ── */}
+            {step === 2 && (
+              <div className="space-y-5">
+                <div className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>
+                  <strong>Instructions:</strong> Answer the following 5 questions based on your eating habits today. Consider your eating window to be 8-12 hours of your awake hours. Please provide estimated responses if you cannot remember.
+                </div>
+                <div></div>
+                
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time did you wake up today?</label>
+                  <input type="time" value={wakeUp} onChange={(e) => setWakeUp(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time did you consume your first meal or beverage (other than plain water or black coffee/tea) today?</label>
+                  <input type="time" value={firstMealTime} onChange={(e) => setFirstMealTime(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time did you finish your last meal or snack today?</label>
+                  <input type="time" value={lastSnack} onChange={(e) => setLastSnack(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+                <div className="space-y-5">
+                <Question label="Did you consume any calories (including milk/sugar in coffee, bites of food, or snacks) during your fasting window (8-12 hours of your awake hours) today?">
+                  <YesNoButtons value={consumeCal} onChange={setConsumeCal} />
+                </Question>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time are you going to bed?</label>
+                  <input type="time" value={bedTime} onChange={(e) => setBedTime(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+                
+
+              </div>
             )}
 
             {/* Navigation */}

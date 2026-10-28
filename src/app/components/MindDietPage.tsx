@@ -1,13 +1,36 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, BookOpen } from 'lucide-react';
-
+import MINDDiet3 from './images/MINDDiet3.png'
 
 
 export default function MindDietPage(){
     const navigate = useNavigate();
     const { resourceId } = useParams();
     const role = localStorage.getItem("role");
+    const mindDiet = document.createElement('img') as HTMLImageElement;
+
+    
+
+    useEffect(() => {
+
+        const container = document.getElementById('mindDiet-container');
+        if (container) {
+            container.appendChild(mindDiet);
+
+            mindDiet.src = MINDDiet3
+            mindDiet.alt = 'MIND Diet Graphic'
+            mindDiet.width = 1190
+            mindDiet.height = 1536
+            container.style.display = 'flex';
+            container.style.justifyContent = 'center';
+            container.style.alignItems = 'center';
+
+}
+
+    })
+
+    
 
    interface MindDietTableData {
     food: string;
@@ -61,7 +84,13 @@ export default function MindDietPage(){
           <ArrowLeft size={16} />
           <span>Back to Modules</span>
         </button>
-    
+
+        <body>
+            <div id="mindDiet-container"></div>
+        </body>
+        
+{/*     
+
         <div>
             {tables.map((table) => (
                 
@@ -91,7 +120,7 @@ export default function MindDietPage(){
             </table>
             </div>
             ))}
-        </div>
+        </div> */}
     </div>
     </div>
     )

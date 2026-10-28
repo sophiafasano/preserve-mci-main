@@ -10,6 +10,7 @@ import {
   weekNumberFromKey,
 } from '../data/moduleData';
 
+
 const MODULE_PROGRESS_KEY = 'modules_progress_v1';
 
 export interface VideoProgress {

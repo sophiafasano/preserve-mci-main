@@ -329,7 +329,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("")}
+                     onClick={() => navigate("/cogengagemodules")}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',

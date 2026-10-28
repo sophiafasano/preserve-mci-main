@@ -29,6 +29,7 @@ import CaregiverModulesOverview from './components/caregiver/CaregiverModulesOve
 import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModulePage'
 import DietModulesOverview from './components/DietModulesOverview';
 import MindDietPage from './components/MindDietPage';
+import CognitiveEngagementModulePage from './components/CognitiveEngagementModulePage';
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -397,6 +398,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <ModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/cogengagemodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CognitiveEngagementModulePage />
           </ProtectedRoute>
         ),
       },

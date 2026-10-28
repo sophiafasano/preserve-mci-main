@@ -22,7 +22,7 @@ import {
   CalendarCheck
 } from 'lucide-react';
 import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
+import { moduleWeekOrder, weekSlugFromKey } from '../data/dietModuleData';
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 

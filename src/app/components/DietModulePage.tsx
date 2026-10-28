@@ -16,12 +16,12 @@ import PatientSidebarShell from './patient/PatientSidebarShell';
 import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 import {
   moduleWeekOrder,
-  moduleData,
+  dietModuleData,
   toWeekKeyFromSlug,
   weekNumberFromKey,
   weekSlugFromKey,
   type ModuleWeekKey,
-} from '../data/moduleData';
+} from '../data/dietModuleData';
 import { modulesAPI, type ModuleWithProgress } from '../utils/modulesAPI';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/useAuth'; 
@@ -811,7 +811,7 @@ export default function DietModulePage() {
             
             {/* Previous Week Resources */}
             {(() => {
-              const prevResources = moduleData[weekKey!].resources;
+              const prevResources = dietModuleData[weekKey!].resources;
               if (prevResources.length === 0) return null;
               return (
                 <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
