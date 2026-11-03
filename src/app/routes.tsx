@@ -8,7 +8,7 @@ import SignOut from "./components/SignOut";
 import PatientDashboard from "./components/PatientDashboard";
 import CarePartnerDashboard from "./components/caregiver/CarePartnerDashboard";
 import ClinicianDashboard from "./components/ClinicianDashboard";
-import ModulesOverview from "./components/ModulesOverview";
+import SleepModulesOverview from "./components/SleepModulesOverview";
 import SleepModulePage from "./components/SleepModulePage";
 import DietModulePage from "./components/DietModulePage";
 import ProgressiveMuscleRelaxationPage from "./components/ProgressiveMuscleRelaxationPage";
@@ -30,6 +30,7 @@ import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModul
 import DietModulesOverview from './components/DietModulesOverview';
 import MindDietPage from './components/MindDietPage';
 import CognitiveEngagementModulePage from './components/CognitiveEngagementModulePage';
+import CognitiveEngagementModulesOverview from './components/CognitiveEngagementModulesOverview'
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -43,7 +44,7 @@ import CaregiverProgressiveMuscleRelaxation from "./components/caregiver/Caregiv
 
 
 //testing
-import TestDashboard from "./components/caregiver/TestDashboard"
+import TestDashboard from "./components/caregiver/CareDashboard"
 import TestModulesOverview from "./components/caregiver/TestModulesOverview"
 
 
@@ -138,7 +139,7 @@ export const router = createBrowserRouter([
         path: "caregiver",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <TestDashboard />
           </ProtectedRoute>
         ),
       },
@@ -146,7 +147,7 @@ export const router = createBrowserRouter([
         path: "caregiver/dashboard",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
+            <TestDashboard />
           </ProtectedRoute>
         ),
       },
@@ -389,7 +390,7 @@ export const router = createBrowserRouter([
         path: "modules",
         element: (
           <ProtectedRoute allowedRoles={['patient']}>
-            <ModulesOverview />
+            <SleepModulesOverview />
           </ProtectedRoute>
         ),
       },
@@ -397,7 +398,7 @@ export const router = createBrowserRouter([
         path: "sleep-modules",
         element: (
           <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
-            <ModulesOverview />
+            <SleepModulesOverview />
           </ProtectedRoute>
         ),
       },
@@ -405,6 +406,30 @@ export const router = createBrowserRouter([
         path: "caregiver/cogengagemodules",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CognitiveEngagementModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cogengagemodules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <CognitiveEngagementModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cogengagemodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["patient"]}>
+            <CognitiveEngagementModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/cogengagemodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["care_partner", "caregiver"]}>
             <CognitiveEngagementModulePage />
           </ProtectedRoute>
         ),
@@ -586,7 +611,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "preview/modules",
-        Component: ModulesOverview,
+        Component: SleepModulesOverview,
       },
       {
         path: "preview/module-week-1",

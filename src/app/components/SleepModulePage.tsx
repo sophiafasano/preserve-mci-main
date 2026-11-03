@@ -14,13 +14,13 @@ import {
 } from 'lucide-react';
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import {
-  moduleWeekOrder,
-  moduleData,
-  toWeekKeyFromSlug,
-  weekNumberFromKey,
+  sleepModuleWeekOrder,
+  sleepModuleData,
+  toSleepWeekKeyFromSlug,
+  sleepWeekNumberFromKey,
   weekSlugFromKey,
-  type ModuleWeekKey,
-} from '../data/moduleData';
+  type SleepModuleWeekKey,
+} from '../data/sleepModuleData';
 import { modulesAPI, type ModuleWithProgress } from '../utils/modulesAPI';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/useAuth'; 
@@ -41,7 +41,7 @@ export default function SleepModulePage() {
 
   const weekKey = useMemo(() => {
     if (!moduleId) return null;
-    return toWeekKeyFromSlug(moduleId);
+    return toSleepWeekKeyFromSlug(moduleId);
   }, [moduleId]);
 
   const [module, setModule] = useState<ModuleWithProgress | null>(null);
@@ -83,7 +83,7 @@ export default function SleepModulePage() {
       return;
     }
 
-    if (!toWeekKeyFromSlug(moduleId)) {
+    if (!toSleepWeekKeyFromSlug(moduleId)) {
       navigate('/modules', { replace: true });
     }
   }, [moduleId, navigate]);
@@ -367,9 +367,9 @@ export default function SleepModulePage() {
 
   const nextWeekKey = useMemo(() => {
     if (!module) return null;
-    const index = moduleWeekOrder.indexOf(module.weekKey);
-    if (index < 0 || index === moduleWeekOrder.length - 1) return null;
-    return moduleWeekOrder[index + 1];
+    const index = sleepModuleWeekOrder.indexOf(module.weekKey);
+    if (index < 0 || index === sleepModuleWeekOrder.length - 1) return null;
+    return sleepModuleWeekOrder[index + 1];
   }, [module]);
 
   useEffect(() => {
@@ -804,7 +804,7 @@ export default function SleepModulePage() {
             
             {/* Previous Week Resources */}
             {(() => {
-              const prevResources = moduleData[weekKey!].resources;
+              const prevResources = sleepModuleData[weekKey!].resources;
               if (prevResources.length === 0) return null;
               return (
                 <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
@@ -866,7 +866,7 @@ export default function SleepModulePage() {
           <div className="w-full max-w-[440px] rounded-[16px] bg-white p-8 text-center">
             <CheckCircle size={48} color="#7200CA" className="mx-auto" />
             <h2 className="mt-4" style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
-              Week {weekNumberFromKey(module.weekKey)} Complete!
+              Week {sleepWeekNumberFromKey(module.weekKey)} Complete!
             </h2>
             <p className="mt-2" style={{ fontSize: '14px', color: '#6B7280' }}>
               You&apos;ve completed all videos for this week. Come back next week to continue your program.
@@ -879,13 +879,13 @@ export default function SleepModulePage() {
                   className="mt-5 w-full rounded-[10px] py-2.5"
                   style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
                 >
-                  Start Week {weekNumberFromKey(nextWeekKey)}
+                  Start Week {sleepWeekNumberFromKey(nextWeekKey)}
                 </button>
               ) : (
                 <p className="mt-5 text-center" style={{ fontSize: '13px', color: '#9CA3AF' }}>
                   {nextModuleData?.daysUntilUnlock > 0
-                    ? `Week ${weekNumberFromKey(nextWeekKey)} available in ${nextModuleData.daysUntilUnlock} day${nextModuleData.daysUntilUnlock !== 1 ? 's' : ''}`
-                    : `Complete all videos to unlock Week ${weekNumberFromKey(nextWeekKey)}`}
+                    ? `Week ${sleepWeekNumberFromKey(nextWeekKey)} available in ${nextModuleData.daysUntilUnlock} day${nextModuleData.daysUntilUnlock !== 1 ? 's' : ''}`
+                    : `Complete all videos to unlock Week ${sleepWeekNumberFromKey(nextWeekKey)}`}
                 </p>
               )
             )}

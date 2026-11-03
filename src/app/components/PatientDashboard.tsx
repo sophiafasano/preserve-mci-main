@@ -27,7 +27,7 @@ import { Button } from './ui/button';
 import { useSleepLogs } from '../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../hooks/useModuleProgress';
 import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../utils/modulesAPI';
-import { moduleData, moduleWeekOrder } from '../data/moduleData';
+import { sleepModuleData, sleepModuleWeekOrder } from '../data/sleepModuleData';
 import { useReminders } from '../hooks/useReminders';
 import { useAuth } from '../contexts/useAuth';
 import { useMessaging } from '../hooks/useMessaging';

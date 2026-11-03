@@ -44,20 +44,20 @@ export interface ModuleContent {
     description: string;
     questions: QuizQuestion[];
   };
-  exercise: {
+  exercise?: {
     title: string;
     description: string;
     tasks: string[];
   };
   resources?: ResourceItem[];
-  keyTakeaways: string[];
+  keyTakeaways?: string[];
 }
 
-export const moduleContent: Record<string, ModuleContent> = {
+export const dietModuleContent: Record<string, ModuleContent> = {
   '1': {
     weekNumber: 1,
     totalWeeks: 1,
-    title: 'Understanding Sleep and MCI; Introduction to Sleep Intervention',
+    title: 'Diet',
     subtitle: 'The Foundation of Better Sleep and Cognitive Health',
     estimatedTime: 25,
     introduction: {
@@ -79,6 +79,7 @@ export const moduleContent: Record<string, ModuleContent> = {
       description:
         'Dr. Sarah Chen introduces the science behind sleep and cognitive health, explaining how quality sleep supports memory, attention, and overall brain function.',
     },
+    resources: [],  
   },
 
 };
@@ -87,7 +88,7 @@ export const moduleContent: Record<string, ModuleContent> = {
  * Get module content by week number
  */
 export function getModuleContent(weekNumber: string | number): ModuleContent | null {
-  const content = moduleContent[weekNumber.toString()];
+  const content = dietModuleContent[weekNumber.toString()];
   return content || null;
 }
 
@@ -95,7 +96,7 @@ export function getModuleContent(weekNumber: string | number): ModuleContent | n
  * Get all modules as an array
  */
 export function getAllModules(): ModuleContent[] {
-  return Object.values(moduleContent);
+  return Object.values(dietModuleContent);
 }
 
 /**
@@ -103,7 +104,7 @@ export function getAllModules(): ModuleContent[] {
  */
 export function getModuleNavigation(weekNumber: string | number) {
   const current = parseInt(weekNumber.toString());
-  const totalWeeks = 4;
+  const totalWeeks = 1;
 
   return {
     hasPrevious: current > 1,

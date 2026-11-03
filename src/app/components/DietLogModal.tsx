@@ -4,6 +4,7 @@ import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
 import SleepLogModal from './SleepLogModal'
+import CogengageLogModal from './CogengageLogModal'
 
 interface DietLogModalProps {
   isOpen: boolean;
@@ -132,10 +133,11 @@ export default function DietLogModal({
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
 
-  const [activeLog, setActiveLog] = useState<'sleep' | 'diet' | null>('diet');
+  const [activeLog, setActiveLog] = useState<'sleep' | 'diet' | 'cogengage' |null>('diet');
 
   //other Logs
   const [sleepModalOpen, setSleepModalOpen] = useState(false);
+  const [cogengageModalOpen, setCogEngageModalOpen] = useState(false);
 
 
   // Step 1 — Sleep Diary
@@ -349,9 +351,27 @@ export default function DietLogModal({
                   padding: '9px 16px',
                   border: 'none',
                   backgroundImage: homepageButtonGradient,
-                  marginBottom: '20px', 
+                  marginBottom: '20px',
+                  marginRight: '5px' 
                 }}>
                   Sleep Log
+            </button>
+            <button
+            type="button"
+            onClick={() => setActiveLog('cogengage')}
+            className="transition-all duration-200 hover:brightness-95 hover:-translate-y-px active:translate-y-0"
+            style={{
+                  color: token.white,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  padding: '9px 16px',
+                  border: 'none',
+                  backgroundImage: homepageButtonGradient,
+                  marginBottom: '20px', 
+                  marginRight: '5px'
+                }}>
+                  Cognitive Engagement Log
             </button>
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1A1A2E' }}>
               Daily Diet Log
@@ -776,16 +796,19 @@ export default function DietLogModal({
         )}
         </div>
 </div>
-    ) : (
-      <SleepLogModal
-        isOpen={true}
-        onClose={onClose}
-        onSubmit={(data) => {
-          // Replace this with your diet log save function
-          setActiveLog('sleep');
-        }}
-      />
-    )}
-  </>
-  );
-}
+    ) : activeLog === 'sleep' ? (
+          <SleepLogModal
+            isOpen={true}
+            onClose={onClose}
+            onSubmit={(data) => setActiveLog('sleep')}
+          />
+      ) : activeLog === 'cogengage' ? (
+          <CogengageLogModal
+            isOpen={true}
+            onClose={onClose}
+            onSubmit={(data) => setActiveLog('cogengage')}
+          />
+        ) : null }
+          </>
+      )
+    }

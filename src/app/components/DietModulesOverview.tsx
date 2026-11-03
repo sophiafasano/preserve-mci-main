@@ -21,8 +21,8 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/dietModuleData';
+import { dietModulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/dietModulesAPI';
+import { dietModuleWeekOrder, weekSlugFromKey } from '../data/dietModuleData';
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 
@@ -44,7 +44,7 @@ const role = localStorage.getItem('role');
 
 const staticResources: StaticResource[] = [
   {
-    id: 'na',
+    id: 'mind_diet',
     title: 'MIND Diet at a Glance',
     description: 'Foods to Eat More and Less of',
     icon: Dumbbell,
@@ -206,7 +206,7 @@ export default function DietModulesOverview() {
 
     async function loadModules() {
       try {
-        const response = await modulesAPI.getModules();
+        const response = await dietModulesAPI.getModules();
         if (!mounted) return;
         setModules(response.modules);
         setSummary(response.summary);
@@ -223,7 +223,7 @@ export default function DietModulesOverview() {
   }, []);
 
   const modulesByKey = useMemo(() => {
-    return moduleWeekOrder
+    return dietModuleWeekOrder
       .map((weekKey) => modules.find((item) => item.weekKey === weekKey))
       .filter((item): item is ModuleWithProgress => Boolean(item));
   }, [modules]);
@@ -322,7 +322,7 @@ return (
                             letterSpacing: '0.06em',
                           }}
                         >
-                          Week {module.weekNumber} of 4
+                          Week {module.weekNumber} of {modules.length}
                         </p>
                         <h3
                           className="line-clamp-2"

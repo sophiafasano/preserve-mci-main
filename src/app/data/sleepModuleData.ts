@@ -11,9 +11,10 @@ const Stimulus_Control_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.
 const Week_1_recap_E = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Week_1_recap_E_CG.mov'
 const Activities_Video = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/Activities_that_Interfer_with_sleep.mov'
 
-export type ModuleWeekKey = 'week1' | 'week2' | 'week3' | 'week4';
+export type SleepModuleWeekKey = 'week1' | 'week2' | 'week3' | 'week4';
+export const SleepModuleWeekOrder = ['week1', 'week2', 'week3', 'week4']
 
-export interface ModuleQueueVideo {
+export interface SleepModuleQueueVideo {
   id: string;
   title: string;
   description: string;
@@ -23,7 +24,7 @@ export interface ModuleQueueVideo {
   fileName: string;
 }
 
-export interface ModuleResource {
+export interface SleepModuleResource {
   id: string;
   title: string;
   videoUrl: string;
@@ -32,16 +33,16 @@ export interface ModuleResource {
   icon: 'BedDouble' | 'Moon' | 'Wind';
 }
 
-export interface WeekModuleData {
+export interface SleepWeekModuleData {
   title: string;
   subtitle: string;
   duration: string;
   description: string;
-  queue: ModuleQueueVideo[];
-  resources: ModuleResource[];
+  queue: SleepModuleQueueVideo[];
+  resources: SleepModuleResource[];
 }
 
-export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
+export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = {
   week1: {
     title: 'Understanding Sleep and MCI; Introduction to Sleep Intervention',
     subtitle: 'The Foundation of Better Sleep and Cognitive Health',
@@ -274,9 +275,9 @@ export const moduleData: Record<ModuleWeekKey, WeekModuleData> = {
   },
 };
 
-export const moduleWeekOrder: ModuleWeekKey[] = ['week1', 'week2', 'week3', 'week4'];
+export const sleepModuleWeekOrder: SleepModuleWeekKey[] = ['week1', 'week2', 'week3', 'week4'];
 
-export function toWeekKeyFromSlug(slug: string): ModuleWeekKey | null {
+export function toSleepWeekKeyFromSlug(slug: string): SleepModuleWeekKey | null {
   const normalized = slug.toLowerCase();
   if (normalized === 'week-1') return 'week1';
   if (normalized === 'week-2') return 'week2';
@@ -285,10 +286,10 @@ export function toWeekKeyFromSlug(slug: string): ModuleWeekKey | null {
   return null;
 }
 
-export function weekSlugFromKey(weekKey: ModuleWeekKey): string {
+export function weekSlugFromKey(weekKey: SleepModuleWeekKey): string {
   return weekKey.replace('week', 'week-');
 }
 
-export function weekNumberFromKey(weekKey: ModuleWeekKey): number {
+export function sleepWeekNumberFromKey(weekKey: SleepModuleWeekKey): number {
   return Number.parseInt(weekKey.replace('week', ''), 10);
 }

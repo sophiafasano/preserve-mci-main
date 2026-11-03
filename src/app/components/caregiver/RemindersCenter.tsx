@@ -19,7 +19,7 @@ import { useReminders } from '../../hooks/useReminders';
 import { useSleepLogs } from '../../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../../hooks/useModuleProgress';
 import { modulesAPI } from '../../utils/modulesAPI';
-import { moduleWeekOrder } from '../../data/moduleData';
+import { sleepModuleWeekOrder } from '../../data/sleepModuleData';
 import { getReminderColor, getReminderIcon } from '../../utils/reminders';
 
 import CaregiverLayout from './CaregiverLayout';

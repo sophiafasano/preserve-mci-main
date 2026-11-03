@@ -17,7 +17,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useSleepLogs } from '../../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../../hooks/useModuleProgress';
 import { modulesAPI } from '../../utils/modulesAPI';
-import { moduleWeekOrder } from '../../data/moduleData';
+import { sleepModuleWeekOrder } from '../../data/sleepModuleData';
 import CaregiverLayout from './CaregiverLayout';
 
 export default function MyProgressCaregiver() {

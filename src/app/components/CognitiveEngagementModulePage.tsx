@@ -1,607 +1,918 @@
-import { useEffect, useMemo, useState, } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useReminders } from '../hooks/useReminders';
-import { useSleepLogs } from '../hooks/useSleepLogs';
 import {
-  AlertTriangle,
   ArrowLeft,
-  BedDouble,
-  BookOpen,
-  CheckCircle2,
-  Clock3,
-  Dumbbell,
-  House,
+  Captions,
+  Check,
+  CheckCircle,
   Lock,
-  Moon,
+  Maximize2,
+  Pause,
   Play,
-  Wind,
-  MessageCircle,
-  ChevronRight,
-  Clock,
-  ClipboardList,
-  CalendarCheck
+  SkipBack,
+  SkipForward,
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
+import {
+  cogengageModuleWeekOrder,
+  cogengageModuleData,
+  toCogengageWeekKeyFromSlug,
+  cogengageWeekNumberFromKey,
+  weekSlugFromKey,
+  type CogengageModuleWeekKey,
+} from '../data/cogModuleData';
+import { cogengageModulesAPI, type ModuleWithProgress } from '../utils/cogModulesAPI';
+import { supabase } from '../utils/supabaseClient';
+import { useAuth } from '../contexts/useAuth'; 
 
-type ResourceLink = {
-  label: string;
-  url?: string;
-  notes?: string;
-};
-
-type StaticResource = {
+interface PlayerSelection {
   id: string;
   title: string;
   description: string;
-  icon: React.ComponentType<{ size?: number; color?: string }>;
-  path?: string;
-  links?: ResourceLink[];
-};
-
-const role = localStorage.getItem('role'); 
-
-const staticResources: StaticResource[] = [
-  
-  {
-    id: 'brain-training-resources',
-    title: 'Brain Training Resource',
-    description: 'Be cautious of any product that promises to prevent dementia. Choose something you enjoy and will keep doing. Also, prices change often. Check each website for current prices and free options.',
-    icon: BookOpen,
-    links: [
-      {
-        label: 'Brain HQ',
-        url: 'https://www.brainhq.com',
-        notes: 'Includes the speed-training exercise used in the ACTIVE study. Some exercises are free. Subscriptions are about $14/month for a monthly subscription or $8/month for a yearly subscription. Free access may be available through some Medicare Advantage plans and some public libraries, so check with yours before paying.'
-      },
-      {
-        label: 'Lumosity',
-        url: 'https://www.lumosity.com/en/',
-        notes: 'You can sign up for a free trial, but this is also limited. Subscriptions are about $11.99/month for a monthly subscription or $5.00/month for a yearly subscription ($59.99). They also have 2-year plans for $89.99.',
-      },
-      {
-        label: 'CogniFit Brain Games',
-        url: 'https://www.cognifit.com/brain-games',
-        notes: "Free brain games available here.",
-      },
-      {
-        label: 'CogniFit Brain Training',
-        url: 'https://www.cognifit.com/brain-training-active-aging',
-        notes: 'Brain training subscription of about $19.99/month.',
-      },
-      
-    ],
-  },
-  {
-    id: 'other-community-resources',
-    title: 'Other Community Resources',
-    description: '',
-    icon: BookOpen,
-    links: [
-      {
-        label: 'Osher Lifelong Learning Institute at USF (OLLI-USF)',
-        url: 'https://www.usf.edu/continuing-education/olli/',
-        notes: 'Low-cost classes for adults 50+ in Tampa and St. Petersburg. It combines learning something new with social contact.'
-      },
-      {
-        label: 'Florida Tuition Waiver',
-        notes: 'Florida state universities generally let residents 60 and older audit classes for free when space is available. Contact the school’s admissions office.',
-      },
-      {
-        label: 'Public Libraries',
-        notes: "Free book clubs, classes, game groups, and computer help. Many libraries also offer free access to learning programs.",
-      },
-      {
-        label: 'Senior and Community Centers',
-        notes: 'Classes, game groups, dance, and tai ch.',
-      },
-      
-    ],
-  },
-  {
-    id: 'free-information-and-activities',
-    title: 'Free Information and Activities',
-    description: '',
-    icon: BookOpen,
-    links: [
-      {
-        label: 'AARP Staying Sharp',
-        url: 'https://stayingsharp.aarp.org',
-        notes: 'Free brain health activities, challenges, and articles.'
-      },
-      {
-        label: 'National Institute on Aging',
-        url: 'https://www.nia.nih.gov/health/brain-health',
-        notes: '“Cognitive Health and Older Adults.”',
-      },
-      {
-        label: 'Alzheimer\'s Association',
-        url: 'https://www.alz.org/help-support/brain_health/10-healthy-habits-for-your-brain',
-        notes: "Healthy living tips and a 24/7 Helpline (1-800-272-3900), which is useful for caregivers.",
-      },
-      {
-        label: 'Senior and Community Centers',
-        notes: 'Many newspapers and apps offer free daily crosswords and word puzzles. Your library card may give you free newspaper access.',
-      },
-      
-    ],
-  },
-
-];
-
-const emptySummary: ModulesSummary = {
-  completedCount: 0,
-  inProgressCount: 0,
-  notStartedCount: 4,
-  overallPercent: 0,
-  watchedVideos: 0,
-  totalVideos: 0,
-};
+  duration: string;
+  videoUrl: string;
+  captionUrl?: string;
+  kind: 'queue' | 'resource';
+}
 
 export default function CognitiveEngagementModulePage() {
-  const navigate = useNavigate();
-  const [modules, setModules] = useState<ModuleWithProgress[]>([]);
-  const [summary, setSummary] = useState<ModulesSummary>(emptySummary);
-  const [expandedResourceIds, setExpandedResourceIds] = useState<Record<string, boolean>>({});
-  const quickActions = [
-    { label: "Log Last Night's Sleep", icon: Moon, action: 'log-sleep' },
-    { label: 'View Sleep Tips', icon: BookOpen, action: 'sleep-tips' },
-    { label: 'Message Care Team', icon: MessageCircle, action: 'messages' },
-  ];
 
+  const navigate = useNavigate();
   const { resourceId } = useParams();
   const role = localStorage.getItem("role");
   const SidebarShell = role === 'patient' ? PatientSidebarShell : CaregiverSidebarShell;
-  const modulesPath = role === "patient" ? "/dietmodules" : "/caregiver/dietmodules";
+  const modulesPath = role === "patient" ? "/cogengagemodules" : "/caregiver/cogengagemodules";
 
-  const handleQuickAction = (action: string) => {
-    switch (action) {
-      case 'log-sleep':
-        window.dispatchEvent(new Event('open-sleep-log'));
-        break;
-      case 'sleep-tips':
-        window.dispatchEvent(new Event('open-sleep-tips'));
-        break;
-      case 'messages':
-        navigate('/patient/messages');
-        break;
-    }
-  };
+  const { moduleId } = useParams();
 
-  const { activeCount } = useReminders();
-  const { logs: sleepLogs } = useSleepLogs();
+  const weekKey = useMemo(() => {
+    if (!moduleId) return null;
+    return toCogengageWeekKeyFromSlug(moduleId);
+  }, [moduleId]);
 
-  const upcomingItems = useMemo(() => {
-    const items: { type: string; title: string; date: string; icon: typeof CalendarCheck }[] = [];
-    const today = new Date().toISOString().split('T')[0];
-    const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
-    if (!hasLoggedToday) {
-      items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
-    }
-    if (activeCount > 0) {
-      items.push({
-        type: 'reminder',
-        title: `${activeCount} active reminder${activeCount !== 1 ? 's' : ''}`,
-        date: 'Pending',
-        icon: ClipboardList,
-      });
-    }
-    if (items.length === 0) {
-      items.push({ type: 'info', title: 'All caught up! Keep logging your sleep.', date: '', icon: CalendarCheck });
-    }
-    return items;
-  }, [sleepLogs, activeCount]);
+  const [module, setModule] = useState<ModuleWithProgress | null>(null);
+  const [activeQueueIndex, setActiveQueueIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<'queue' | 'resources'>('queue');
+  const [selectedResource, setSelectedResource] = useState<PlayerSelection | null>(null);
+  const [countdownSeconds, setCountdownSeconds] = useState<number | null>(null);
+  const [pendingNextIndex, setPendingNextIndex] = useState<number | null>(null);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [isPlaceholderSimulating, setIsPlaceholderSimulating] = useState(false);
+  const [mockElapsedMs, setMockElapsedMs] = useState(0);
+  const [mockSpeed, setMockSpeed] = useState(1);
+  const [isRealPlaying, setIsRealPlaying] = useState(false);
+  const [captionsEnabled, setCaptionsEnabled] = useState(false);
+  const [captionStatus, setCaptionStatus] = useState<'ready' | 'unavailable'>('unavailable');
 
-  const toggleResourceLinks = (resourceId: string) => {
-    setExpandedResourceIds((prev) => ({
-      ...prev,
-      [resourceId]: !prev[resourceId],
-    }));
-  };
+  const countdownTimerRef = useRef<number | null>(null);
+  const placeholderTimerRef = useRef<number | null>(null);
+ const playerRef = useRef<HTMLVideoElement | null>(null);
+  const youtubePlayerRef = useRef<HTMLIFrameElement | null>(null);
+  const ytPlayerRef = useRef<any>(null);
+  const fullscreenContainerRef = useRef<HTMLDivElement | null>(null);
+  const playerContainerRef = useRef<HTMLDivElement | null>(null);
+  const shouldAutoplayNextRef = useRef(false);
+  const placeholderEndedRef = useRef(false);
+  const mockElapsedMsRef = useRef(0);
+  const [nextModuleData, setNextModuleData] = useState<any>(null);
+
+
+  function isYouTubeUrl(url: string) {
+  return url.includes('youtube.com') || url.includes('youtu.be');
+}
+
+
+  
+  useEffect(() => {
+    if (!moduleId) {
+      navigate('/modules', { replace: true });
+      return;
+    }
+
+    if (!toCogengageWeekKeyFromSlug(moduleId)) {
+      navigate('/modules', { replace: true });
+    }
+  }, [moduleId, navigate]);
 
   useEffect(() => {
+    if (!weekKey) return;
     let mounted = true;
 
-    async function loadModules() {
+    setShowCompletionModal(false);
+    setSelectedResource(null);
+    setActiveTab('queue');
+    stopCountdown();
+
+    async function load() {
       try {
-        const response = await modulesAPI.getModules();
+        const response = await cogengageModulesAPI.getModuleWeek(weekKey);
         if (!mounted) return;
-        setModules(response.modules);
-        setSummary(response.summary);
+
+        if (!response.module.unlocked) {
+          navigate(modulesPath, { replace: true });
+          return;
+        }
+
+        setModule(response.module);
+        const firstUnwatchedIndex = response.module.queue.findIndex((item) => !item.progress.watched);
+        setActiveQueueIndex(firstUnwatchedIndex >= 0 ? firstUnwatchedIndex : Math.max(response.module.queue.length - 1, 0));
       } catch {
-        // Leave default empty state; ProtectedRoute prevents reaching here unauthenticated.
+        if (mounted) navigate(modulesPath, { replace: true });
       }
     }
 
-    void loadModules();
+    void load();
 
     return () => {
       mounted = false;
     };
+  }, [navigate, weekKey]);
+
+  const { user } = useAuth();
+  const [prescribedSleepHours, setPrescribedSleepHours] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('clinician_patients')
+      .select('prescribed_sleep_hours')
+      .eq('patient_id', user.id)
+      .eq('status', 'active')
+      .order('assigned_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.prescribed_sleep_hours != null) {
+          setPrescribedSleepHours(Number(data.prescribed_sleep_hours));
+        }
+      });
+  }, [user]);
+
+  useEffect(() => {
+    return () => {
+      if (countdownTimerRef.current) {
+        window.clearInterval(countdownTimerRef.current);
+      }
+      if (placeholderTimerRef.current) {
+        window.clearTimeout(placeholderTimerRef.current);
+      }
+    };
   }, []);
 
-  const modulesByKey = useMemo(() => {
-    return moduleWeekOrder
-      .map((weekKey) => modules.find((item) => item.weekKey === weekKey))
-      .filter((item): item is ModuleWithProgress => Boolean(item));
-  }, [modules]);
+  useEffect(() => {
+    // Reset playback UI for each newly selected video
+    mockElapsedMsRef.current = 0;
+    setMockElapsedMs(0);
+    setIsPlaceholderSimulating(false);
+    setIsRealPlaying(false);
+    placeholderEndedRef.current = false;
+    setCaptionsEnabled(false);
+    setCaptionStatus('unavailable');
+  }, [activeQueueIndex, selectedResource?.id]);
 
-return (
-  <SidebarShell>
-  <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
-    <div className="mx-auto max-w-6xl">
-        <header className="mb-6">
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Cognitive Engagement Modules</h1>
-        </header>
+  const currentQueueVideo = module?.queue
+  [activeQueueIndex] ?? null;
+  const currentSelection: PlayerSelection | null = selectedResource ?? (currentQueueVideo
+    ? {
+        id: currentQueueVideo.id,
+        title: currentQueueVideo.title,
+        description: currentQueueVideo.description,
+        duration: currentQueueVideo.duration,
+        videoUrl: currentQueueVideo.videoUrl,
+        kind: 'queue',
+        captionUrl: currentQueueVideo.captionUrl,
+      }
+    : null);
+    
 
-          <section className="mb-7 rounded-[12px] bg-white p-6" style={{ border: '0.5px solid #E9D5FF' }}>
-            <div className="mb-4 flex items-end justify-between">
-              <div>
-                <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
-                <p style={{ fontSize: '14px', color: '#858993' }}>
-                  {summary.watchedVideos} of {summary.totalVideos} queue videos completed
-                </p>
-              </div>
-              <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{summary.overallPercent}%</div>
-            </div>
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!player || !currentSelection?.videoUrl) {
+      setCaptionStatus('unavailable');
+      return;
+    }
 
-            <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
-              <div
-                className="h-full transition-all duration-300"
-                style={{
-                  width: `${summary.overallPercent}%`,
-                  background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
-                }}
-              />
-            </div>
+    const tracks = Array.from(player.textTracks || []);
+    if (tracks.length === 0) {
+      setCaptionStatus('unavailable');
+      return;
+    }
 
-            <div className="mt-5 grid grid-cols-3 text-center">
-              <div>
-                <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.completedCount}</p>
-                <p style={{ fontSize: '16px', color: '#858993' }}>Completed</p>
-              </div>
-              <div style={{ borderLeft: '0.5px solid #E9D5FF', borderRight: '0.5px solid #E9D5FF' }}>
-                <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.inProgressCount}</p>
-                <p style={{ fontSize: '16px', color: '#858993' }}>In Progress</p>
-              </div>
-              <div>
-                <p style={{ fontSize: '22px', color: '#1A1A2E', fontWeight: 700 }}>{summary.notStartedCount}</p>
-                <p style={{ fontSize: '16px', color: '#858993' }}>Not Started</p>
-              </div>
-            </div>
-          </section>
+    setCaptionStatus('ready');
+    tracks.forEach((track) => {
+      track.mode = captionsEnabled ? 'showing' : 'hidden';
+    });
+  }, [captionsEnabled, currentSelection?.id, currentSelection?.videoUrl]);
 
-          <section className="mb-10">
-            <h2 className="mb-4" style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>
-              Weekly Modules
-            </h2>
-            <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
-              {modulesByKey.map((module) => {
-                const watchedCount = module.queue.filter((video) => video.progress.watched).length;
-                const isInProgress = watchedCount > 0 && !module.completed;
+  const nextQueueVideo = module && pendingNextIndex !== null ? module.queue[pendingNextIndex] : null;
+  
 
-                return (
-                  <div
-                    key={module.weekKey}
-                    className="relative rounded-[12px] bg-white p-5"
-                    style={{ border: '0.5px solid #E9D5FF' }}
+
+  useEffect(() => {
+    if (!currentSelection || currentSelection.kind !== 'queue') return;
+
+    if (isYouTubeUrl(currentSelection.videoUrl)) {
+      const initYTPlayer = () => {
+      if (!youtubePlayerRef.current) return;
+      new (window as any).YT.Player(youtubePlayerRef.current, {
+        events: {
+          onReady: (event: any) => {
+            ytPlayerRef.current = event.target;
+            // auto-advance-to-next-video playback is triggered from here
+            if (shouldAutoplayNextRef.current) {
+              shouldAutoplayNextRef.current = false;
+              event.target.playVideo();
+            }
+          },
+          onStateChange: (event: any) => {
+            if (event.data === 0) {
+              setIsRealPlaying(false);
+              void handleQueueVideoEnded();
+            } else if (event.data === 1) {
+              setIsRealPlaying(true);
+            } else if (event.data === 2) {
+              setIsRealPlaying(false);
+            }
+          },
+        },
+      });
+    };
+
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.body.appendChild(tag);
+      (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+    } else if ((window as any).YT?.Player) {
+      initYTPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initYTPlayer;
+    }
+    }
+    
+})
+
+  async function refreshWeek(keepQueueIndex = true) {
+    if (!weekKey) return;
+    try {
+      const response = await cogengageModulesAPI.getModuleWeek(weekKey);
+      setModule(response.module);
+      if (!keepQueueIndex) {
+        const firstUnwatchedIndex = response.module.queue.findIndex((item) => !item.progress.watched);
+        setActiveQueueIndex(firstUnwatchedIndex >= 0 ? firstUnwatchedIndex : Math.max(response.module.queue.length - 1, 0));
+      }
+    } catch {
+      // Silently ignore — module state unchanged.
+    }
+  }
+
+  async function markCurrentQueueVideo(watchedPercent: number) {
+    if (!module || !currentQueueVideo) return;
+    try {
+      await cogengageModulesAPI.postVideoProgress(module.weekKey, currentQueueVideo.id, { watchedPercent });
+      await refreshWeek(true);
+    } catch {
+      // Silently ignore — progress will sync on next load.
+    }
+  }
+
+  function stopCountdown() {
+    if (countdownTimerRef.current) {
+      window.clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setCountdownSeconds(null);
+    setPendingNextIndex(null);
+  }
+
+  function stopPlaceholderSimulation() {
+    if (placeholderTimerRef.current) {
+      window.clearInterval(placeholderTimerRef.current);
+      placeholderTimerRef.current = null;
+    }
+    setIsPlaceholderSimulating(false);
+  }
+
+  function playPlaceholder() {
+    if (mockElapsedMs >= 3000) {
+      mockElapsedMsRef.current = 0;
+      setMockElapsedMs(0);
+      placeholderEndedRef.current = false;
+    }
+    setIsPlaceholderSimulating(true);
+  }
+
+  function startCountdownForNext(nextIndex: number | null) {
+    if (!module || nextIndex === null) {
+      setShowCompletionModal(true);
+      return;
+    }
+
+    stopCountdown();
+    setPendingNextIndex(nextIndex);
+    setCountdownSeconds(3);
+
+    countdownTimerRef.current = window.setInterval(() => {
+      setCountdownSeconds((previous) => {
+        if (previous === null) return null;
+        if (previous <= 1) {
+          if (countdownTimerRef.current) {
+            window.clearInterval(countdownTimerRef.current);
+            countdownTimerRef.current = null;
+          }
+          shouldAutoplayNextRef.current = true;
+          setActiveQueueIndex(nextIndex);
+          setSelectedResource(null);
+          setPendingNextIndex(null);
+          return null;
+        }
+        return previous - 1;
+      });
+    }, 1000);
+  }
+
+  async function handleQueueVideoEnded() {
+    console.log('handleQueueVideoEnded - activeQueueIndex:', activeQueueIndex, 'module.queue.length:', module?.queue.length);
+    if (!module || !currentQueueVideo) return;
+
+    await markCurrentQueueVideo(100);
+    stopPlaceholderSimulation();
+
+    const lastIndex = module.queue.length - 1;
+    const isLast = activeQueueIndex >= lastIndex;
+
+    if (isLast) {
+      setShowCompletionModal(true);
+      return;
+    }
+
+    startCountdownForNext(activeQueueIndex + 1);
+  }
+
+  function queueStatus(index: number): 'Playing' | 'Up next' | 'Completed' | 'Locked' {
+    if (!module) return 'Locked';
+
+    const item = module.queue[index];
+    if (item.progress.watched) return 'Completed';
+    if (index === activeQueueIndex && !selectedResource) return 'Playing';
+
+    // Find the first unwatched video
+    const firstUnwatched = module.queue.findIndex((v) => !v.progress.watched);
+    if (index === firstUnwatched) return 'Up next';
+
+    return 'Locked';
+  }
+
+  function stepStyle(status: ReturnType<typeof queueStatus>) {
+    if (status === 'Playing') {
+      return { borderLeft: '2px solid #7200CA', backgroundColor: '#F9F7FF' };
+    }
+
+    return { borderLeft: '2px solid transparent', backgroundColor: 'white' };
+  }
+
+  const nextWeekKey = useMemo(() => {
+    if (!module) return null;
+    const index = cogengageModuleWeekOrder.indexOf(module.weekKey);
+    if (index < 0 || index === cogengageModuleWeekOrder.length - 1) return null;
+    return cogengageModuleWeekOrder[index + 1];
+  }, [module]);
+
+  useEffect(() => {
+    if (!module || selectedResource) return;
+    if (!shouldAutoplayNextRef.current) return;
+
+    const queueVideo = module.queue[activeQueueIndex];
+    if (!queueVideo) return;
+
+    //autoplay
+    if (!queueVideo.videoUrl) {
+      shouldAutoplayNextRef.current = false;
+      playPlaceholder();
+    }
+  }, [activeQueueIndex, module, selectedResource]);
+
+
+  if (!weekKey || !module || !currentSelection) {
+    return (
+      <SidebarShell>
+        <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
+          <div className="mx-auto max-w-5xl rounded-xl bg-white p-8 text-center" style={{ border: '0.5px solid #E9D5FF' }}>
+            <h1 style={{ color: '#1A1A2E', fontSize: '20px', fontWeight: 700 }}>Loading module...</h1>
+          </div>
+        </div>
+      </SidebarShell>
+    );
+  }
+
+  const isQueueSelection = currentSelection.kind === 'queue';
+  const queueHasPrevious = isQueueSelection && activeQueueIndex > 0;
+  const queueHasNext = isQueueSelection && activeQueueIndex < module.queue.length - 1;
+  // Next video is only allowed once everything through the current one has been watched
+  const nextQueueUnlocked =
+    queueHasNext && module.queue.slice(0, activeQueueIndex + 1).every((v) => v.progress.watched);
+  const isPlaceholderMode = !currentSelection.videoUrl;
+  const isPlaying = isPlaceholderMode ? isPlaceholderSimulating : isRealPlaying;
+
+  function goToPrevious() {
+    if (!queueHasPrevious) return;
+    stopPlaceholderSimulation();
+    stopCountdown();
+    setSelectedResource(null);
+    setActiveQueueIndex((previous) => Math.max(0, previous - 1));
+  }
+
+  function goToNext() {
+    if (!nextQueueUnlocked) return;
+    stopPlaceholderSimulation();
+    stopCountdown();
+    setSelectedResource(null);
+    setActiveQueueIndex((previous) => Math.min(module.queue.length - 1, previous + 1));
+  }
+
+  function togglePlayback() {
+    if (!isQueueSelection) return;
+
+    if (isPlaceholderMode) {
+      setIsPlaceholderSimulating((previous) => !previous);
+      return;
+    }
+
+    const player = playerRef.current;
+    if (!player) return;
+
+    if (isRealPlaying) {
+      player.pause();
+    } else {
+      void player.play();
+    }
+  }
+
+  function requestFullSize() {
+    const target = fullscreenContainerRef.current ?? playerContainerRef.current;
+    if (!target) return;
+
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+      return;
+    }
+
+    void target.requestFullscreen?.();
+  }
+
+  return (
+    <SidebarShell>
+      <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
+        <div className="mx-auto max-w-6xl">
+          <header className="mb-6 flex items-center justify-between">
+            <button
+              onClick={() => navigate(modulesPath, { replace: true })}
+              className="inline-flex items-center gap-1.5 hover:opacity-90 cursor-pointer"
+              style={{ color: '#7200CA', fontSize: '16px', fontWeight: 500 }}
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Modules</span>
+            </button>
+            <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Cognitive Engagement Modules</h1>
+          </header>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,70%)_minmax(0,30%)]">
+            <section>
+              <div ref={fullscreenContainerRef}>
+                <div
+                  ref={playerContainerRef}
+                  className="relative overflow-hidden rounded-[12px]"
+                  style={{ backgroundColor: '#1A1A2E', aspectRatio: '16 / 9' }}
+                >
+                  <button
+                    onClick={() => setCaptionsEnabled((previous) => !previous)}
+                    className="absolute right-3 top-3 z-20 rounded px-2 py-1 inline-flex items-center gap-1"
+                    style={{
+                      color: captionsEnabled ? '#FFFFFF' : '#E5E7EB',
+                      border: captionsEnabled ? '1px solid #FFFFFF' : '1px solid #9CA3AF',
+                      backgroundColor: 'rgba(26, 26, 46, 0.55)',
+                      fontSize: '12px',
+                      fontWeight: 500,
+                    }}
                     title={
-                      module.unlocked
-                        ? ''
-                        : `Complete Week ${module.weekNumber - 1} to unlock`
+                      captionStatus === 'ready'
+                        ? 'Toggle captions'
+                        : 'Captions unavailable for this video'
                     }
                   >
-                    {!module.unlocked && (
-                      <div
-                        className="absolute inset-0 z-10 rounded-[12px]"
-                        style={{ background: 'rgba(255,255,255,0.72)' }}
-                      >
-                        <div className="absolute right-4 top-4 rounded-full bg-white p-2" style={{ border: '0.5px solid #E9D5FF' }}>
-                          <Lock size={16} color="#7200CA" />
-                        </div>
-                        <div className="absolute bottom-3 left-4">
-                          <p style={{ fontSize: '16px', color: '#7200CA', fontWeight: 500 }}>
-                            {module.daysUntilUnlock !== null && module.daysUntilUnlock > 0
-                              ? `Available in ${module.daysUntilUnlock} day${module.daysUntilUnlock !== 1 ? 's' : ''}`
-                              : `Complete Week ${module.weekNumber - 1} to unlock`}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                    <Captions size={14} />
+                    <span>CC</span>
+                  </button>
 
-                    <div className="mb-3 flex items-start justify-between">
-                      <div>
-                        <p
-                          style={{
-                            fontSize: '12px',
-                            color: '#858993',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.06em',
-                          }}
-                        >
-                          Week {module.weekNumber} of 4
-                        </p>
-                        <h3
-                          className="line-clamp-2"
-                          style={{ fontSize: '16px', color: '#1A1A2E', fontWeight: 600, lineHeight: 1.35, minHeight: '43px' }}
-                        >
-                          {module.title}
-                        </h3>
-                        <p
-                          className="line-clamp-2"
-                          style={{ fontSize: '14px', color: '#858993', lineHeight: 1.35, minHeight: '35px' }}
-                        >
-                          {module.subtitle}
-                        </p>
-                        {module.completed && (
-                          <span
-                            className="mt-2 inline-flex rounded-full px-2 py-0.5"
-                            style={{ backgroundColor: '#DCFCE7', color: '#166534', fontSize: '11px', fontWeight: 500 }}
-                          >
-                            Completed
-                          </span>
-                        )}
-                      </div>
-                      <div className="rounded-[10px] p-2.5" style={{ backgroundColor: '#F3E8FF' }}>
-                        {module.completed ? (
-                          <CheckCircle2 size={20} color="#7200CA" strokeWidth={1.5} />
-                        ) : (
-                          <BookOpen size={20} color="#7200CA" strokeWidth={1.5} />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mb-4 flex items-center gap-4" style={{ fontSize: '14px', color: '#858993' }}>
-                      <span className="inline-flex items-center gap-1">
-                        <Clock3 size={13} color="#C4B5FD" />
-                        {module.duration}
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <Play size={13} color="#C4B5FD" />
-                        {module.queue.length} videos
-                      </span>
-                    </div>
-
-                    <div className="mb-4 h-[4px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
-                      <div
-                        className="h-full"
-                        style={{
-                          width: `${module.queue.length ? Math.round((watchedCount / module.queue.length) * 100) : 0}%`,
-                          background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
-                        }}
+                  {currentSelection.videoUrl ? (
+                    currentSelection.videoUrl.includes('youtube.com') ||
+                    currentSelection.videoUrl.includes('youtu.be') ? (
+                      <iframe
+                        ref={youtubePlayerRef}
+                        className="h-full w-full"
+                        src={currentSelection.videoUrl}
+                        title={currentSelection.title}
+                        allow="autoplay; encrypted-media; picture-in-picture"
+                        allowFullScreen
                       />
-                    </div>
+                    ) : (
+                      <video
+                        ref={playerRef}
+                        className="h-full w-full"
+                        controls
+                        autoPlay
+                        src={currentSelection.videoUrl}
+                        onPlay={() => setIsRealPlaying(true)}
+                        onPause={() => setIsRealPlaying(false)}
+                        onLoadedMetadata={() => {
+                          const player = playerRef.current;
+                          if (!player) return;
 
-                    {isInProgress && (
-                      <p className="mb-3" style={{ fontSize: '14px', color: '#858993' }}>
-                        {watchedCount} of {module.queue.length} videos completed
-                      </p>
-                    )}
+                          const hasTracks = Array.from(player.textTracks || []).length > 0;
+                          setCaptionStatus(hasTracks ? 'ready' : 'unavailable');
 
-                    <button
-                      disabled={!module.unlocked}
-                      //onClick={() => navigate(`/dietmodules/${weekSlugFromKey(module.weekKey)}`)}
-                      onClick={() => ( role === "patient" ? navigate(`/dietmodules/${weekSlugFromKey(module.weekKey)}`) : navigate(`/caregiver/dietmodules/${weekSlugFromKey(module.weekKey)}`))}
-                      className="w-full rounded-[10px] py-2.5"
-                      style={
-                        module.completed
-                          ? {
-                              backgroundColor: 'white',
-                              color: '#7200CA',
-                              border: '1px solid #7200CA',
-                              fontWeight: 500,
-                              fontSize: '16px',
-                            }
-                          : {
-                              color: 'white',
-                              border: 'none',
-                              fontWeight: 600,
-                              fontSize: '16px',
-                              background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
-                              opacity: module.unlocked ? 1 : 0.55,
-                            }
-                      }
-                    >
-                      {module.completed ? 'Review Module' : isInProgress ? 'Continue Module' : 'Start Module'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+                          player.playbackRate = mockSpeed;
+                        }}
+                        onEnded={() => {
+                          setIsRealPlaying(false);
 
-          <section>
-            <h2 className="mb-1" style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>
-              Cognitive Engagement Resources
-            </h2>
-            <p className="mb-4" style={{ fontSize: '14px', color: '#6B7280' }}>
-              Watchable reference resources from your weekly program.
-            </p>
-            <div className="grid grid-cols-1 gap-[14px] md:grid-cols-2 lg:grid-cols-3">
-              {staticResources.map((resource) => {
-                const Icon = resource.icon;
-                return (
-                  <div
-                    key={resource.id}
-                    className="h-full rounded-[12px] bg-white p-4 flex flex-col"
-                    style={{ border: '0.5px solid #E9D5FF' }}
-                  >
-                    <div className="mb-3 inline-flex self-start rounded-[10px] p-2.5" style={{ backgroundColor: '#F3E8FF' }}>
-                      <Icon size={20} color="#7200CA" />
-                    </div>
-                    <h3 style={{ fontSize: '14px', color: '#1A1A2E', fontWeight: 600 }}>{resource.title}</h3>
-                    <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.6 }}>{resource.description}</p>
-                    <div className="mt-auto pt-3">
-                    {resource.path && (
-                      <button
-                        onClick={() => navigate(resource.path)}
-                        className="rounded-[8px] px-3 py-1.5"
-                        style={{
-                          border: '0.5px solid #C4B5FD',
-                          color: '#7200CA',
-                          backgroundColor: 'white',
-                          fontSize: '12px',
-                          fontWeight: 500,
+                          if (currentSelection.kind === 'queue') {
+                            void handleQueueVideoEnded();
+                          }
                         }}
                       >
-                        Open Resource
-                      </button>
-                    )}
-
-                    {resource.links && (
-                      <div>
-                        <button
-                          onClick={() => toggleResourceLinks(resource.id)}
-                          className="rounded-[8px] px-3 py-1.5"
-                          style={{
-                            border: '0.5px solid #C4B5FD',
-                            color: '#7200CA',
-                            backgroundColor: 'white',
-                            fontSize: '12px',
-                            fontWeight: 500,
-                          }}
-                        >
-                          View Resources
-                        </button>
-
-                        {expandedResourceIds[resource.id] && (
-                          <div
-                            className="mt-3 rounded-[10px] px-3 py-2"
-                            style={{ border: '0.5px solid #E9D5FF', backgroundColor: '#F9FAFB' }}
-                          >
-                            <ul className="space-y-2">
-                              {resource.links.map((link) => (
-                                <li key={link.url || link.label}>
-                                  {link.url ? (
-                                  <span style={{}}>
-                                  <a
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="underline hover:opacity-90"
-                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 700 }}
-                                  >
-                                    {link.label}
-                                    
-                                    </a>
-                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500, }}>
-                                        
-                                      {link.notes} 
-                                    </span>
-                                  </span>
-                                  
-                                  ) : (
-                                    <span>
-                                    <span style={{fontSize: '13px', color: '#7200CA', fontWeight: 700}}>
-                                      {link.label} 
-                                    </span>
-                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500}}>
-                                      {link.notes} 
-                                    </span>
-                                    </span>
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
+                        {currentSelection.captionUrl && (
+                          <track
+                            kind="captions"
+                            src={currentSelection.captionUrl}
+                            srcLang="en"
+                            label="English"
+                          />
                         )}
-                      </div>
-                    )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-          {/* Quick Actions + Upcoming */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-            {/* Quick Actions */}
-            <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
-              <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#1A1A2E', marginBottom: '12px' }}>
-                Quick Actions
-              </h2>
-              <div>
-                {quickActions.map((action, index) => {
-                  const Icon = action.icon;
-                  return (
+                      </video>
+                    )
+                  ) : (
                     <button
-                      key={index}
-                      onClick={() => handleQuickAction(action.action)}
-                      className="w-full flex items-center justify-between py-4 transition-all duration-200 hover:bg-[#FAF5FF] hover:-translate-y-px"
-                      style={{
-                        borderRadius: '10px',
-                        borderBottom: index !== quickActions.length - 1 ? '0.5px solid #F3F4F6' : 'none',
-                      }}
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className="w-9 h-9 rounded-[10px] flex items-center justify-center" style={{ backgroundColor: '#F3E9FB' }}>
-                          <Icon size={18} strokeWidth={1.5} color="#7200CA" />
-                        </div>
-                        <span style={{ fontSize: '14px', color: '#1A1A2E', fontWeight: 400 }}>{action.label}</span>
-                      </div>
-                      <ChevronRight size={16} strokeWidth={1.5} color="#C4B5FD" />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Upcoming */}
-            <div className="bg-white rounded-[12px] p-5" style={{ border: '0.5px solid #E9D5FF' }}>
-              <h2 style={{ fontSize: '16px', fontWeight: 500, color: '#1A1A2E', marginBottom: '12px' }}>
-                Upcoming
-              </h2>
-              <div>
-                {upcomingItems.map((item, index) => {
-                  const Icon = item.icon;
-                  const isToday = item.date.toLowerCase().includes('today');
-                  return (
-                    <button
-                      key={index}
                       onClick={() => {
-                        if (item.type === 'sleep-log') {
-                          window.dispatchEvent(new Event('open-sleep-log'));
-                        } else if (item.type === 'reminder') {
-                          navigate('/patient/reminders');
+                        if (currentSelection.kind === 'queue') {
+                          playPlaceholder();
                         }
                       }}
-                      className="flex items-start space-x-3 py-4 w-full text-left hover:bg-[#F9F7FF] rounded-xl transition-colors"
-                      style={{
-                        borderBottom: index !== upcomingItems.length - 1 ? '0.5px solid #F3F4F6' : 'none',
-                        cursor: item.type === 'reminder' ? 'pointer' : 'default',
-                      }}
+                      className="h-full w-full"
+                      style={{ backgroundColor: '#1A1A2E' }}
                     >
-                      <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F3E9FB' }}>
-                        <Icon size={18} strokeWidth={1.5} color="#7200CA" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p style={{ fontSize: '14px', color: '#1A1A2E', marginBottom: '5px', fontWeight: 500 }}>{item.title}</p>
-                        <div className="flex items-center gap-2">
-                          <p style={{ fontSize: '12px', color: '#9CA3AF' }}>{item.date}</p>
-                          {item.date && (
-                            <span style={{
-                              fontSize: '11px', fontWeight: 500, borderRadius: '20px',
-                              padding: '3px 10px',
-                              backgroundColor: isToday ? '#EDE9FE' : '#F3E8FF',
-                              color: isToday ? '#4C1D95' : '#6B21A8',
-                            }}>
-                              {isToday ? 'Today' : 'Due soon'}
-                            </span>
-                          )}
-                        </div>
+                      <div className="flex h-full items-center justify-center">
+                        <Play size={48} color="white" fill="white" opacity={0.6} />
                       </div>
                     </button>
+                  )}
+
+
+
+                  {countdownSeconds !== null && nextQueueVideo && (
+                    <div
+                      className="absolute inset-0 flex flex-col items-center justify-center"
+                      style={{ backgroundColor: 'rgba(26,26,46,0.85)', borderRadius: '12px' }}
+                    >
+                      <p style={{ fontSize: '16px', color: 'white', fontWeight: 500 }}>
+                        Next up: {nextQueueVideo.title}
+                      </p>
+                      <p style={{ fontSize: '48px', color: '#C4B5FD', fontWeight: 700, lineHeight: 1.1 }}>
+                        {countdownSeconds}
+                      </p>
+                      <button
+                        onClick={() => {
+                          if (pendingNextIndex !== null) {
+                            stopCountdown();
+                            shouldAutoplayNextRef.current = true;
+                            setActiveQueueIndex(pendingNextIndex);
+                            setSelectedResource(null);
+                          }
+                        }}
+                        className="rounded-lg px-4 py-2"
+                        style={{
+                          background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
+                          color: 'white',
+                          fontSize: '13px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        Play now
+                      </button>
+                      <button
+                        onClick={() => {
+                          stopCountdown();
+                          stopPlaceholderSimulation();
+                        }}
+                        className="mt-2"
+                        style={{ color: 'white', fontSize: '13px', textDecoration: 'underline' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {isQueueSelection && (
+                  <div
+                    className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-[10px] bg-white px-3 py-2"
+                    style={{ border: '0.5px solid #E9D5FF' }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={goToPrevious}
+                        disabled={!queueHasPrevious}
+                        className="rounded px-2 py-1 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ color: queueHasPrevious ? '#7200CA' : '#C4B5FD' }}
+                      >
+                        <SkipBack size={16} />
+                      </button>
+                      <button
+                        onClick={togglePlayback}
+                        className="rounded px-2 py-1 cursor-pointer"
+                        style={{ color: '#7200CA' }}
+                      >
+                        {isPlaying ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}
+                      </button>
+                      <button
+                        onClick={goToNext}
+                        disabled={!nextQueueUnlocked}
+                        className="rounded px-2 py-1 cursor-pointer disabled:cursor-not-allowed"
+                        style={{ color: nextQueueUnlocked ? '#7200CA' : '#C4B5FD' }}
+                        title={!queueHasNext ? undefined : nextQueueUnlocked ? undefined : 'Finish the current video to unlock the next one'}
+                      >
+                        <SkipForward size={16} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <label style={{ fontSize: '12px', color: '#6B7280' }}>Speed</label>
+                      <select
+                        value={mockSpeed}
+                        onChange={(event) => {
+                          const speed = Number.parseFloat(event.target.value);
+                          setMockSpeed(speed);
+                          if (playerRef.current) { playerRef.current.playbackRate = speed; }
+                        }}
+                        className="rounded px-2 py-1 cursor-pointer"
+                        style={{ border: '0.5px solid #C4B5FD', fontSize: '12px', color: '#1A1A2E' }}
+                      >
+                        <option value={0.5}>0.5x</option>
+                        <option value={1}>1x</option>
+                        <option value={1.25}>1.25x</option>
+                        <option value={1.5}>1.5x</option>
+                        <option value={2}>2x</option>
+                      </select>
+                      <button
+                        onClick={requestFullSize}
+                        className="rounded px-2 py-1 cursor-pointer"
+                        style={{ color: '#7200CA' }}
+                      >
+                        <Maximize2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {captionsEnabled && captionStatus === 'unavailable' && (
+                  <p style={{ fontSize: '12px', color: '#9CA3AF', marginTop: '6px' }}>
+                    Live captions are enabled, but this video does not include a caption track yet.
+                  </p>
+                )}
+              </div>
+
+              <h2 className="mt-4" style={{ fontSize: '18px', color: '#1A1A2E', fontWeight: 700 }}>
+                {currentSelection.title}
+              </h2>
+              <p style={{ fontSize: '13px', color: '#9CA3AF' }}>
+                Week {module.weekNumber} | {currentSelection.duration}
+              </p>
+              <p className="mt-2" style={{ fontSize: '14px', color: '#4B5563', lineHeight: 1.7 }}>
+                {currentSelection.description}
+              </p>
+
+              <div className="mt-5 space-y-2 rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
+                {module.queue.map((item, index) => {
+                  const status = queueStatus(index);
+                  const isCompleted = status === 'Completed';
+
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between rounded-[10px] px-3 py-2"
+                      style={stepStyle(status)}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="inline-flex h-6 w-6 items-center justify-center rounded-full"
+                          style={
+                            isCompleted
+                              ? { backgroundColor: '#DCFCE7', color: '#166534' }
+                              : { backgroundColor: '#F3E8FF', color: '#7200CA' }
+                          }
+                        >
+                          {isCompleted ? <Check size={12} /> : <span style={{ fontSize: '12px', fontWeight: 600 }}>{index + 1}</span>}
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '14px', color: '#1A1A2E' }}>{item.title}</p>
+                          <p style={{ fontSize: '12px', color: '#9CA3AF' }}>{item.duration}</p>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '12px', color: '#9CA3AF' }}>{status}</span>
+                    </div>
                   );
                 })}
               </div>
-            </div>
-          </div>
+            </section>
 
+            <div className="flex flex-col gap-4 lg:sticky lg:top-8 self-start">
+            <aside className="h-fit rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
+              <div className="mb-3 flex gap-4">
+                <button
+                  onClick={() => setActiveTab('queue')}
+                  style={
+                    activeTab === 'queue'
+                      ? { color: '#7200CA', borderBottom: '2px solid #7200CA', fontWeight: 600, fontSize: '14px' }
+                      : { color: '#9CA3AF', fontSize: '13px' }
+                  }
+                  className="pb-1"
+                >
+                  Queue
+                </button>
+              </div>
+
+              {activeTab === 'queue' && (
+                <div className="space-y-2">
+                  {module.queue.map((item, index) => {
+                    const status = queueStatus(index);
+                    const isCurrent = index === activeQueueIndex && !selectedResource;
+                    const isCompleted = item.progress.watched;
+
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          if (status === 'Locked') return;
+                          // Block if any video before this one hasn't been watched
+                          const allPreviousWatched = module.queue
+                            .slice(0, index)
+                            .every((v) => v.progress.watched);
+                          if (!allPreviousWatched) return;
+                          stopPlaceholderSimulation();
+                          setActiveQueueIndex(index);
+                          setSelectedResource(null);
+                          stopCountdown();
+                        }}
+                        className="w-full rounded-[8px] px-2 py-2 text-left"
+                        style={
+                          isCurrent
+                            ? { borderLeft: '2px solid #7200CA', backgroundColor: '#F9F7FF' }
+                            : { opacity: isCompleted ? 0.5 : 1 }
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="relative flex h-[50px] w-[80px] items-center justify-center rounded-[6px]"
+                            style={{ backgroundColor: '#1A1A2E' }}
+                          >
+                            <Play size={14} color="white" fill="white" opacity={0.7} />
+                            {isCompleted && (
+                              <div className="absolute -right-1 -top-1 rounded-full bg-[#DCFCE7] p-1">
+                                <Check size={10} color="#166534" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate" style={{ fontSize: '13px', color: '#1A1A2E', fontWeight: 500 }}>
+                              {item.title}
+                            </p>
+                            <p style={{ fontSize: '11px', color: '#9CA3AF' }}>{item.duration}</p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </aside>
+              <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
+                  Sleep Prescription
+                </p>
+                <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
+                  {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
+                </p>
+                <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
+                  Recommended by your clinician
+                </p>
+              </div>
+            </div>
+            
+            {/* Previous Week Resources */}
+            {(() => {
+              const prevResources = cogengageModuleData[weekKey!].resources;
+              if (prevResources.length === 0) return null;
+              return (
+                <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A2E', marginBottom: '12px' }}>
+                    Resources
+                  </p>
+                  <div className="space-y-2">
+                    {prevResources.map((resource) => (
+                      <button
+                        key={resource.id}
+                        onClick={() => {
+                          setSelectedResource({
+                            id: resource.id,
+                            title: resource.title,
+                            description: resource.title,
+                            duration: '',
+                            videoUrl: resource.videoUrl,
+                            kind: 'resource',
+                            captionUrl: resource.captionUrl,
+                          });
+                          stopPlaceholderSimulation();
+                          stopCountdown();
+                        }}
+                        className="w-full rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-[#F9F7FF]"
+                        style={
+                          selectedResource?.id === resource.id
+                            ? { borderLeft: '2px solid #7200CA', backgroundColor: '#F9F7FF' }
+                            : {}
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="relative flex h-[50px] w-[80px] items-center justify-center rounded-[6px]"
+                            style={{ backgroundColor: '#1A1A2E' }}
+                          >
+                            <Play size={14} color="white" fill="white" opacity={0.7} />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate" style={{ fontSize: '13px', color: '#1A1A2E', fontWeight: 500 }}>
+                              {resource.title}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
       </div>
-    </div>
+
+      {showCompletionModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-6"
+          style={{ backgroundColor: 'rgba(26,26,46,0.5)' }}
+        >
+          <div className="w-full max-w-[440px] rounded-[16px] bg-white p-8 text-center">
+            <CheckCircle size={48} color="#7200CA" className="mx-auto" />
+            <h2 className="mt-4" style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
+              Week {cogengageWeekNumberFromKey(module.weekKey)} Complete!
+            </h2>
+            <p className="mt-2" style={{ fontSize: '14px', color: '#6B7280' }}>
+              You&apos;ve completed all videos for this week. Come back next week to continue your program.
+            </p>
+
+            {nextWeekKey && (
+              nextModuleData?.unlocked ? (
+                <button
+                  onClick={() => navigate(`/modules/${weekSlugFromKey(nextWeekKey)}`)}
+                  className="mt-5 w-full rounded-[10px] py-2.5"
+                  style={{ background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)', color: 'white', fontSize: '14px', fontWeight: 600 }}
+                >
+                  Start Week {cogengageWeekNumberFromKey(nextWeekKey)}
+                </button>
+              ) : (
+                <p className="mt-5 text-center" style={{ fontSize: '13px', color: '#9CA3AF' }}>
+                  {nextModuleData?.daysUntilUnlock > 0
+                    ? `Week ${cogengageWeekNumberFromKey(nextWeekKey)} available in ${nextModuleData.daysUntilUnlock} day${nextModuleData.daysUntilUnlock !== 1 ? 's' : ''}`
+                    : `Complete all videos to unlock Week ${cogengageWeekNumberFromKey(nextWeekKey)}`}
+                </p>
+              )
+            )}
+
+            <button
+              onClick={() => ( role === "patient" ? navigate('/cogengagemodules') : navigate('/caregiver/cogengagemodules'))}
+              className="mt-3 w-full rounded-[10px] py-2.5"
+              style={{
+                border: '1px solid #7200CA',
+                color: '#7200CA',
+                backgroundColor: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}
+            >
+              Back to Modules
+            </button>
+          </div>
+        </div>
+      )}
     </SidebarShell>
   );
 }

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useMemo, useState, } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import { useReminders } from '../hooks/useReminders';
 import { useSleepLogs } from '../hooks/useSleepLogs';
 import {
@@ -21,13 +21,15 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../data/moduleData';
+import { cogengageModulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/cogModulesAPI';
+import { cogengageModuleWeekOrder, weekSlugFromKey } from '../data/cogModuleData';
 import PatientSidebarShell from './patient/PatientSidebarShell';
+import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 
 type ResourceLink = {
   label: string;
-  url: string;
+  url?: string;
+  notes?: string;
 };
 
 type StaticResource = {
@@ -39,58 +41,94 @@ type StaticResource = {
   links?: ResourceLink[];
 };
 
+const role = localStorage.getItem('role'); 
+
 const staticResources: StaticResource[] = [
+  
   {
-    id: 'res_progressive_muscle_relaxation',
-    title: 'Relaxation and Wind-Down Techniques',
-    description: 'Guided progressive relaxation exercises to ease tension before sleep.',
-    icon: Dumbbell,
-    path: '/modules/resources/progressive-muscle-relaxation',
-  },
-  {
-    id: 'res_sleep_hygiene',
-    title: 'Sleep Hygiene Fundamentals',
-    description: 'Build a healthier sleep environment and bedtime habits.',
-    icon: House,
-    path: '/modules/resources/sleep-hygiene',
-  },
-  {
-    id: 'res_relaxation',
-    title: 'Managing Worry and Racing Thoughts',
-    description: 'Short calming exercises to quiet body and mind before sleep.',
-    icon: Wind,
-    path: '/modules/resources/autogenic-relaxation',
-  },
-  {
-    id: 'res_stimulus_control',
-    title: 'Stimulus Control',
-    description: 'Practical steps to strengthen your bed-sleep association.',
-    icon: BedDouble,
-    path: '/modules/resources/stimulus-control',
-  },
-  {
-    id: 'res_activities_interfer_sleep',
-    title: 'Activities That Interfere with Sleep',
-    description: 'Identify daily habits that can delay or disturb sleep.',
-    icon: AlertTriangle,
-    path: '/modules/resources/activities-that-interfere-with-sleep',
-  },
-  {
-    id: 'res_community_resources',
-    title: 'Community Resources',
-    description: 'Find support resources and educational materials in your community.',
+    id: 'brain-training-resources',
+    title: 'Brain Training Resource',
+    description: 'Be cautious of any product that promises to prevent dementia. Choose something you enjoy and will keep doing. Also, prices change often. Check each website for current prices and free options.',
     icon: BookOpen,
     links: [
       {
-        label: 'AASM resources for sleep, insomnia, and apnea (Sleep education for patients)',
-        url: 'https://sleepeducation.org/patients/',
+        label: 'Brain HQ',
+        url: 'https://www.brainhq.com',
+        notes: 'Includes the speed-training exercise used in the ACTIVE study. Some exercises are free. Subscriptions are about $14/month for a monthly subscription or $8/month for a yearly subscription. Free access may be available through some Medicare Advantage plans and some public libraries, so check with yours before paying.'
       },
       {
-        label: 'Alzheimer\'s Association resources (Early stages of cognitive impairment)',
-        url: 'https://www.alz.org/alzheimers-dementia/stages',
+        label: 'Lumosity',
+        url: 'https://www.lumosity.com/en/',
+        notes: 'You can sign up for a free trial, but this is also limited. Subscriptions are about $11.99/month for a monthly subscription or $5.00/month for a yearly subscription ($59.99). They also have 2-year plans for $89.99.',
       },
+      {
+        label: 'CogniFit Brain Games',
+        url: 'https://www.cognifit.com/brain-games',
+        notes: "Free brain games available here.",
+      },
+      {
+        label: 'CogniFit Brain Training',
+        url: 'https://www.cognifit.com/brain-training-active-aging',
+        notes: 'Brain training subscription of about $19.99/month.',
+      },
+      
     ],
   },
+  {
+    id: 'other-community-resources',
+    title: 'Other Community Resources',
+    description: '',
+    icon: BookOpen,
+    links: [
+      {
+        label: 'Osher Lifelong Learning Institute at USF (OLLI-USF)',
+        url: 'https://www.usf.edu/continuing-education/olli/',
+        notes: 'Low-cost classes for adults 50+ in Tampa and St. Petersburg. It combines learning something new with social contact.'
+      },
+      {
+        label: 'Florida Tuition Waiver',
+        notes: 'Florida state universities generally let residents 60 and older audit classes for free when space is available. Contact the school’s admissions office.',
+      },
+      {
+        label: 'Public Libraries',
+        notes: "Free book clubs, classes, game groups, and computer help. Many libraries also offer free access to learning programs.",
+      },
+      {
+        label: 'Senior and Community Centers',
+        notes: 'Classes, game groups, dance, and tai ch.',
+      },
+      
+    ],
+  },
+  {
+    id: 'free-information-and-activities',
+    title: 'Free Information and Activities',
+    description: '',
+    icon: BookOpen,
+    links: [
+      {
+        label: 'AARP Staying Sharp',
+        url: 'https://stayingsharp.aarp.org',
+        notes: 'Free brain health activities, challenges, and articles.'
+      },
+      {
+        label: 'National Institute on Aging',
+        url: 'https://www.nia.nih.gov/health/brain-health',
+        notes: '“Cognitive Health and Older Adults.”',
+      },
+      {
+        label: 'Alzheimer\'s Association',
+        url: 'https://www.alz.org/help-support/brain_health/10-healthy-habits-for-your-brain',
+        notes: "Healthy living tips and a 24/7 Helpline (1-800-272-3900), which is useful for caregivers.",
+      },
+      {
+        label: 'Senior and Community Centers',
+        notes: 'Many newspapers and apps offer free daily crosswords and word puzzles. Your library card may give you free newspaper access.',
+      },
+      
+    ],
+  },
+
 ];
 
 const emptySummary: ModulesSummary = {
@@ -102,7 +140,7 @@ const emptySummary: ModulesSummary = {
   totalVideos: 0,
 };
 
-export default function ModulesOverview() {
+export default function CognitiveEngagementModuleOverview() {
   const navigate = useNavigate();
   const [modules, setModules] = useState<ModuleWithProgress[]>([]);
   const [summary, setSummary] = useState<ModulesSummary>(emptySummary);
@@ -112,6 +150,11 @@ export default function ModulesOverview() {
     { label: 'View Sleep Tips', icon: BookOpen, action: 'sleep-tips' },
     { label: 'Message Care Team', icon: MessageCircle, action: 'messages' },
   ];
+
+  const { resourceId } = useParams();
+  const role = localStorage.getItem("role");
+  const SidebarShell = role === 'patient' ? PatientSidebarShell : CaregiverSidebarShell;
+  const modulesPath = role === "patient" ? "/cogengagemodules" : "/caregiver/cogengagemodules";
 
   const handleQuickAction = (action: string) => {
     switch (action) {
@@ -163,7 +206,7 @@ export default function ModulesOverview() {
 
     async function loadModules() {
       try {
-        const response = await modulesAPI.getModules();
+        const response = await cogengageModulesAPI.getModules();
         if (!mounted) return;
         setModules(response.modules);
         setSummary(response.summary);
@@ -180,17 +223,17 @@ export default function ModulesOverview() {
   }, []);
 
   const modulesByKey = useMemo(() => {
-    return moduleWeekOrder
+    return cogengageModuleWeekOrder
       .map((weekKey) => modules.find((item) => item.weekKey === weekKey))
       .filter((item): item is ModuleWithProgress => Boolean(item));
   }, [modules]);
 
 return (
-  <PatientSidebarShell>
+  <SidebarShell>
   <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
     <div className="mx-auto max-w-6xl">
         <header className="mb-6">
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Sleep Modules</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Cognitive Engagement Modules</h1>
         </header>
 
           <section className="mb-7 rounded-[12px] bg-white p-6" style={{ border: '0.5px solid #E9D5FF' }}>
@@ -340,7 +383,7 @@ return (
 
                     <button
                       disabled={!module.unlocked}
-                      onClick={() => navigate(`/modules/${weekSlugFromKey(module.weekKey)}`)}
+                      onClick={() => ( role === "patient" ? navigate(`/cogengagemodules/${weekSlugFromKey(module.weekKey)}`) : navigate(`/caregiver/cogengagemodules/${weekSlugFromKey(module.weekKey)}`))}
                       className="w-full rounded-[10px] py-2.5"
                       style={
                         module.completed
@@ -371,7 +414,7 @@ return (
 
           <section>
             <h2 className="mb-1" style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>
-              Sleep Resources
+              Cognitive Engagement Resources
             </h2>
             <p className="mb-4" style={{ fontSize: '14px', color: '#6B7280' }}>
               Watchable reference resources from your weekly program.
@@ -430,16 +473,35 @@ return (
                           >
                             <ul className="space-y-2">
                               {resource.links.map((link) => (
-                                <li key={link.url}>
+                                <li key={link.url || link.label}>
+                                  {link.url ? (
+                                  <span style={{}}>
                                   <a
                                     href={link.url}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="underline hover:opacity-90"
-                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 500 }}
+                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 700 }}
                                   >
                                     {link.label}
-                                  </a>
+                                    
+                                    </a>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500, }}>
+                                        
+                                      {link.notes} 
+                                    </span>
+                                  </span>
+                                  
+                                  ) : (
+                                    <span>
+                                    <span style={{fontSize: '13px', color: '#7200CA', fontWeight: 700}}>
+                                      {link.label} 
+                                    </span>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500}}>
+                                      {link.notes} 
+                                    </span>
+                                    </span>
+                                  )}
                                 </li>
                               ))}
                             </ul>
@@ -539,6 +601,6 @@ return (
 
       </div>
     </div>
-    </PatientSidebarShell>
+    </SidebarShell>
   );
 }
