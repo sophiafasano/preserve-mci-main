@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useReminders } from '../../hooks/useReminders';
-import { useSleepLogs } from '../../hooks/useSleepLogs';
+import { useReminders } from '../hooks/useReminders';
+import { useSleepLogs } from '../hooks/useSleepLogs';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -21,9 +21,11 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../../utils/caregiverModulesAPI';
-import { moduleWeekOrder, weekSlugFromKey } from '../../data/caregiverModuleData';
-import CaregiverLayout from './CaregiverLayout';
+import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/caregiverModulesAPI';
+import { moduleWeekOrder, weekSlugFromKey } from '../data/caregiverModuleData';
+import CaregiverLayout from './caregiver/CaregiverLayout';
+import PatientSidebarShell from './patient/PatientSidebarShell';
+import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell';
 
 
 type ResourceLink = {
@@ -133,6 +135,9 @@ const emptySummary: ModulesSummary = {
 
 export default function CaregiverModulesOverview() {
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+  const SidebarShell = role === 'patient' ? PatientSidebarShell : CaregiverSidebarShell;
+  const modulesPath = role === "patient" ? "/dietmodules" : "/caregiver/dietmodules";
   const [modules, setModules] = useState<ModuleWithProgress[]>([]);
   const [summary, setSummary] = useState<ModulesSummary>(emptySummary);
   const [expandedResourceIds, setExpandedResourceIds] = useState<Record<string, boolean>>({});
@@ -268,7 +273,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("/caregiver/modules")}
+                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/modules' : '/modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',
@@ -311,7 +316,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("/caregiver/dietmodules")}
+                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/dietmodules' : '/dietmodules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',
@@ -329,7 +334,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("/caregiver/cogengagemodules")}
+                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/cogengagemodules' : '/cogengagemodules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',

@@ -23,21 +23,31 @@ import {
   Sparkles,
   Bell
 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { useSleepLogs } from '../../hooks/useSleepLogs';
+import { Button } from './ui/button';
+import { useSleepLogs } from '../hooks/useSleepLogs';
 // import { useAllModulesProgress } from '../hooks/useModuleProgress';
-import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../../utils/modulesAPI';
-import { caregiverModuleData, moduleWeekOrder } from '../../data/caregiverModuleData';
-import { useReminders } from '../../hooks/useReminders';
-import { useAuth } from '../../contexts/useAuth';
-import { useMessaging } from '../../hooks/useMessaging';
+import { modulesAPI, type ModulesSummary, type ModuleWithProgress } from '../utils/modulesAPI';
+import { caregiverModuleData, moduleWeekOrder } from '../data/caregiverModuleData';
+import { useReminders } from '../hooks/useReminders';
+import { useAuth } from '../contexts/useAuth';
+import { useMessaging } from '../hooks/useMessaging';
 // import SleepLogModal, { SleepLogData } from '../SleepLogModal';
-import { supabase } from '../../utils/supabaseClient';
+import { supabase } from '../utils/supabaseClient';
 import { toast } from 'sonner';
-import CaregiverLayout from "./CaregiverLayout"
+import CaregiverLayout from "./caregiver/CaregiverLayout"
+import PatientLayout from "./patient/PatientLayout"
+import PatientSidebarShell from './patient/PatientSidebarShell';
+import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 
 export default function TestDashboard() {
   const navigate = useNavigate();
+
+  const role = localStorage.getItem("role");
+  const SidebarShell = role === 'patient' ? PatientSidebarShell : CaregiverSidebarShell;
+  const Layout = role === 'pateint' ? PatientLayout : CaregiverLayout; 
+
+  const basePath = role === 'caregiver' ? '/caregiver' : '';
+
   const location = useLocation();
   const { user, signout } = useAuth();
   const { unreadCount } = useMessaging();
@@ -321,13 +331,13 @@ export default function TestDashboard() {
   }, [sleepLogs, activeCount]);
 
   const navigationItems: Array<{ label: string; icon: React.ElementType; path: string; action?: string; badge?: number }> = [
-    { label: 'Dashboard',      icon: LayoutDashboard, path: '/caregiver/dashboard' },
-    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: '/caregiver/modules' },
+    { label: 'Dashboard',      icon: LayoutDashboard, path: `${basePath}/testdashboard` },
+    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: `${basePath}/testmodules` },
     { label: 'Sleep Log',      icon: NotebookPen,     path: 'null', action: 'log-sleep' },
-    { label: 'Sleep Analysis', icon: BarChart2,      path: '/caregiver/sleep-analytics' },
-    { label: 'My Progress',    icon: TrendingUp,      path: '/caregiver/my-progress' },
-    { label: 'Messages',       icon: MessageCircle,   path: '/caregiver/messages', badge: unreadCount },
-    { label: 'Reminders',      icon: Bell,                 path: '/caregiver/reminders', badge: activeCount },
+    { label: 'Sleep Analysis', icon: BarChart2,      path: `${basePath}/sleep-analytics` },
+    { label: 'My Progress',    icon: TrendingUp,      path: `${basePath}/my-progress` },
+    { label: 'Messages',       icon: MessageCircle,   path: `${basePath}/messages`, badge: unreadCount },
+    { label: 'Reminders',      icon: Bell,                 path: `${basePath}/reminders`, badge: activeCount },
   ];
 
   // Suppress recharts duplicate key warning (known library issue)
@@ -394,7 +404,7 @@ export default function TestDashboard() {
   const contentScale = 1.08;
 
   return (
-    <CaregiverLayout>
+    <SidebarShell>
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: '#F9FAFB' }}>
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -1131,6 +1141,6 @@ export default function TestDashboard() {
         </div>
       )}
     </div>
-    </CaregiverLayout>
+    </SidebarShell>
   );
 }

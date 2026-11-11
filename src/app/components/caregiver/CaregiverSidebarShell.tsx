@@ -82,7 +82,7 @@ export default function CaregiverSidebarShell({ children }: CaregiverSidebarShel
       }
     }},
     { label: 'Sleep Analysis', icon: BarChart2, path: '/caregiver/sleep-analytics', action: null },
-    { label: 'My Progress', icon: TrendingUp, path: '/caregiver/progress', action: null },
+    { label: 'My Progress', icon: TrendingUp, path: '/caregiver/my-progress', action: null },
     { label: 'Messages', icon: MessageCircle, path: '/caregiver/messages', action: null },
     { label: 'Reminders', icon: Bell, path: '/caregiver/reminders', action: null, badge: activeCount },
   ];

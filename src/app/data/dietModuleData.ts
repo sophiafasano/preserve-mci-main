@@ -43,7 +43,7 @@ export const dietModuleData: Record<DietModuleWeekKey, DietWeekModuleData> = {
         description:
           'Placeholder',
         duration: '~5 min',
-        videoUrl: 'https://www.youtube.com/embed/8vn4JuJiVJE?si=mguuwfxFvuKqkUFb&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/__dlTbIdbfY?si=MDnBZohsiyWviDp4&enablejsapi=1&rel=0',
         fileName: 'Diet_Vid_1',
       },
       {
@@ -52,16 +52,17 @@ export const dietModuleData: Record<DietModuleWeekKey, DietWeekModuleData> = {
         description:
           'Placeholder',
         duration: '~2 min',
-        videoUrl: 'https://www.youtube.com/embed/Ubq5FoSbB6E?si=3KUi1_ydEwh0fEqw&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/Ubq5FoSbB6E?si=3KUi1_ydEwh0fEqw&enablejsapi=1&rel=0',
         fileName: 'Diet_Vid_2',
       },
+      
       {
         id: 'diet_w1_v3',
         title: 'When you Eat: Time-Restricted Eating',
         description:
           'Placeholder',
         duration: '~2 min',
-        videoUrl: 'https://www.youtube.com/embed/hGkovLd7Puw?si=_7bj7rWQ3C8tSt9k&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/4UsOWmGFmWI?si=pufIS1mqy1DFE5Ro&enablejsapi=1&rel=0',
         fileName: 'Diet_Vid_3',
       },
       {
@@ -70,7 +71,7 @@ export const dietModuleData: Record<DietModuleWeekKey, DietWeekModuleData> = {
         description:
           'Placeholder',
         duration: '~3 min',
-        videoUrl: 'https://www.youtube.com/embed/XWLQ8dlVqGg?si=aZpDOfkBPup4B-lc&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/XWLQ8dlVqGg?si=aZpDOfkBPup4B-lc&enablejsapi=1&rel=0',
         fileName: 'Diet_Vid_4',
       },
       {
@@ -79,7 +80,7 @@ export const dietModuleData: Record<DietModuleWeekKey, DietWeekModuleData> = {
         description:
           'Placeholder',
         duration: '~3 min',
-        videoUrl: 'https://www.youtube.com/embed/gk3nZoOwJ10?si=txOVbW6VPISf70fc&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/nAfyMM2GjcA?si=Btb--IYStT1zFUOe&enablejsapi=1&rel=0',
         fileName: 'Diet_Vid_5',
       },
     ],

@@ -213,7 +213,7 @@ function buildModuleWithProgress(
   return {
     ...base,
     weekKey,
-    weekNumber: weekNumberFromKey(weekKey),
+    weekNumber: getWeekNumberFromKey(weekKey),
     unlocked: isWeekUnlocked(weekKey, record),
     isLocked: !isWeekUnlocked(weekKey, record),
     daysUntilUnlock: getDaysUntilUnlock(weekKey, record),

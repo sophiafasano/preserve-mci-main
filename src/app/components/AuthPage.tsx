@@ -101,7 +101,7 @@ export default function AuthPage() {
       }
 
       const dashboardMap: Record<string, string> = {
-        patient: '/patient/dashboard',
+        patient: '/patient/testdashboard',
         care_partner: '/caregiver',
         caregiver: '/caregiver',
         clinician: '/clinician',

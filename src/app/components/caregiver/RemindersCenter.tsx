@@ -49,7 +49,7 @@ export default function CaregiverRemindersCenter() {
       ? logs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date
       : null;
 
-    const incompleteModules = moduleWeekOrder.length - (modulesData?.summary.completedCount ?? 0);
+    const incompleteModules = sleepModuleWeekOrder.length - (modulesData?.summary.completedCount ?? 0);
 
     // Get current module info from modulesData
     // Find the first incomplete unlocked module (the one they should be working on)

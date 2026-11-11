@@ -5,7 +5,7 @@ import AuthPage from "./components/AuthPage";
 import RegistrationPage from "./components/RegistrationPage";
 import ForgotPasswordFlow from "./components/ForgotPasswordFlow";
 import SignOut from "./components/SignOut";
-import PatientDashboard from "./components/PatientDashboard";
+//import PatientDashboard from "./components/PatientDashboard";
 import CarePartnerDashboard from "./components/caregiver/CarePartnerDashboard";
 import ClinicianDashboard from "./components/ClinicianDashboard";
 import SleepModulesOverview from "./components/SleepModulesOverview";
@@ -44,8 +44,8 @@ import CaregiverProgressiveMuscleRelaxation from "./components/caregiver/Caregiv
 
 
 //testing
-import TestDashboard from "./components/caregiver/CareDashboard"
-import TestModulesOverview from "./components/caregiver/TestModulesOverview"
+import TestDashboard from "./components/CareDashboard"
+import TestModulesOverview from "./components/TestModulesOverview"
 
 
 /**
@@ -82,7 +82,7 @@ export const router = createBrowserRouter([
         path: "patient/dashboard",
         element: (
           <ProtectedRoute allowedRoles={['patient']}>
-            <PatientDashboard />
+            <TestDashboard />
           </ProtectedRoute>
         ),
       },
@@ -160,6 +160,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "patient/testdashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "caregiver/patients",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -232,6 +240,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "testmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "caregiver/settings",
         element: (
           <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
@@ -239,14 +255,14 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-      {
-        path: "caregiver/*",
-        element: (
-          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
-            <CarePartnerDashboard />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "caregiver/*",
+      //   element: (
+      //     <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+      //       <CarePartnerDashboard />
+      //     </ProtectedRoute>
+      //   ),
+      // },
       // Legacy Care Partner routes (backward compatibility)
       {
         path: "care-partner",
@@ -300,7 +316,7 @@ export const router = createBrowserRouter([
         path: "patient/sleep-logs",
         element: (
           <ProtectedRoute allowedRoles={['patient']}>
-            <PatientDashboard />
+            <TestDashboard />
           </ProtectedRoute>
         ),
       },
@@ -567,7 +583,7 @@ export const router = createBrowserRouter([
       // Development Preview Routes (bypass auth for page selector)
       {
         path: "preview/patient-dashboard",
-        Component: PatientDashboard,
+        Component: TestDashboard,
       },
       {
         path: "preview/patient-messages",

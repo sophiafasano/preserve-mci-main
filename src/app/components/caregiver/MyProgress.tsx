@@ -107,7 +107,7 @@ export default function MyProgressCaregiver() {
     }
 
     // All modules completed
-    if ((modulesData?.summary.completedCount || 0) === moduleWeekOrder.length) {
+    if ((modulesData?.summary.completedCount || 0) === sleepModuleWeekOrder.length) {
       earned.push({
         id: 'all-modules',
         name: 'Program Complete',
@@ -199,7 +199,7 @@ export default function MyProgressCaregiver() {
     },
     {
       label: 'Modules Completed',
-      value: `${modulesData?.summary.completedCount ?? 0}/${moduleWeekOrder.length}`,
+      value: `${modulesData?.summary.completedCount ?? 0}/${sleepModuleWeekOrder.length}`,
       icon: BookOpen,
       color: 'teal',
       subtext: `${modulesData?.summary.overallPercent ?? 0}% complete`,
@@ -532,7 +532,7 @@ export default function MyProgressCaregiver() {
                   </h3>
                 </div>
                 <p style={{ fontSize: '24px', fontWeight: 700, color: '#1A1A2E' }}>
-                  {moduleWeekOrder.length - (modulesData?.summary.completedCount ?? 0)}
+                  {sleepModuleWeekOrder.length - (modulesData?.summary.completedCount ?? 0)}
                 </p>
                 <p style={{ fontSize: '14px', color: '#6B7280' }}>modules to go</p>
               </div>

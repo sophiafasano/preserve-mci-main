@@ -43,7 +43,7 @@ export const cogengageModuleData: Record<CogengageModuleWeekKey, CogengageWeekMo
         description:
           'Placeholder',
         duration: '~3 min',
-        videoUrl: 'https://www.youtube.com/embed/pArdpdA5xpA?si=0evG2KPWDNcWDZy7&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/Fv9YNqf3o5U?si=onPHIpjZb3exEzFK&enablejsapi=1&rel=0',
         fileName: 'Cogengage_Vid_1',
       },
       {
@@ -52,7 +52,7 @@ export const cogengageModuleData: Record<CogengageModuleWeekKey, CogengageWeekMo
         description:
           'Placeholder',
         duration: '~4 min',
-        videoUrl: 'https://www.youtube.com/embed/OT1RskWaFZM?si=8IXyyhixLK3Emzo-&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/gQbJ5sJtN_c?si=HHpDVYfSpeayFV7i&enablejsapi=1&rel=0',
         fileName: 'Cogengage_Vid_2',
       },
       {
@@ -61,17 +61,26 @@ export const cogengageModuleData: Record<CogengageModuleWeekKey, CogengageWeekMo
         description:
           'Placeholder',
         duration: '~1 min',
-        videoUrl: 'https://www.youtube.com/embed/fIaHAd8azf8?si=3CP2-NU7Q-TQIgSU&enablejsapi=1',
+        videoUrl: 'https://www.youtube.com/embed/jdeISC-Ae8s?si=Z328jDh8kJFovoRi&enablejsapi=1&rel=0',
         fileName: 'Cogengage_Vid_3',
       },
       {
         id: 'cogengage_w1_v4',
-        title: 'Recap and Your Plan for This Week',
+        title: 'Everyday Memory Tools',
+        description:
+          'Placeholder',
+        duration: '~1 min',
+        videoUrl: 'https://www.youtube.com/embed/6_sc3js9wXU?si=c_RXllREnxXHxC3k&enablejsapi=1&rel=0',
+        fileName: 'Cogengage_Vid_4',
+      },
+      {
+        id: 'cogengage_recap',
+        title: 'Recap',
         description:
           'Placeholder',
         duration: '~2 min',
-        videoUrl: 'https://www.youtube.com/embed/KaWOREGIEE8?si=wpCrwR7TQNEUQesS&enablejsapi=1',
-        fileName: 'Cogengage_Vid_4',
+        videoUrl: 'https://www.youtube.com/embed/qtkaTcZldvw?si=KSVS-J_TZqtYzbLo&enablejsapi=1&rel=0',
+        fileName: 'Cogengage_Vid_5',
       },
     ],
     resources: [],

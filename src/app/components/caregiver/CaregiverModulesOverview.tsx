@@ -369,7 +369,7 @@ export default function CaregiverModulesOverview() {
   
                       <button
                         disabled={!module.unlocked}
-                        onClick={() => navigate(`/caregiver/modules/${weekSlugFromKey(module.weekKey)}`)}
+                        onClick={() => navigate(`/caregiver/testmodules${weekSlugFromKey(module.weekKey)}`)}
                         className="w-full rounded-[10px] py-2.5"
                         style={
                           module.completed
@@ -422,7 +422,11 @@ export default function CaregiverModulesOverview() {
                       <div className="mt-auto pt-3">
                       {resource.path && (
                         <button
-                          onClick={() => navigate(resource.path)}
+                          onClick={() => {
+                            if (resource.path) {
+                              navigate(resource.path);
+                            }
+                          }}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',

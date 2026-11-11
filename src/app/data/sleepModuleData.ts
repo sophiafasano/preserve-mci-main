@@ -44,7 +44,7 @@ export interface SleepWeekModuleData {
 
 export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = {
   week1: {
-    title: 'Understanding Sleep and MCI; Introduction to Sleep Intervention',
+    title: 'How Sleep Works, and Healthy Sleep Habits',
     subtitle: 'The Foundation of Better Sleep and Cognitive Health',
     duration: '14 min',
     description:
@@ -52,84 +52,117 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
     queue: [
       {
         id: 'w1_v1',
-        title: 'Week 1 Introduction',
+        title: 'Welcome: Sleep, Aging and Your Brain',
         description:
           'Introduction to the sleep intervention program and what to expect over the coming weeks.',
         duration: '~5 min',
         //videoUrl: CBTi_Week_1_Video_1_P,
-        videoUrl: 'https://www.youtube.com/embed/Vn7KRiLg7jE?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/MphZRzwwfCs?si=O7TR9RUiIJDNIqIP&enablejsapi=1&rel=0',
         fileName: 'CBTi_Week_1_Video_1_P',
       },
       {
         id: 'w1_v2',
-        title: 'Activities that Interfere with Sleep',
-        description: 'Common habits and behaviors that disrupt healthy sleep patterns.',
+        title: 'What is Insomnia, and How Do We Treat It?',
+        description: 'Placeholder',
         duration: '~1 min',
         //videoUrl: Activities_Video,
-        videoUrl: 'https://www.youtube.com/embed/GD9VWT0JQo8?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/f1U16hSYK6U?si=SXpzfqe7ain1QiaH&enablejsapi=1&rel=0',
         fileName: 'Activities_Video',
       },
       {
         id: 'w1_v3',
-        title: 'Sleep Hygiene',
-        description: 'Essential practices and environmental factors that promote quality sleep.',
+        title: 'Things That Can Get in the Way of Sleep',
+        description: 'Placeholder',
         duration: '~4 min',
         // videoUrl: Sleep_Hygiene_E,
-        videoUrl: 'https://www.youtube.com/embed/J8hRZ9zqvVU?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/sQsZMI5zvR0?si=oVmmbOCW0g2abecV&enablejsapi=1&rel=0',
         fileName: 'Sleep_Hygiene_E',
       },
       {
         id: 'w1_v4',
-        title: 'Stimulus Control',
-        description: 'Evidence-based techniques to strengthen the bed-sleep association.',
+        title: 'Healthy Sleep Habits',
+        description: 'Placeholder',
         duration: '~2 min',
         // videoUrl: Stimulus_Control_E,
-        videoUrl: 'https://www.youtube.com/embed/-8n_SPzN5Y4?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/c1DFng_CuGI?si=DcY1rj9GSE4BJP6S&enablejsapi=1&rel=0',
         fileName: 'Stimulus_Control_E',
       },
       {
-        id: 'w1_recap',
-        title: 'Week 1 Recap',
-        description: 'Summary of key concepts from Week 1.',
+        id: 'w1_v5',
+        title: 'WRONG FORMAT - Retrain Your Brain for Sleep (Stimulus Control)',
+        description: 'Placeholder',
         duration: '~2 min',
         // videoUrl: Week_1_recap_E,
         videoUrl: 'https://www.youtube.com/embed/mYYHNOawQyw?enablejsapi=1&rel=0',
         fileName: 'Week_1_recap_E',
+      },
+      {
+        id: 'w1_recap',
+        title: 'Your Plan for Week 1',
+        description: 'Summary of key concepts from Week 1.',
+        duration: '~2 min',
+        // videoUrl: Week_1_recap_E,
+        videoUrl: 'https://www.youtube.com/embed/xsggC6QHWt4?si=48CzI6jxnZW35Ysr&enablejsapi=1&rel=0',
+        fileName: 'Week_1_recap_E2',
       },
     ],
     resources: [],
   },
  
   week2: {
-    title: 'Techniques to Enhance Sleep',
+    title: 'Your Sleep Schedule, Relaxation, and Noticing Thoughts',
     subtitle: 'Building Better Sleep Habits',
     duration: '30 min',
     description: 'Explore relaxation techniques and strategies to improve your sleep quality.',
     queue: [
       {
         id: 'w2_v1',
-        title: 'Week 2 Introduction',
+        title: 'Your Sleep Schedule (Sleep Compression)',
         description: 'Building on Week 1 foundations with new techniques to enhance sleep.',
         duration: '~6 min',
         //videoUrl: CBTi_Week_2_Video_1_P,
-        videoUrl: 'https://www.youtube.com/embed/dNCMYTyzGWs?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/9sG4IDEMCdc?si=7ZiRhQv4hJqDyKlm&enablejsapi=1&rel=0',
         fileName: 'CBTi_Week_2_Video_1_P',
       },
       {
         id: 'w2_v2',
-        title: 'Autogenic Relaxation',
-        description: 'Autogenic Relaxation',
+        title: 'Notcing Thoughts That Keep You Awake',
+        description: 'Placeholder',
         duration: '~6 min',
-        videoUrl: 'https://www.youtube.com/embed/H62t26iYF9o?si=zchGwlBqCObJ7GcT&enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/C-yhMzjdEUw?si=y6RTBia8AbKvIm0V&si=zchGwlBqCObJ7GcT&enablejsapi=1&rel=0',
         fileName: 'Week 2 auto_relax'
       },
       {
+        id: 'w2_v3',
+        title: 'Calming Your Body and Mind at Bedtime',
+        description: 'Placeholder',
+        duration: '~6 min',
+        videoUrl: 'https://www.youtube.com/embed/vGVdYJ-5bKw?si=eIQ14SlP0DZk-EFy&si=zchGwlBqCObJ7GcT&enablejsapi=1&rel=0',
+        fileName: 'Week 2 auto_relax2'
+      },
+      {
+        id: 'w2_v4',
+        title: 'The Mental Shuffle: For a Racing Mind',
+        description: 'Placeholder',
+        duration: '~6 min',
+        videoUrl: 'https://www.youtube.com/embed/vV2VSJCv84Q?enablejsapi=1&rel=0',
+        fileName: 'Week 2 auto_relax3'
+      },
+      {
+        id: 'w2_v5',
+        title: 'Working Together at Night',
+        description: 'Placeholder',
+        duration: '~6 min',
+        videoUrl: 'https://www.youtube.com/embed/vIYhrZoDKIM?enablejsapi=1&rel=0',
+        fileName: 'Week 2 auto_relax4'
+      },
+      {
         id: 'w2_recap',
-        title: 'Week 2 Recap',
+        title: 'Your Plan for Week 2',
         description: 'Summary of key concepts from Week 2.',
         duration: '~1 min',
         // videoUrl: Week_2_recap_E,
-        videoUrl: 'https://www.youtube.com/embed/wlv4zQEbt9I?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/rwJxWUdMn3c?si=382V21WwB9XbjsYO&enablejsapi=1&rel=0',
         fileName: 'Week_2_recap_E',
       },
     ],
@@ -161,7 +194,7 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
   },
  
   week3: {
-    title: 'Managing Stress and Worry',
+    title: 'Balacing Thoughts, Living with MCI, and Managing Stress',
     subtitle: 'Strategies for Staying Asleep',
     duration: '9 min',
     description:
@@ -169,30 +202,39 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
     queue: [
       {
         id: 'w3_v1',
-        title: 'Week 3 Introduction',
+        title: 'Sleep, Memory, and Living with MCI',
         description:
-          'Introduction to managing stress, worry, and maladaptive thinking patterns.',
+          'Placeholder',
         duration: '~5 min',
         // videoUrl: CBTi_Week_3_Video_1_P,
-        videoUrl: 'https://www.youtube.com/embed/WRJVpWZDMhw?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/jR4ywKsx5Hs?si=rWHJRk7OAK1YwCv8&enablejsapi=1&rel=0',
         fileName: 'CBTi_Week_3_Video_1_P',
       },
       {
-        id: 'w3_maladaptive',
-        title: 'Maladaptive Thoughts',
-        description: 'Understanding and reframing thought patterns that disrupt sleep.',
+        id: 'w3_v2',
+        title: 'Catch It, Check It, Change It',
+        description: 'Placeholder',
         duration: '~4 min',
         // videoUrl: Maladaptive_Thoughts_Week_3,
-        videoUrl: 'https://www.youtube.com/embed/YKsqSgtHp4M?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/GomKEs77U64?si=SPmAySrW66Bqm0-N&enablejsapi=1&rel=0',
         fileName: 'Maladaptive_Thoughts_Week_3',
       },
       {
+        id: 'w3_v3',
+        title: 'Managing Stress During the Day',
+        description: 'Placeholder',
+        duration: '~4 min',
+        // videoUrl: Maladaptive_Thoughts_Week_3,
+        videoUrl: 'https://www.youtube.com/embed/s1EvZ_q0_P4?si=oh82ZkF-7EaSTUw2&enablejsapi=1&rel=0',
+        fileName: 'Maladaptive_Thoughts_Week_32',
+      },
+      {
         id: 'w3_recap',
-        title: 'Week 3 Recap',
+        title: 'Your Plan for Week 3',
         description: 'Summary of key concepts from Week 3.',
         duration: '~1 min',
         // videoUrl: Week_3_Recap,
-        videoUrl: 'https://www.youtube.com/embed/UBqnJACsYjM?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/5iBnOdLg20M?si=D3fsuNJ5ZbF9sM-z&enablejsapi=1&rel=0',
         fileName: 'Week_3_Recap',
       },
     ],
@@ -231,7 +273,7 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
   },
  
   week4: {
-    title: 'Practical Recommendations',
+    title: 'Keeping Your Progress',
     subtitle: 'Maintaining Long-Term Sleep Health',
     duration: '5 min',
     description:
@@ -239,13 +281,33 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
     queue: [
       {
         id: 'w4_v1',
-        title: 'Week 4 Introduction',
+        title: 'Keeping Your Progress',
         description:
-          'Final week bringing together all strategies for long-term sleep health.',
+          'Placeholder',
         duration: '~5 min',
         // videoUrl: CBTi_Week_4_Video_1_P,
-        videoUrl: 'https://www.youtube.com/embed/TgQXRurrR9I?enablejsapi=1&rel=0',
+        videoUrl: 'https://www.youtube.com/embed/0ePF9Ac7ioA?si=hHP6MQygDNaQzf3Y&enablejsapi=1&rel=0',
         fileName: 'CBTi_Week_4_Video_1_P',
+      },
+      {
+        id: 'w4_v2',
+        title: 'Your Plan Going Forward',
+        description:
+          'Placeholder',
+        duration: '~5 min',
+        // videoUrl: CBTi_Week_4_Video_1_P,
+        videoUrl: 'https://www.youtube.com/embed/sqizetBi43Y?si=BelpVXqpydwpOZTa&enablejsapi=1&rel=0',
+        fileName: 'CBTi_Week_4_Video_2_P',
+      },
+      {
+        id: 'w4_recap',
+        title: 'Sleep Plan',
+        description:
+          'Placeholder',
+        duration: '~5 min',
+        // videoUrl: CBTi_Week_4_Video_1_P,
+        videoUrl: 'https://www.youtube.com/embed/Jl88hx0-ahY?si=z50cca4e7sr-2o9i&enablejsapi=1&rel=0',
+        fileName: 'CBTi_Week_4_Video_3_P',
       },
     ],
     resources: [
