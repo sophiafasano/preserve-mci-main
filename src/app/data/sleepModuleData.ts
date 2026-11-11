@@ -89,7 +89,7 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
       },
       {
         id: 'w1_v5',
-        title: 'WRONG FORMAT - Retrain Your Brain for Sleep (Stimulus Control)',
+        title: 'Retrain Your Brain for Sleep (Stimulus Control)',
         description: 'Placeholder',
         duration: '~2 min',
         // videoUrl: Week_1_recap_E,
