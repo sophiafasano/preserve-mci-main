@@ -29,6 +29,7 @@ import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 type ResourceLink = {
   label: string;
   url?: string;
+  notes?: string;
 };
 
 type StaticResource = {
@@ -97,7 +98,8 @@ const staticResources: StaticResource[] = [
         url: 'https://www.freshaccessbucks.com',
       },
       {
-        label: '-Meals for older adults (60+): home-delivered meals (Meals on Wheels) and group meal sites. Call the Florida Elder Helpline at 1-800-963-5337 to connect with your local Area Agency on Aging.',
+        label: 'Meals for older adults (60+)',
+        notes: 'Home-delivered meals (Meals on Wheels) and group meal sites. Call the Florida Elder Helpline at 1-800-963-5337 to connect with your local Area Agency on Aging.'
         //url: '',
       },
       
@@ -114,16 +116,19 @@ const staticResources: StaticResource[] = [
         url: 'https://www.nia.nih.gov/',
       },
       {
-        label: 'NHLBI DASH Eating Plan: recipes and tips',
+        label: 'NHLBI DASH Eating Plan',
         url: 'https://www.nhlbi.nih.gov/health/dash-eating-plan',
+        notes: 'Recipes and tips'
       },
       {
-        label: ' Oldways: free recipes and guides for the African Heritage and Latin American Heritage diets',
+        label: ' Oldways',
         url: 'https://oldwayspt.org/',
+        notes: 'Free recipes and guides for the African Heritage and Latin American Heritage diets'
       },
       {
-        label: 'Alzheimer\'s Association: brain-healthy living tips and 24/7 Helpline, 1-800-272-3900',
+        label: 'Alzheimer\'s Association',
         url: 'https://www.alz.org/',
+        notes: 'Brain-healthy living tips and 24/7 Helpline, 1-800-272-3900'
       },
       
     ],
@@ -484,18 +489,31 @@ return (
                               {resource.links.map((link) => (
                                 <li key={link.url || link.label}>
                                   {link.url ? (
+                                  <span style={{}}>
                                   <a
                                     href={link.url}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="underline hover:opacity-90"
-                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 500 }}
+                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 700 }}
                                   >
                                     {link.label}
-                                  </a>
+                                    
+                                    </a>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500, }}>
+                                        
+                                      {link.notes} 
+                                    </span>
+                                  </span>
+                                  
                                   ) : (
-                                    <span style={{fontSize: '13px', color: '#000000', fontWeight: 500}}>
+                                    <span>
+                                    <span style={{fontSize: '13px', color: '#7200CA', fontWeight: 700}}>
                                       {link.label} 
+                                    </span>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500}}>
+                                      {link.notes} 
+                                    </span>
                                     </span>
                                   )}
                                 </li>

@@ -16,7 +16,7 @@ export default function BloodPressurePage(){
     <div className="min-h-screen px-6 py-6 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
       <div className="mx-auto max-w-6xl">
         <button
-          onClick={() => ( role === "patient" ? navigate('/dietmodules') : navigate('/caregiver/dietmodules'))}
+          onClick={() => ( role === "patient" ? navigate('/heart-modules') : navigate('/caregiver/heart-modules'))}
           className="mb-6 inline-flex items-center gap-1.5 hover:opacity-90"
           style={{ color: '#7200CA', fontSize: '17px', fontWeight: 500 }}
         >

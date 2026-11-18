@@ -29,6 +29,7 @@ import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
 type ResourceLink = {
   label: string;
   url?: string;
+  notes?: string;
 };
 
 type StaticResource = {
@@ -51,80 +52,60 @@ const staticResources: StaticResource[] = [
     path: role === 'patient' ? '/heart-modules/resources/blood-pressure' : '/caregiver/heart-modules/resources/blood-pressure',
   },
   {
-    id: 'breakfast_ideas',
-    title: 'Breakfast Ideas',
-    description: 'Ideas for a healthy breakfast.',
-    icon: House,
-    path: role === 'patient' ? '/dietmodules/resources/breakfast-ideas' : '/caregiver/dietmodules/resources/breakfast-ideas',
-  },
-  {
-    id: 'lunch_ideas',
-    title: 'Lunch Ideas',
-    description: 'Ideas for a healthy lunch.',
-    icon: Wind,
-    path: role === 'patient' ? '/dietmodules/resources/lunch-ideas' : '/caregiver/dietmodules/resources/lunch-ideas',
-  },
-  {
-    id: 'dinner_ideas',
-    title: 'Dinner Ideas',
-    description: 'Ideas for a healthy dinner.',
-    icon: BedDouble,
-    path: role === 'patient' ? '/dietmodules/resources/dinner-ideas' : '/caregiver/dietmodules/resources/dinner-ideas',
-  },
-  {
-    id: 'low_effort_meals',
-    title: 'Quick, No-Cook, or Low-Effort Meals',
-    description: 'Ideas for meals when you do not have a lot of time.',
-    icon: AlertTriangle,
-    path: role === 'patient' ? '/dietmodules/resources/low-effort-meals' : '/caregiver/dietmodules/resources/low-effort-meals',
-  },
-  {
-    id: 'help-with-food',
-    title: 'Help with Food',
-    description: 'Find support resources for food in your community.',
+    id: 'questions-to-ask-doctor',
+    title: 'Questions to Ask Your Doctor',
+    description: '',
     icon: BookOpen,
     links: [
       {
-        label: 'Feeding Tampa Bay: food pantries and mobile markets',
-        url: 'https://ftb.org/',
+        label: '1. What are my blood pressure, LDL cholesterol, and A1C numbers? What should my goals be?',
       },
       {
-        label: 'SNAP (food assistance): apply through Florida ACCESS',
-        url: 'https://www.myflfamilies.com/services/public-assistance',
+        label: '2. How often should I check my blood pressure at home? What numbers should I call you about?',
       },
       {
-        label: 'Fresh Access Bucks: doubles SNAP dollars for fruits and vegetables at participating markets and stores',
-        url: 'https://www.freshaccessbucks.com',
+        label: '3. What is each of my medicines for? Are there any I should take at a certain time or with food?',
       },
       {
-        label: '-Meals for older adults (60+): home-delivered meals (Meals on Wheels) and group meal sites. Call the Florida Elder Helpline at 1-800-963-5337 to connect with your local Area Agency on Aging.',
-        //url: '',
+        label: '4. Could any of my medicines cause dizziness, low blood sugar, or affect my memory?',
+      },
+      {
+        label: '5. Is there anything I can stop taking?',
+      },
+      {
+        label: '6. What one change would help my heart and brain the most right now?',
       },
       
     ],
   },
   {
-    id: 'trusted-information',
-    title: 'Trusted Information',
-    description: 'Find support resources and educational materials concerning food health.',
+    id: 'helpful-resources',
+    title: 'Helpful Resources',
+    description: '',
     icon: BookOpen,
     links: [
       {
-        label: 'National Institute on Aging: “What Do We Know About Diet and Prevention of Alzheimer\'s Disease?”',
+        label: 'American Heart Association, Life/’s Essential 8',
         url: 'https://www.nia.nih.gov/',
       },
       {
-        label: 'NHLBI DASH Eating Plan: recipes and tips',
-        url: 'https://www.nhlbi.nih.gov/health/dash-eating-plan',
+        label: 'Validated Blood Pressure',
+        url: 'https://www.validatebp.org/devices?f%5B0%5D=device_types_grid%3A256',
+        notes: 'A list of home monitors checked for accuracy'
       },
       {
-        label: ' Oldways: free recipes and guides for the African Heritage and Latin American Heritage diets',
-        url: 'https://oldwayspt.org/',
+        label: 'Medicare',
+        notes: 'Covers cardiovascular screening blood tests (cholesterol and other blood fats) once every 5 years, and diabetes screening for people at risk. Ask whether your plan helps pay for a home blood pressure monitor; some Medicare Advantage plans do.',
       },
       {
-        label: 'Alzheimer\'s Association: brain-healthy living tips and 24/7 Helpline, 1-800-272-3900',
-        url: 'https://www.alz.org/',
+        label: 'Emergencies',
+        notes: 'Call 911 for signs of stroke (BE FAST) or chest pain',
       },
+      {
+        label: 'Quitting tobacco',
+        url: 'smokefree.gov',
+        notes: 'Tobacco Free Florida quitline, 1-877-U-CAN-NOW (1-877-822-6669); national quitline, 1-800-QUIT-NOW. The full quit plan worksheet from the Quitting Smoking module is posted here.'
+      }
       
     ],
   },
@@ -484,18 +465,31 @@ return (
                               {resource.links.map((link) => (
                                 <li key={link.url || link.label}>
                                   {link.url ? (
+                                  <span style={{}}>
                                   <a
                                     href={link.url}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="underline hover:opacity-90"
-                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 500 }}
+                                    style={{ fontSize: '13px', color: '#7200CA', fontWeight: 700 }}
                                   >
                                     {link.label}
-                                  </a>
+                                    
+                                    </a>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500, }}>
+                                        
+                                      {link.notes} 
+                                    </span>
+                                  </span>
+                                  
                                   ) : (
-                                    <span style={{fontSize: '13px', color: '#000000', fontWeight: 500}}>
+                                    <span>
+                                    <span style={{fontSize: '13px', color: '#7200CA', fontWeight: 700}}>
                                       {link.label} 
+                                    </span>
+                                    <span style={{display: 'inline-block', marginLeft: '10px', fontSize: '13px', color: '#4c4c4c', fontWeight: 500}}>
+                                      {link.notes} 
+                                    </span>
                                     </span>
                                   )}
                                 </li>

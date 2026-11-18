@@ -227,7 +227,7 @@ export default function CaregiverModulesOverview() {
             <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1A1A2E' }}>Weekly Modules</h1>
           </header>
   
-            <section className="mb-7 rounded-[12px] bg-white p-6" style={{ border: '0.5px solid #E9D5FF' }}>
+            {/* <section className="mb-7 rounded-[12px] bg-white p-6" style={{ border: '0.5px solid #E9D5FF' }}>
               <div className="mb-4 flex items-end justify-between">
                 <div>
                   <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
@@ -262,7 +262,7 @@ export default function CaregiverModulesOverview() {
                   <p style={{ fontSize: '16px', color: '#858993' }}>Not Started</p>
                 </div>
               </div>
-            </section>
+            </section> */}
   
             <section className="mb-10">
               <h2 className="mb-4" style={{ fontSize: '20px', fontWeight: 600, color: '#1A1A2E' }}>
