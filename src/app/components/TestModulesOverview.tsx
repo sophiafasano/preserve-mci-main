@@ -220,7 +220,7 @@ export default function CaregiverModulesOverview() {
   }, [modules]);
 
   return (
-    <CaregiverLayout>
+    <SidebarShell>
     <div className="min-h-screen px-6 py-8 lg:px-10" style={{ backgroundColor: '#F9FAFB' }}>
       <div className="mx-auto max-w-6xl">
           <header className="mb-6">
@@ -273,7 +273,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/modules' : '/modules')}
+                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/modules' : '/sleep-modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',
@@ -286,12 +286,20 @@ export default function CaregiverModulesOverview() {
                           Sleep
                         </button>
                   </div>
+               </div>
+            </section>
+
+            <section className="mb-10">
+              <h2 className="mb-4" style={{ fontSize: '20px', fontWeight: 600, color: '#1A1A2E' }}>
+                Wellness Modules
+              </h2>
+              <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
 
                   <div 
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("")}
+                     onClick={() => navigate(role === 'caregiver' ? '/caregiver/heart-modules' : '/heart-modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',
@@ -301,17 +309,10 @@ export default function CaregiverModulesOverview() {
                             fontWeight: 600,
                           }}
                         >
-                          Physical Activity
+                          Heart Health
                         </button>
                    </div>
-               </div>
-            </section>
 
-            <section className="mb-10">
-              <h2 className="mb-4" style={{ fontSize: '20px', fontWeight: 600, color: '#1A1A2E' }}>
-                Wellness Modules
-              </h2>
-              <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
                   <div 
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
@@ -352,7 +353,7 @@ export default function CaregiverModulesOverview() {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                     onClick={() => navigate("")}
+                     onClick={() =>  navigate(role === 'caregiver' ? '/caregiver/hvs-modules' : '/hvs-modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
                             border: '0.5px solid #C4B5FD',
@@ -362,25 +363,7 @@ export default function CaregiverModulesOverview() {
                             fontWeight: 600,
                           }}
                         >
-                          Smoking
-                        </button>
-                   </div>
-
-                   <div 
-                  className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
-                  style={{ border: '0.5px solid #E9D5FF' }}>
-                    <button
-                     onClick={() => navigate("")}
-                          className="rounded-[8px] px-3 py-1.5"
-                          style={{
-                            border: '0.5px solid #C4B5FD',
-                            color: '#7200CA',
-                            backgroundColor: 'white',
-                            fontSize: '20px',
-                            fontWeight: 600,
-                          }}
-                        >
-                          Cardiovascular
+                          Hearing, Vision, and Staying Connected
                         </button>
                    </div>
 
@@ -474,7 +457,7 @@ export default function CaregiverModulesOverview() {
   
         </div>
       </div>
-      </CaregiverLayout>
+      </SidebarShell>
     );
   }
   

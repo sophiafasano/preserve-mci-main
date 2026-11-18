@@ -30,7 +30,13 @@ import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModul
 import DietModulesOverview from './components/DietModulesOverview';
 import MindDietPage from './components/MindDietPage';
 import CognitiveEngagementModulePage from './components/CognitiveEngagementModulePage';
-import CognitiveEngagementModulesOverview from './components/CognitiveEngagementModulesOverview'
+import CognitiveEngagementModulesOverview from './components/CognitiveEngagementModulesOverview';
+import HeartHealthModulesOverview from './components/HeartModulesOverview';
+import HeartModulePage from './components/HeartModulePage';
+import BloodPressurePage from './components/BloodPressurePage';
+import HVSModulesOverview from './components/HVSModulesOverview';
+import HVSModulePage from './components/HVSModulePage';
+
 
 
 import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
@@ -240,7 +246,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "testmodules",
+        path: "modules",
         element: (
           <ProtectedRoute allowedRoles={['patient']}>
             <TestModulesOverview />
@@ -402,19 +408,59 @@ export const router = createBrowserRouter([
         ),
       },
       // Module Routes
-      {
-        path: "modules",
-        element: (
-          <ProtectedRoute allowedRoles={['patient']}>
-            <SleepModulesOverview />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "modules",
+      //   element: (
+      //     <ProtectedRoute allowedRoles={['patient']}>
+      //       <SleepModulesOverview />
+      //     </ProtectedRoute>
+      //   ),
+      // },
       {
         path: "sleep-modules",
         element: (
           <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
             <SleepModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "hvs-modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HVSModulesOverview />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "hvs-modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HVSModulePage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HeartHealthModulesOverview />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HeartModulePage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules/resources/blood-pressure",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <BloodPressurePage />
           </ProtectedRoute>
         ),
       },

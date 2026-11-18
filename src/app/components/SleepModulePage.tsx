@@ -44,6 +44,9 @@ export default function SleepModulePage() {
     return toSleepWeekKeyFromSlug(moduleId);
   }, [moduleId]);
 
+  const role = localStorage.getItem('role'); 
+  const modulesPath = role === "patient" ? "/sleep-modules" : "/caregiver/sleep-modules";
+
   const [module, setModule] = useState<ModuleWithProgress | null>(null);
   const [activeQueueIndex, setActiveQueueIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'queue' | 'resources'>('queue');
@@ -460,7 +463,7 @@ export default function SleepModulePage() {
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-center justify-between">
             <button
-              onClick={() => navigate('/modules')}
+              onClick={() => navigate(modulesPath, { replace: true })}
               className="inline-flex items-center gap-1.5 hover:opacity-90 cursor-pointer"
               style={{ color: '#7200CA', fontSize: '16px', fontWeight: 500 }}
             >

@@ -22,7 +22,7 @@ import {
   weekSlugFromKey,
   type DietModuleWeekKey,
 } from '../data/dietModuleData';
-import { dietModulesAPI, type ModuleWithProgress } from '../utils/dietModulesAPI';
+import { modulesAPI, type ModuleWithProgress } from '../utils/modulesAPI';
 import { supabase } from '../utils/supabaseClient';
 import { useAuth } from '../contexts/useAuth'; 
 
@@ -106,7 +106,7 @@ export default function DietModulePage() {
 
     async function load() {
       try {
-        const response = await dietModulesAPI.getModuleWeek(weekKey);
+        const response = await modulesAPI.getModuleWeek(weekKey);
         if (!mounted) return;
 
         if (!response.module.unlocked) {
@@ -256,7 +256,7 @@ export default function DietModulePage() {
   async function refreshWeek(keepQueueIndex = true) {
     if (!weekKey) return;
     try {
-      const response = await dietModulesAPI.getModuleWeek(weekKey);
+      const response = await modulesAPI.getModuleWeek(weekKey);
       setModule(response.module);
       if (!keepQueueIndex) {
         const firstUnwatchedIndex = response.module.queue.findIndex((item) => !item.progress.watched);
@@ -270,7 +270,7 @@ export default function DietModulePage() {
   async function markCurrentQueueVideo(watchedPercent: number) {
     if (!module || !currentQueueVideo) return;
     try {
-      await dietModulesAPI.postVideoProgress(module.weekKey, currentQueueVideo.id, { watchedPercent });
+      await modsAPI.postVideoProgress(module.weekKey, currentQueueVideo.id, { watchedPercent });
       await refreshWeek(true);
     } catch {
       // Silently ignore — progress will sync on next load.

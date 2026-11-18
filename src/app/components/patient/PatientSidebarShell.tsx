@@ -68,8 +68,8 @@ export default function PatientSidebarShell({ children }: PatientSidebarShellPro
     badge?: number;
   }> = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/patient/testdashboard', action: null },
-    { label: 'Weekly Modules', icon: BookOpen, path: '/testmodules', action: null },
-    { label: 'Wellness Log', icon: NotebookPen, path: null, action: () => {
+    { label: 'Weekly Modules', icon: BookOpen, path: '/modules', action: null },
+    { label: 'Wellness Logs', icon: NotebookPen, path: null, action: () => {
       console.log(logs)
       const today = new Date().toDateString();
       const hasLoggedToday = logs.some((log) => new Date(log.date).toDateString() === today);

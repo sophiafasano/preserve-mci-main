@@ -332,7 +332,7 @@ export default function TestDashboard() {
 
   const navigationItems: Array<{ label: string; icon: React.ElementType; path: string; action?: string; badge?: number }> = [
     { label: 'Dashboard',      icon: LayoutDashboard, path: `${basePath}/testdashboard` },
-    { label: 'Weekly Sleep Modules',  icon: BookOpen,        path: `${basePath}/testmodules` },
+    { label: 'Weekly Modules',  icon: BookOpen,        path: `${basePath}/modules` },
     { label: 'Sleep Log',      icon: NotebookPen,     path: 'null', action: 'log-sleep' },
     { label: 'Sleep Analysis', icon: BarChart2,      path: `${basePath}/sleep-analytics` },
     { label: 'My Progress',    icon: TrendingUp,      path: `${basePath}/my-progress` },

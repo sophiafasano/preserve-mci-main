@@ -21,7 +21,7 @@ import {
   ClipboardList,
   CalendarCheck
 } from 'lucide-react';
-import { cogengageModulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/cogModulesAPI';
+import { modulesAPI, type ModuleWithProgress, type ModulesSummary } from '../utils/modulesAPI';
 import { cogengageModuleWeekOrder, weekSlugFromKey } from '../data/cogModuleData';
 import PatientSidebarShell from './patient/PatientSidebarShell';
 import CaregiverSidebarShell from './caregiver/CaregiverSidebarShell'
@@ -206,7 +206,7 @@ export default function CognitiveEngagementModuleOverview() {
 
     async function loadModules() {
       try {
-        const response = await cogengageModulesAPI.getModules();
+        const response = await modulesAPI.getModules();
         if (!mounted) return;
         setModules(response.modules);
         setSummary(response.summary);
@@ -322,7 +322,7 @@ return (
                             letterSpacing: '0.06em',
                           }}
                         >
-                          Week {module.weekNumber} of 4
+                          Week {module.weekNumber} of {modules.length}
                         </p>
                         <h3
                           className="line-clamp-2"
@@ -425,7 +425,7 @@ return (
                 return (
                   <div
                     key={resource.id}
-                    className="h-full rounded-[12px] bg-white p-4 flex flex-col"
+                    className="rounded-[12px] bg-white p-4 flex flex-col"
                     style={{ border: '0.5px solid #E9D5FF' }}
                   >
                     <div className="mb-3 inline-flex self-start rounded-[10px] p-2.5" style={{ backgroundColor: '#F3E8FF' }}>
@@ -433,7 +433,7 @@ return (
                     </div>
                     <h3 style={{ fontSize: '14px', color: '#1A1A2E', fontWeight: 600 }}>{resource.title}</h3>
                     <p style={{ fontSize: '13px', color: '#6B7280', lineHeight: 1.6 }}>{resource.description}</p>
-                    <div className="mt-auto pt-3">
+                    <div className="pt-3">
                     {resource.path && (
                       <button
                         onClick={() => navigate(resource.path)}
