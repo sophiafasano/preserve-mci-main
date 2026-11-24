@@ -135,51 +135,90 @@ const emptySummary: ModulesSummary = {
 
 
 
-const sleepSummary = await modulesAPI.getModules('sleep');
-sleepSummary.summary.overallPercent
-sleepSummary.summary.completedCount
-sleepSummary.summary.inProgressCount
-sleepSummary.summary.notStartedCount
-sleepSummary.summary.watchedVideos
-sleepSummary.summary.totalVideos
+// const sleepSummary = await modulesAPI.getModules('sleep');
+// sleepSummary.summary.overallPercent
+// sleepSummary.summary.completedCount
+// sleepSummary.summary.inProgressCount
+// sleepSummary.summary.notStartedCount
+// sleepSummary.summary.watchedVideos
+// sleepSummary.summary.totalVideos
 
-const dietSummary = await modulesAPI.getModules('diet');
-dietSummary.summary.overallPercent
-dietSummary.summary.completedCount
-dietSummary.summary.inProgressCount
-dietSummary.summary.notStartedCount
-dietSummary.summary.watchedVideos
-dietSummary.summary.totalVideos
+// const dietSummary = await modulesAPI.getModules('diet');
+// dietSummary.summary.overallPercent
+// dietSummary.summary.completedCount
+// dietSummary.summary.inProgressCount
+// dietSummary.summary.notStartedCount
+// dietSummary.summary.watchedVideos
+// dietSummary.summary.totalVideos
 
-const heartSummary = await modulesAPI.getModules('heart');
-heartSummary.summary.overallPercent
-heartSummary.summary.completedCount
-heartSummary.summary.inProgressCount
-heartSummary.summary.notStartedCount
-heartSummary.summary.watchedVideos
-heartSummary.summary.totalVideos
+// const heartSummary = await modulesAPI.getModules('heart');
+// heartSummary.summary.overallPercent
+// heartSummary.summary.completedCount
+// heartSummary.summary.inProgressCount
+// heartSummary.summary.notStartedCount
+// heartSummary.summary.watchedVideos
+// heartSummary.summary.totalVideos
 
-const cogengageSummary = await modulesAPI.getModules('cogengage');
-cogengageSummary.summary.overallPercent
-cogengageSummary.summary.completedCount
-cogengageSummary.summary.inProgressCount
-cogengageSummary.summary.notStartedCount
-cogengageSummary.summary.watchedVideos
-cogengageSummary.summary.totalVideos
+// const cogengageSummary = await modulesAPI.getModules('cogengage');
+// cogengageSummary.summary.overallPercent
+// cogengageSummary.summary.completedCount
+// cogengageSummary.summary.inProgressCount
+// cogengageSummary.summary.notStartedCount
+// cogengageSummary.summary.watchedVideos
+// cogengageSummary.summary.totalVideos
 
-const hvsSummary = await modulesAPI.getModules('hvs');
-hvsSummary.summary.overallPercent
-hvsSummary.summary.completedCount
-hvsSummary.summary.inProgressCount
-hvsSummary.summary.notStartedCount
-hvsSummary.summary.watchedVideos
-hvsSummary.summary.totalVideos
+// const hvsSummary = await modulesAPI.getModules('hvs');
+// hvsSummary.summary.overallPercent
+// hvsSummary.summary.completedCount
+// hvsSummary.summary.inProgressCount
+// hvsSummary.summary.notStartedCount
+// hvsSummary.summary.watchedVideos
+// hvsSummary.summary.totalVideos
 
 
 
 
 
 export default function CaregiverModulesOverview() {
+
+  const [sleepSummary, setSleepSummary] = useState<ModulesSummary>(emptySummary);
+const [dietSummary, setDietSummary] = useState<ModulesSummary>(emptySummary);
+const [heartSummary, setHeartSummary] = useState<ModulesSummary>(emptySummary);
+const [cogengageSummary, setCogengageSummary] = useState<ModulesSummary>(emptySummary);
+const [hvsSummary, setHvsSummary] = useState<ModulesSummary>(emptySummary);
+
+useEffect(() => {
+  let mounted = true;
+
+  async function loadSummaries() {
+    try {
+      const [sleep, diet, heart, cogengage, hvs] = await Promise.all([
+        modulesAPI.getModules('sleep'),
+        modulesAPI.getModules('diet'),
+        modulesAPI.getModules('heart'),
+        modulesAPI.getModules('cogengage'),
+        modulesAPI.getModules('hvs'),
+      ]);
+
+      if (!mounted) return;
+
+      setSleepSummary(sleep.summary);
+      setDietSummary(diet.summary);
+      setHeartSummary(heart.summary);
+      setCogengageSummary(cogengage.summary);
+      setHvsSummary(hvs.summary);
+    } catch (error) {
+      console.error('Error loading module summaries:', error);
+    }
+  }
+
+  void loadSummaries();
+
+  return () => {
+    mounted = false;
+  };
+}, []);
+
 
 
   const [dietLocked, setDietLocked] = useState(true);
