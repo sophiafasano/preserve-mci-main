@@ -453,17 +453,17 @@ useEffect(() => {
                             <div>
                               <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
                               <p style={{ fontSize: '14px', color: '#858993' }}>
-                                {sleepSummary.summary.watchedVideos} of {sleepSummary.summary.totalVideos} queue videos completed
+                                {sleepSummary.watchedVideos} of {sleepSummary.totalVideos} queue videos completed
                               </p>
                             </div>
-                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{sleepSummary.summary.overallPercent}%</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{sleepSummary.overallPercent}%</div>
                           </div>
 
                           <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
                             <div
                               className="h-full transition-all duration-300"
                               style={{
-                                width: `${sleepSummary.summary.overallPercent}%`,
+                                width: `${sleepSummary.overallPercent}%`,
                                 background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               }}
                             />
@@ -490,7 +490,7 @@ useEffect(() => {
                           style={{
                             border: '0.5px solid #C4B5FD',
                             color: '#7200CA',
-                            backgroundColor: heartLocked ? '#c2bfd0' : 'white',
+                            backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
                             cursor: heartLocked ? 'not-allowed' : 'pointer',
@@ -504,17 +504,17 @@ useEffect(() => {
                             <div>
                               <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
                               <p style={{ fontSize: '14px', color: '#858993' }}>
-                                {heartSummary.summary.watchedVideos} of {heartSummary.summary.totalVideos} queue videos completed
+                                {heartSummary.watchedVideos} of {heartSummary.totalVideos} queue videos completed
                               </p>
                             </div>
-                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{heartSummary.summary.overallPercent}%</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{heartSummary.overallPercent}%</div>
                           </div>
 
                           <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
                             <div
                               className="h-full transition-all duration-300"
                               style={{
-                                width: `${heartSummary.summary.overallPercent}%`,
+                                width: `${heartSummary.overallPercent}%`,
                                 background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               }}
                             />
@@ -539,7 +539,7 @@ useEffect(() => {
                           style={{
                             border: '0.5px solid #C4B5FD',
                             color: '#7200CA',
-                            backgroundColor: dietLocked ? '#c2bfd0' : 'white',
+                            backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
                             cursor: dietLocked ? 'not-allowed' : 'pointer',
@@ -553,17 +553,17 @@ useEffect(() => {
                             <div>
                               <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
                               <p style={{ fontSize: '14px', color: '#858993' }}>
-                                {dietSummary.summary.watchedVideos} of {dietSummary.summary.totalVideos} queue videos completed
+                                {dietSummary.watchedVideos} of {dietSummary.totalVideos} queue videos completed
                               </p>
                             </div>
-                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{dietSummary.summary.overallPercent}%</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{dietSummary.overallPercent}%</div>
                           </div>
 
                           <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
                             <div
                               className="h-full transition-all duration-300"
                               style={{
-                                width: `${dietSummary.summary.overallPercent}%`,
+                                width: `${dietSummary.overallPercent}%`,
                                 background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               }}
                             />
@@ -588,7 +588,7 @@ useEffect(() => {
                           style={{
                             border: '0.5px solid #C4B5FD',
                             color: '#7200CA',
-                            backgroundColor: cogengageLocked ? '#c2bfd0' : 'white',
+                            backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
                             cursor: cogengageLocked ? 'not-allowed' : 'pointer',
@@ -601,17 +601,17 @@ useEffect(() => {
                             <div>
                               <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
                               <p style={{ fontSize: '14px', color: '#858993' }}>
-                                {cogengageSummary.summary.watchedVideos} of {cogengageSummary.summary.totalVideos} queue videos completed
+                                {cogengageSummary.watchedVideos} of {cogengageSummary.totalVideos} queue videos completed
                               </p>
                             </div>
-                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{cogengageSummary.summary.overallPercent}%</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{cogengageSummary.overallPercent}%</div>
                           </div>
 
                           <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
                             <div
                               className="h-full transition-all duration-300"
                               style={{
-                                width: `${cogengageSummary.summary.overallPercent}%`,
+                                width: `${cogengageSummary.overallPercent}%`,
                                 background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               }}
                             />
@@ -636,7 +636,7 @@ useEffect(() => {
                           style={{
                             border: '0.5px solid #C4B5FD',
                             color: '#7200CA',
-                            backgroundColor: hvsLocked ? '#c2bfd0' : 'white',
+                            backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
                             cursor: hvsLocked ? 'not-allowed' : 'pointer',
@@ -649,17 +649,17 @@ useEffect(() => {
                             <div>
                               <h2 style={{ fontSize: '18px', fontWeight: 600, color: '#1A1A2E' }}>Overall Progress</h2>
                               <p style={{ fontSize: '14px', color: '#858993' }}>
-                                {hvsSummary.summary.watchedVideos} of {hvsSummary.summary.totalVideos} queue videos completed
+                                {hvsSummary.watchedVideos} of {hvsSummary.totalVideos} queue videos completed
                               </p>
                             </div>
-                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{hvsSummary.summary.overallPercent}%</div>
+                            <div style={{ fontSize: '22px', fontWeight: 700, color: '#7200CA' }}>{hvsSummary.overallPercent}%</div>
                           </div>
 
                           <div className="h-[6px] overflow-hidden rounded" style={{ backgroundColor: '#F3E8FF' }}>
                             <div
                               className="h-full transition-all duration-300"
                               style={{
-                                width: `${hvsSummary.summary.overallPercent}%`,
+                                width: `${hvsSummary.overallPercent}%`,
                                 background: 'linear-gradient(90deg, #6D28D9 0%, #5B21B6 100%)',
                               }}
                             />
