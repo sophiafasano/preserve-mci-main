@@ -541,7 +541,7 @@ export default function CaregiverModulesOverview() {
 
                   <div 
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
-                  style={{ border: '0.5px solid #E9D5FF' }}>
+                  style={{ border: '0.5px solid #e9d5ff' }}>
                     <button
                     disabled={cogengageLocked}
                      onClick={() => navigate(role === 'caregiver' ? '/caregiver/cogengagemodules' : '/cogengagemodules')}
