@@ -1,0 +1,690 @@
+import { createBrowserRouter } from "react-router";
+import RootLayout from "./components/RootLayout";
+import LandingPage from "./components/LandingPage";
+import AuthPage from "./components/AuthPage";
+import RegistrationPage from "./components/RegistrationPage";
+import ForgotPasswordFlow from "./components/ForgotPasswordFlow";
+import SignOut from "./components/SignOut";
+//import PatientDashboard from "./components/PatientDashboard";
+import CarePartnerDashboard from "./components/caregiver/CarePartnerDashboard";
+import ClinicianDashboard from "./components/ClinicianDashboard";
+import SleepModulesOverview from "./components/SleepModulesOverview";
+import SleepModulePage from "./components/SleepModulePage";
+import DietModulePage from "./components/DietModulePage";
+import ProgressiveMuscleRelaxationPage from "./components/ProgressiveMuscleRelaxationPage";
+import AutogenicRelaxationPage from "./components/AutogenicRelaxationPage";
+import SleepResourceDetailPage from "./components/SleepResourceDetailPage";
+import DietResourceDetailPage from "./components/DietResourceDetailPage";
+import PatientMessagesCenter from "./components/patient/MessagesCenter";
+import MyProgress from "./components/patient/MyProgress";
+import SleepAnalytics from "./components/patient/SleepAnalytics";
+import RemindersCenter from "./components/patient/RemindersCenter";
+import SettingsPage from "./components/patient/SettingsPage";
+import SleepTips from "./components/patient/SleepTips";
+import CarePartnerMessagesCenter from "./components/care-partner/CarePartnerMessagesCenter";
+import ClinicianMessagesCenter from "./components/clinician/ClinicianMessagesCenter";
+import NotFound from "./components/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+//import CaregiverModulesOverview from './components/caregiver/CaregiverModulesOverview';
+import CaregiverSleepModulePage from './components/caregiver/CaregiverSleepModulePage'
+import DietModulesOverview from './components/DietModulesOverview';
+import MindDietPage from './components/MindDietPage';
+import CognitiveEngagementModulePage from './components/CognitiveEngagementModulePage';
+import CognitiveEngagementModulesOverview from './components/CognitiveEngagementModulesOverview';
+import HeartHealthModulesOverview from './components/HeartModulesOverview';
+import HeartModulePage from './components/HeartModulePage';
+import BloodPressurePage from './components/BloodPressurePage';
+import HVSModulesOverview from './components/HVSModulesOverview';
+import HVSModulePage from './components/HVSModulePage';
+
+import CaregiverModulesOverview from './components/TestModulesOverview';
+
+
+
+import CaregiverMessagesCenter from "./components/caregiver/MessagesCenter";
+import MyProgressCaregiver from "./components/caregiver/MyProgress";
+import CaregiverSleepAnalytics from "./components/caregiver/SleepAnalytics";
+import CaregiverRemindersCenter from "./components/caregiver/RemindersCenter";
+import CaregiverSettingsPage from "./components/caregiver/SettingsPage";
+import CaregiverSleepTips from "./components/caregiver/SleepTips";
+import CaregiverAutogenicRelaxationPage from "./components/caregiver/CaregiverAutogenicRelaxationPage";
+import CaregiverProgressiveMuscleRelaxation from "./components/caregiver/CaregiverProgressiveMuscleRelaxationPage";
+
+
+//testing
+import TestDashboard from "./components/CareDashboard"
+import TestModulesOverview from "./components/TestModulesOverview"
+
+
+/**
+ * Application routing configuration
+ * Includes both protected routes (require auth) and preview routes (no auth for development)
+ */
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: RootLayout,
+    children: [
+      {
+        index: true,
+        Component: LandingPage,
+      },
+      {
+        path: "signin",
+        Component: AuthPage,
+      },
+      {
+        path: "register",
+        Component: RegistrationPage,
+      },
+      {
+        path: "forgot-password",
+        Component: ForgotPasswordFlow,
+      },
+      {
+        path: "signout",
+        Component: SignOut,
+      },
+      // Patient Routes
+      {
+        path: "patient/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/messages",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <PatientMessagesCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/progress",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <MyProgress />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/sleep-analytics",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <SleepAnalytics />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/reminders",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <RemindersCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/settings",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <SettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/sleep-tips",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <SleepTips />
+          </ProtectedRoute>
+        ),
+      },
+      // Care Partner Routes — all rendered inside CarePartnerDashboard (shell + sidebar)
+      {
+        path: "caregiver",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/testdashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/testdashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/patients",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/patients/:patientId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/sleep-analytics",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSleepAnalytics />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/messages",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverMessagesCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/my-progress",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <MyProgressCaregiver />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/reminders",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverRemindersCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/resources",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/testmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <TestModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/settings",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      // {
+      //   path: "caregiver/*",
+      //   element: (
+      //     <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+      //       <CarePartnerDashboard />
+      //     </ProtectedRoute>
+      //   ),
+      // },
+      // Legacy Care Partner routes (backward compatibility)
+      {
+        path: "care-partner",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/dashboard",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/patients",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/patients/:patientId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/sleep-data",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSleepAnalytics />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/sleep-logs",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "patient/sleep-logs",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <TestDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/messages",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverMessagesCenter />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/resources",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/settings",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSettingsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "care-partner/*",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CarePartnerDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      // Clinician Routes — all rendered inside ClinicianDashboard (shell + sidebar)
+      {
+        path: "clinician",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clinician/patients",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clinician/patients/:patientId",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clinician/sleep-data",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clinician/messages",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "clinician/settings",
+        element: (
+          <ProtectedRoute allowedRoles={['clinician']}>
+            <ClinicianDashboard />
+          </ProtectedRoute>
+        ),
+      },
+      // Module Routes
+      // {
+      //   path: "modules",
+      //   element: (
+      //     <ProtectedRoute allowedRoles={['patient']}>
+      //       <SleepModulesOverview />
+      //     </ProtectedRoute>
+      //   ),
+      // },
+      {
+        path: "sleep-modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+            <SleepModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "hvs-modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HVSModulesOverview />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "hvs-modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HVSModulePage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HeartHealthModulesOverview />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <HeartModulePage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "heart-modules/resources/blood-pressure",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <BloodPressurePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/cogengagemodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CognitiveEngagementModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cogengagemodules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <CognitiveEngagementModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "cogengagemodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["patient"]}>
+            <CognitiveEngagementModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/cogengagemodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["care_partner", "caregiver"]}>
+            <CognitiveEngagementModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <DietModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <DietModulesOverview />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["patient"]}>
+            <DietModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={["care_partner", "caregiver"]}>
+            <DietModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <SleepModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      
+      {
+        path: "modules/resources/progressive-muscle-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['patient',]}>
+            <ProgressiveMuscleRelaxationPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "modules/resources/autogenic-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+            <AutogenicRelaxationPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "modules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient', 'care_partner', 'caregiver']}>
+            <SleepResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <DietResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "dietmodules/resources/mind-diet",
+        element: (
+          <ProtectedRoute allowedRoles={['patient']}>
+            <MindDietPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/resources/mind-diet",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <MindDietPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/dietmodules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <DietResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/resources/:resourceId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <SleepResourceDetailPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/:moduleId",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverSleepModulePage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/resources/autogenic-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverAutogenicRelaxationPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "caregiver/modules/resources/progressive-muscle-relaxation",
+        element: (
+          <ProtectedRoute allowedRoles={['care_partner', 'caregiver']}>
+            <CaregiverProgressiveMuscleRelaxation/>
+          </ProtectedRoute>
+        ),
+      },
+      
+      // Development Preview Routes (bypass auth for page selector)
+      {
+        path: "preview/patient-dashboard",
+        Component: TestDashboard,
+      },
+      {
+        path: "preview/patient-messages",
+        Component: PatientMessagesCenter,
+      },
+      {
+        path: "preview/patient-progress",
+        Component: MyProgress,
+      },
+      {
+        path: "preview/patient-sleep-analytics",
+        Component: SleepAnalytics,
+      },
+      {
+        path: "preview/patient-reminders",
+        Component: RemindersCenter,
+      },
+      {
+        path: "preview/patient-settings",
+        Component: SettingsPage,
+      },
+      {
+        path: "preview/patient-sleep-tips",
+        Component: SleepTips,
+      },
+      {
+        path: "preview/care-partner-dashboard",
+        Component: CarePartnerDashboard,
+      },
+      {
+        path: "preview/care-partner-messages",
+        Component: CarePartnerMessagesCenter,
+      },
+      {
+        path: "preview/clinician-dashboard",
+        Component: ClinicianDashboard,
+      },
+      {
+        path: "preview/clinician-messages",
+        Component: ClinicianMessagesCenter,
+      },
+      {
+        path: "preview/modules",
+        Component: SleepModulesOverview,
+      },
+      {
+        path: "preview/module-week-1",
+        Component: SleepModulePage,
+      },
+      {
+        path: "*",
+        Component: NotFound,
+      },
+    ],
+  },
+]);
