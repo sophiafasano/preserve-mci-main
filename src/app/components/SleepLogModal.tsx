@@ -15,6 +15,7 @@ interface SleepLogModalProps {
 
 
 export interface SleepLogData {
+  people: string;
   date: string;
   hoursSlept: number;
   sleepQuality: number;
@@ -48,6 +49,10 @@ export interface SleepLogData {
   tr_automatic_thoughts?: string;
   tr_emotion?: string;
   tr_emotion_intensity?: number | null;
+  //TRE Questions
+  tre_timeFirstMeal?: string;
+  tre_timeLastMeal?: string;
+  tre_consumeCals?: boolean;
 }
 
 function timeToMinutes(time?: string): number | null {
@@ -74,7 +79,7 @@ const EMOTIONS = [
   'Happiness', 'Fear', 'Surprise', 'Disgust',
 ];
 
-const STEPS = ['Sleep Diary', 'Stimulus Control', 'Sleep Hygiene', 'Thought Record'];
+const STEPS = ['Sleep Diary', 'Stimulus Control', 'Sleep Hygiene', 'Thought Record', 'TRE Questions'];
 
 const purple = '#6D28D9';
 const purpleHover = '#5B21B6';
@@ -153,6 +158,7 @@ export default function SleepLogModal({
 
 
   // Step 1 — Sleep Diary
+  const [people, setPeople] = useState('');
   const [napMinutes, setNapMinutes] = useState('');
   const [napTimeOfDay, setNapTimeOfDay] = useState('Did not nap');
   const [bedtime, setBedtime] = useState('');
@@ -185,6 +191,11 @@ export default function SleepLogModal({
   const [trEmotion, setTrEmotion] = useState('');
   const [trIntensity, setTrIntensity] = useState<number | null>(null);
 
+  // Step 5 - TRE Questions
+  const [timeFirstMeal, setTimeFirstMeal] = useState('');
+  const [timeLastMeal, setTimeLastMeal] = useState('');
+  const [consumeCals, setConsumeCals] = useState<boolean | null>(null);;
+
 
   useEffect(() => {
   const saved = sessionStorage.getItem('sleepDraft');
@@ -192,6 +203,7 @@ export default function SleepLogModal({
   if (saved) {
     const data = JSON.parse(saved);
 
+    setPeople(data.people ?? '');
     setNapMinutes(data.napMinutes ?? '');
     setNapTimeOfDay(data.napTimeOfDay ?? 'Did not nap');
     setBedtime(data.bedtime ?? '');
@@ -220,6 +232,10 @@ export default function SleepLogModal({
     setTrThoughts(data.trThoughts ?? '');
     setTrEmotion(data.trEmotion ?? '');
     setTrIntensity(data.trIntensity ?? null);
+
+    setTimeFirstMeal(data.timeFirstMeal ?? '');
+    setTimeLastMeal(data.timeLastMeal ?? '');
+    setConsumeCals(data.consumeCals ?? '');
   }
 }, []);
 
@@ -227,6 +243,7 @@ useEffect(() => {
   sessionStorage.setItem(
     'sleepDraft',
     JSON.stringify({
+      people,
       napMinutes,
       napTimeOfDay,
       bedtime,
@@ -252,16 +269,20 @@ useEffect(() => {
       trThoughts,
       trEmotion,
       trIntensity,
+      timeFirstMeal,
+      timeLastMeal,
+      consumeCals,
     })
   );
 }, [
-  napMinutes, napTimeOfDay, bedtime, timeToFallAsleep,
+  people, napMinutes, napTimeOfDay, bedtime, timeToFallAsleep,
   nightAwakenings, timeAwakeDuringNight, waketime,
   timeOutOfBed, sleepQuality, scAvoidBedroom, scFellAsleep,
   scGotUpCantSleep, scSleptThrough, scGotUpAwakening,
   scAvoidedNapping, shCaffeine, shExercise, shNicotine,
   shAlcohol, shHeavyMeals, shPleasantActivity,
   trSituation, trThoughts, trEmotion, trIntensity,
+  timeFirstMeal, timeLastMeal, consumeCals,
 ]);
 
   const hoursSlept = useMemo(() => toHours(bedtime, waketime), [bedtime, waketime]);
@@ -272,7 +293,7 @@ useEffect(() => {
   }, [existingLogs]);
 
   const resetForm = () => {
-    setStep(0);
+    setPeople(''); setStep(0);
     setNapMinutes(''); setNapTimeOfDay('Did not nap'); setBedtime('');
     setTimeToFallAsleep(''); setNightAwakenings(''); setTimeAwakeDuringNight('');
     setWaketime(''); setTimeOutOfBed(''); setSleepQuality(null);
@@ -281,15 +302,18 @@ useEffect(() => {
     setShCaffeine(null); setShExercise(null); setShNicotine(null);
     setShAlcohol(null); setShHeavyMeals(null); setShPleasantActivity(null);
     setTrSituation(''); setTrThoughts(''); setTrEmotion(''); setTrIntensity(null);
+    setTimeFirstMeal(''); setTimeLastMeal(''); setConsumeCals(null);
   };
 
   const handleNext = () => {
-    if (step === 0 && sleepQuality == null) {
+    if (step === 0 && sleepQuality == null || people == null) {
       toast.error('Please select a sleep quality rating');
       return;
     }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
+
+  
 
   const handleBack = () => setStep((s) => Math.max(s - 1, 0));
 
@@ -338,6 +362,7 @@ useEffect(() => {
       : hoursSlept;
 
     onSubmit({
+      people: people,
       date: new Date().toISOString(),
       hoursSlept: computedHoursSlept,
       sleepQuality: sleepQuality!,
@@ -368,6 +393,9 @@ useEffect(() => {
       tr_automatic_thoughts: trThoughts || undefined,
       tr_emotion: trEmotion || undefined,
       tr_emotion_intensity: trIntensity,
+      tre_timeFirstMeal: timeFirstMeal,
+      tre_timeLastMeal: timeLastMeal,
+      tre_consumeCals: consumeCals || undefined,
     });
 
     toast.success('Sleep log saved', {
@@ -471,7 +499,28 @@ useEffect(() => {
           <>
             {/* ── STEP 1: Sleep Diary ── */}
             {step === 0 && (
+
               <div className="space-y-5">
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>
+                    Who is completing this log?
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Person with MCI', 'Care Partner', 'Both'].map((opt) => (
+                      <button
+                        key={opt} type="button" onClick={() => setPeople(opt)}
+                        className="rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:-translate-y-px"
+                        style={{
+                          backgroundColor: people === opt ? purple : '#FFFFFF',
+                          color: people === opt ? '#FFFFFF' : '#6B7280',
+                          border: people === opt ? 'none' : `0.5px solid ${borderColor}`,
+                        }}
+                      >{opt}</button>
+                    ))}
+                  </div>
+                </div>
+
                 <div>
                   <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>
                     How many minutes total did you nap yesterday?
@@ -682,6 +731,32 @@ useEffect(() => {
                     </span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* ── STEP 5: Stimulus Control ── */}
+            {step === 4 && (
+              <div className="space-y-5">
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time did you consume your first meal or beverage (other than plain water or black coffee/tea) today?</label>
+                  <input type="time" value={timeFirstMeal} onChange={(e) => setTimeFirstMeal(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>What time did you finish your last meal or snack today?</label>
+                  <input type="time" value={timeLastMeal} onChange={(e) => setTimeLastMeal(e.target.value)}
+                    className="w-full rounded-lg border px-3 py-2 text-sm" style={{ borderColor }} />
+                </div>
+
+
+                <Question label="Did you consume any calories (including milk/sugar in coffee, bites of food, or snacks) during your fasting window (8-12 hours of your awake hours) today?">
+                  <YesNoButtons value={consumeCals} onChange={setConsumeCals} />
+                </Question>
+                
+
+                
               </div>
             )}
 

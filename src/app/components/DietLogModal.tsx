@@ -15,6 +15,8 @@ interface DietLogModalProps {
 
 export interface DietLogData {
 
+  people: string;
+
   leafyGreens: number;
   vegetables: number;
   berries: number;
@@ -130,6 +132,8 @@ export default function DietLogModal({
   onSubmit,
   existingLogs = [],
 }: DietLogModalProps) {
+
+  const [people, setPeople] = useState('');
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
 
@@ -173,6 +177,8 @@ export default function DietLogModal({
   
     if (saved) {
       const data = JSON.parse(saved);
+
+      setPeople(data.people ?? null);
   
       setLeafyGreens(data.leafyGreens ?? null);
       setVegetables(data.vegetables ?? null);
@@ -201,6 +207,7 @@ export default function DietLogModal({
     sessionStorage.setItem(
       'dietDraft',
       JSON.stringify({
+        people,
         leafyGreens,
         vegetables,
         berries,
@@ -224,6 +231,7 @@ export default function DietLogModal({
       })
     );
   }, [
+    people,
     leafyGreens,
     vegetables,
     berries,
@@ -249,6 +257,7 @@ export default function DietLogModal({
 
   const resetForm = () => {
 
+    setPeople('');
     setStep(0);
     setLeafyGreens(null);
     setVegetables(null);
@@ -274,7 +283,7 @@ export default function DietLogModal({
 
 
   const handleNext = () => {
-    if (step === 0 && leafyGreens == null || vegetables == null || berries == null || nuts == null || wholeGrains == null || seafood == null || beans == null || chickenOrTurkey == null) {
+    if (people == null || step === 0 && leafyGreens == null || vegetables == null || berries == null || nuts == null || wholeGrains == null || seafood == null || beans == null || chickenOrTurkey == null) {
       toast.error('Please fill out each section to the best of your knowledge');
       return;
     }
@@ -285,6 +294,7 @@ export default function DietLogModal({
 
   const handleSubmit = () => {
     onSubmit({
+      people: people!,
       date: new Date().toISOString(),
       leafyGreens: leafyGreens!,
       vegetables: vegetables!,
@@ -411,11 +421,33 @@ export default function DietLogModal({
         ) : (
           <>
             {/* ── STEP 1: Good Foods ── */}
+
             {step === 0 && (
               <div className="space-y-5">
+
+                <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>
+                    Who is completing this log?
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Person with MCI', 'Care Partner', 'Both'].map((opt) => (
+                      <button
+                        key={opt} type="button" onClick={() => setPeople(opt)}
+                        className="rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:-translate-y-px"
+                        style={{
+                          backgroundColor: people === opt ? purple : '#FFFFFF',
+                          color: people === opt ? '#FFFFFF' : '#6B7280',
+                          border: people === opt ? 'none' : `0.5px solid ${borderColor}`,
+                        }}
+                      >{opt}</button>
+                    ))}
+                  </div>
+                </div>
+
                 <div>
                   <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>Servings of leafy greens today:</label>
                   <p style={{ fontSize: '11px', color: '#9CA3AF', marginBottom: '8px', fontStyle: 'italic'}}>Spinach, kale, collards, salad greens. 1 serving = 1 cup raw or 1/2 cup cooked</p>
+                  
                   <div className="grid grid-cols-10 gap-2">
                     {[0, 1, 2, "3+"].map((r) => {
                       const sel = leafyGreens === r;

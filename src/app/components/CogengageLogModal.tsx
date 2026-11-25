@@ -39,6 +39,8 @@ export interface CogengageLogData {
       withWho: string;
     };
   };
+
+  people: string;
   date: string;
 }
 
@@ -67,27 +69,27 @@ type BrainActivityKey = typeof BRAIN_ACTIVITIES[number]['key'];
 const initialBrainActivities = {
   brainTrainingProgram: {
     selected: false,
-    duration: '',
+    duration: 0,
     withWho: '',
   },
   puzzlesAndBrainGames: {
     selected: false,
-    duration: '',
+    duration: 0,
     withWho: '',
   },
   newLearnedSkill: {
     selected: false,
-    duration: '',
+    duration: 0,
     withWho: '',
   },
   socialActivity: {
     selected: false,
-    duration: '',
+    duration: 0,
     withWho: '',
   },
   mindBodyActivity: {
     selected: false,
-    duration: '',
+    duration: 0,
     withWho: '',
   },
 };
@@ -100,6 +102,7 @@ export default function CogengageLogModal({
 }: CogengageLogModalProps) {
 
   const [step, setStep] = useState(0);
+  const [people, setPeople] = useState('');
 
   const [activeLog, setActiveLog] = useState<
     'sleep' | 'diet' | 'cogengage' | null
@@ -119,7 +122,9 @@ export default function CogengageLogModal({
         setBrainActivities({
           ...initialBrainActivities,
           ...(data.brainActivities ?? {}),
+          
         });
+        setPeople(data.people ?? '')
       } catch {
         sessionStorage.removeItem('cogengageDraft');
       }
@@ -130,24 +135,25 @@ export default function CogengageLogModal({
   useEffect(() => {
     sessionStorage.setItem(
       'cogengageDraft',
-      JSON.stringify({ brainActivities })
+      JSON.stringify({ brainActivities, people })
     );
-  }, [brainActivities]);
+  }, [brainActivities, people]);
 
   // Reset form
   const resetForm = () => {
     setStep(0);
+    setPeople('');
     setBrainActivities({ ...initialBrainActivities });
   };
 
   // Handle next
   const handleNext = () => {
     const hasSelection = Object.values(brainActivities).some(
-      (value) => value === true
+      (value) => value.selected === true
     );
 
-    if (!hasSelection) {
-      toast.error('Please select at least one brain activity');
+    if (!hasSelection || !people) {
+      toast.error('Please fill out each section to the best of your knowledge');
       return;
     }
 
@@ -160,8 +166,19 @@ export default function CogengageLogModal({
 
   // Handle submit
   const handleSubmit = () => {
+
+    const hasSelection = Object.values(brainActivities).some(
+      (value) => value.selected === true
+    );
+
+    if (!hasSelection || !people) {
+      toast.error('Please fill out each section to the best of your knowledge');
+      return;
+    }
+    
     onSubmit({
       date: new Date().toISOString(),
+      people,
       brainActivities,
     });
 
@@ -284,47 +301,66 @@ export default function CogengageLogModal({
 
                   <div className="space-y-4">
 
-  <label className="block text-sm font-medium" style={{ color: '#1A1A2E' }}>
-    Please answer the questions below for brain activities completed today/this week:
-  </label>
+                    <div>
+                  <label className="mb-2 block text-sm" style={{ color: '#1A1A2E' }}>
+                    Who is completing this log?
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {['Person with MCI', 'Care Partner', 'Both'].map((opt) => (
+                          <button
+                            key={opt} type="button" onClick={() => setPeople(opt)}
+                            className="rounded-full px-3 py-1.5 text-sm transition-all duration-200 hover:-translate-y-px"
+                            style={{
+                              backgroundColor: people === opt ? purple : '#FFFFFF',
+                              color: people === opt ? '#FFFFFF' : '#6B7280',
+                              border: people === opt ? 'none' : `0.5px solid ${borderColor}`,
+                            }}
+                          >{opt}</button>
+                        ))}
+                      </div>
+                    </div>
 
-  {BRAIN_ACTIVITIES.map((activity) => (
+                    <label className="block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                      Please answer the questions below for brain activities completed today/this week:
+                    </label>
 
-    <div
-      key={activity.key}
-      className="rounded-xl border p-4 space-y-4"
-      style={{ borderColor }}
-    >
+                    {BRAIN_ACTIVITIES.map((activity) => (
 
-      {/* Activity checkbox */}
-      <label className="flex items-start gap-3 cursor-pointer">
+                      <div
+                        key={activity.key}
+                        className="rounded-xl border p-4 space-y-4"
+                        style={{ borderColor }}
+                      >
 
-        <input
-          type="checkbox"
-          checked={brainActivities[activity.key].selected}
-          onChange={(e) =>
-            setBrainActivities((prev) => ({
-              ...prev,
-              [activity.key]: {
-                ...prev[activity.key],
-                selected: e.target.checked,
-              },
-            }))
-          }
-          className="mt-1 h-4 w-4 accent-purple-700"
-        />
+                        {/* Activity checkbox */}
+                        <label className="flex items-start gap-3 cursor-pointer">
 
-        <span className="text-sm font-medium" style={{ color: '#1A1A2E' }}>
-          {activity.label}
-        </span>
+                          <input
+                            type="checkbox"
+                            checked={brainActivities[activity.key].selected}
+                            onChange={(e) =>
+                              setBrainActivities((prev) => ({
+                                ...prev,
+                                [activity.key]: {
+                                  ...prev[activity.key],
+                                  selected: e.target.checked,
+                                },
+                              }))
+                            }
+                            className="mt-1 h-4 w-4 accent-purple-700"
+                          />
 
-        </label>
+                          <span className="text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                            {activity.label}
+                          </span>
 
-            {/* Expand when selected */}
-            {brainActivities[activity.key].selected && (
+                          </label>
 
-                <div className="ml-7 space-y-4 border-l-2 pl-4"
-                style={{ borderColor: '#E9D5FF' }}>
+                              {/* Expand when selected */}
+                              {brainActivities[activity.key].selected && (
+
+                                  <div className="ml-7 space-y-4 border-l-2 pl-4"
+                                  style={{ borderColor: '#E9D5FF' }}>
 
                     {/* Duration */}
 {/* 
@@ -351,7 +387,7 @@ export default function CogengageLogModal({
                                     ...prev,
                                     [activity.key]: {
                                         ...prev[activity.key],
-                                        duration: e.target.value,
+                                        duration: Number(e.target.value),
                                         
                                     } ,
                                 }))
