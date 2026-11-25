@@ -484,7 +484,7 @@ useEffect(() => {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                    disabled={heartLocked}
+                    //disabled={heartLocked}
                      onClick={() => navigate(role === 'caregiver' ? '/caregiver/heart-modules' : '/heart-modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
@@ -493,8 +493,9 @@ useEffect(() => {
                             backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
-                            cursor: heartLocked ? 'not-allowed' : 'pointer',
-                            opacity: heartLocked ? 0.5 : 1,
+                            //cursor: heartLocked ? 'not-allowed' : 'pointer',
+                            cursor: 'pointer',
+                            //opacity: heartLocked ? 0.5 : 1,
                           }}
                         >
                           Heart Health
@@ -533,7 +534,7 @@ useEffect(() => {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                    disabled={dietLocked}
+                    //disabled={dietLocked}
                      onClick={() => navigate(role === 'caregiver' ? '/caregiver/dietmodules' : '/dietmodules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
@@ -542,8 +543,9 @@ useEffect(() => {
                             backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
-                            cursor: dietLocked ? 'not-allowed' : 'pointer',
-                            opacity: dietLocked ? 0.5 : 1,
+                            //cursor: dietLocked ? 'not-allowed' : 'pointer',
+                            cursor: 'pointer',
+                            //opacity: dietLocked ? 0.5 : 1,
                           }}
                         >
                           Diet
@@ -582,7 +584,7 @@ useEffect(() => {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #e9d5ff' }}>
                     <button
-                    disabled={cogengageLocked}
+                    //disabled={cogengageLocked}
                      onClick={() => navigate(role === 'caregiver' ? '/caregiver/cogengagemodules' : '/cogengagemodules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
@@ -591,8 +593,9 @@ useEffect(() => {
                             backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
-                            cursor: cogengageLocked ? 'not-allowed' : 'pointer',
-                            opacity: cogengageLocked ? 0.5 : 1,
+                            //cursor: cogengageLocked ? 'not-allowed' : 'pointer',
+                            cursor: 'pointer',
+                            //opacity: cogengageLocked ? 0.5 : 1,
                           }}
                         >
                           Cognitive Engagement
@@ -630,7 +633,7 @@ useEffect(() => {
                   className="h-full rounded-[12px] bg-white p-4 flex flex-col" 
                   style={{ border: '0.5px solid #E9D5FF' }}>
                     <button
-                    disabled={hvsLocked}
+                    //disabled={hvsLocked}
                      onClick={() =>  navigate(role === 'caregiver' ? '/caregiver/hvs-modules' : '/hvs-modules')}
                           className="rounded-[8px] px-3 py-1.5"
                           style={{
@@ -639,8 +642,9 @@ useEffect(() => {
                             backgroundColor: 'white',
                             fontSize: '20px',
                             fontWeight: 600,
-                            cursor: hvsLocked ? 'not-allowed' : 'pointer',
-                            opacity: hvsLocked ? 0.5 : 1,
+                            //cursor: hvsLocked ? 'not-allowed' : 'pointer',
+                            cursor: 'pointer',
+                            //opacity: hvsLocked ? 0.5 : 1,
                           }}
                         >
                           Hearing, Vision, and Staying Connected

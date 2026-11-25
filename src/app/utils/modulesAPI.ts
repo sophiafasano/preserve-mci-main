@@ -273,7 +273,9 @@ function isWeekUnlocked(
 ): boolean {
   const index = config.weekOrder.indexOf(weekKey as never);
 
-  if (index <= 0) return true;
+  //Unlocked Lock unlock lock
+  //if (index <= 0) return true;
+  return true;
 
   const previousWeek = config.weekOrder[index - 1];
 

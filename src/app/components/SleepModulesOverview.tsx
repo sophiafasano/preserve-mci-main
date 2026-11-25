@@ -126,6 +126,7 @@ export default function SleepModulesOverview() {
         break;
     }
   };
+  
 
   const { activeCount } = useReminders();
   const { logs: sleepLogs } = useSleepLogs();
@@ -247,6 +248,9 @@ return (
                 const watchedCount = module.queue.filter((video) => video.progress.watched).length;
                 const isInProgress = watchedCount > 0 && !module.completed;
 
+                //module.unlocked = true;
+                
+
                 return (
                   <div
                     key={module.weekKey}
@@ -258,7 +262,7 @@ return (
                         : `Complete Week ${module.weekNumber - 1} to unlock`
                     }
                   >
-                    {!module.unlocked && (
+                    {!module.unlocked && ( 
                       <div
                         className="absolute inset-0 z-10 rounded-[12px]"
                         style={{ background: 'rgba(255,255,255,0.72)' }}
@@ -517,6 +521,7 @@ return (
                       style={{
                         borderBottom: index !== upcomingItems.length - 1 ? '0.5px solid #F3F4F6' : 'none',
                         cursor: item.type === 'reminder' ? 'pointer' : 'default',
+                        //cursor: 'pointer'
                       }}
                     >
                       <div className="w-[34px] h-[34px] rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F3E9FB' }}>
