@@ -796,17 +796,7 @@ export default function DietModulePage() {
                 </div>
               )}
             </aside>
-              <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
-                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
-                  Sleep Prescription
-                </p>
-                <p style={{ fontSize: '22px', fontWeight: 600, color: '#7200CA' }}>
-                  {prescribedSleepHours != null ? `${prescribedSleepHours} hrs` : '—'}
-                </p>
-                <p style={{ fontSize: '14px', color: '#6B7280', marginTop: '2px' }}>
-                  Recommended by your clinician
-                </p>
-              </div>
+              
             </div>
             
             {/* Previous Week Resources */}
@@ -873,7 +863,7 @@ export default function DietModulePage() {
           <div className="w-full max-w-[440px] rounded-[16px] bg-white p-8 text-center">
             <CheckCircle size={48} color="#7200CA" className="mx-auto" />
             <h2 className="mt-4" style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
-              Week {dietWeekNumberFromKey(module.weekKey)} Complete!
+              Complete!
             </h2>
             <p className="mt-2" style={{ fontSize: '14px', color: '#6B7280' }}>
               You&apos;ve completed all videos for this week. Come back next week to continue your program.

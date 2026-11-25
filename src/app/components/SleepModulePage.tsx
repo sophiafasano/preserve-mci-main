@@ -869,7 +869,7 @@ export default function SleepModulePage() {
           <div className="w-full max-w-[440px] rounded-[16px] bg-white p-8 text-center">
             <CheckCircle size={48} color="#7200CA" className="mx-auto" />
             <h2 className="mt-4" style={{ fontSize: '20px', fontWeight: 700, color: '#1A1A2E' }}>
-              Week {sleepWeekNumberFromKey(module.weekKey)} Complete!
+              Complete!
             </h2>
             <p className="mt-2" style={{ fontSize: '14px', color: '#6B7280' }}>
               You&apos;ve completed all videos for this week. Come back next week to continue your program.

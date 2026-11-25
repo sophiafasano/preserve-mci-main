@@ -476,7 +476,7 @@ useEffect(() => {
 
             <section className="mb-10">
               <h2 className="mb-4" style={{ fontSize: '20px', fontWeight: 600, color: '#1A1A2E' }}>
-                Wellness Modules
+                Brain Health Modules
               </h2>
               <div className="grid grid-cols-1 gap-[14px] lg:grid-cols-2">
 

@@ -27,9 +27,9 @@ export interface SleepModuleQueueVideo {
 export interface SleepModuleResource {
   id: string;
   title: string;
-  videoUrl: string;
+  videoUrl?: string;
   captionUrl?: string;
-  fileName: string;
+  fileName?: string;
   icon: 'BedDouble' | 'Moon' | 'Wind';
 }
 
@@ -106,7 +106,14 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
         fileName: 'Week_1_recap_E2',
       },
     ],
-    resources: [],
+    resources: [
+      {
+        id: 'week_1_summary',
+        title: 'Week 1 Summary',
+        // videoUrl: Stimulus_Control_E,
+        videoUrl: '',
+        icon: 'BedDouble',
+      },],
   },
  
   week2: {

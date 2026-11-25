@@ -151,8 +151,7 @@ export default function DietModulesOverview() {
   const [summary, setSummary] = useState<ModulesSummary>(emptySummary);
   const [expandedResourceIds, setExpandedResourceIds] = useState<Record<string, boolean>>({});
   const quickActions = [
-    { label: "Log Last Night's Sleep", icon: Moon, action: 'log-sleep' },
-    { label: 'View Sleep Tips', icon: BookOpen, action: 'sleep-tips' },
+    { label: "Log Wellness", icon: Moon, action: 'log-sleep' },
     { label: 'Message Care Team', icon: MessageCircle, action: 'messages' },
   ];
 
@@ -183,7 +182,7 @@ export default function DietModulesOverview() {
     const today = new Date().toISOString().split('T')[0];
     const hasLoggedToday = sleepLogs.some((l) => l.date?.split('T')[0] === today);
     if (!hasLoggedToday) {
-      items.push({ type: 'sleep-log', title: "Log last night's sleep", date: 'Today', icon: Clock });
+      items.push({ type: 'sleep-log', title: "Log Wellness", date: 'Today', icon: Clock });
     }
     if (activeCount > 0) {
       items.push({
@@ -335,7 +334,7 @@ return (
                             letterSpacing: '0.06em',
                           }}
                         >
-                          Week {module.weekNumber} of {modules.length}
+                          Week 2
                         </p>
                         <h3
                           className="line-clamp-2"
