@@ -1,6 +1,8 @@
 import Week_2_recap_E from '../components/videos/Week_2_recap_E.mov'
 import Week_3_Recap from '../components/videos/Week_3_Recap.mov'
 
+import Testing from '../../../public/assets/Testing.odt'
+
 const CBTi_Week_1_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_1_Video_1_P.mov'
 const CBTi_Week_2_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_2_Video_1_P.mov'
 const CBTi_Week_3_Video_1_P = 'https://mhrnrxuaxlwh4zav.public.blob.vercel-storage.com/CBTi_Week_3_Video_1_P.mov'
@@ -107,13 +109,8 @@ export const sleepModuleData: Record<SleepModuleWeekKey, SleepWeekModuleData> = 
       },
     ],
     resources: [
-      {
-        id: 'week_1_summary',
-        title: 'Week 1 Summary',
-        // videoUrl: Stimulus_Control_E,
-        videoUrl: '',
-        icon: 'BedDouble',
-      },],
+      
+    ],
   },
  
   week2: {

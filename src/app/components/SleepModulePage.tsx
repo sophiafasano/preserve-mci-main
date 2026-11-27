@@ -5,6 +5,7 @@ import {
   Captions,
   Check,
   CheckCircle,
+  Disc,
   Lock,
   Maximize2,
   Pause,
@@ -34,6 +35,16 @@ interface PlayerSelection {
   captionUrl?: string;
   kind: 'queue' | 'resource';
 }
+
+type ModuleSummaries = {
+  week: number;
+  contents: React.ReactNode;
+
+};
+
+
+
+
 
 export default function SleepModulePage() {
   const navigate = useNavigate();
@@ -72,6 +83,9 @@ export default function SleepModulePage() {
   const placeholderEndedRef = useRef(false);
   const mockElapsedMsRef = useRef(0);
   const [nextModuleData, setNextModuleData] = useState<any>(null);
+
+
+  
 
 
   function isYouTubeUrl(url: string) {
@@ -389,6 +403,395 @@ export default function SleepModulePage() {
     }
   }, [activeQueueIndex, module, selectedResource]);
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  const moduleSummaries: ModuleSummaries[] = [
+  {
+    week: 1,
+    contents: (
+      <>
+        <h2
+          className="items-center justify-center"
+          style={{
+            padding: '10px',
+            color: '#7200CA',
+            textAlign: 'center',
+            fontSize: '28px'
+          }}
+        >
+          <strong>Module 1 Summary: Sleep and Your Brain</strong>
+        </h2>
+
+        <div style={{fontSize: '22px'}}>
+
+        <p style={{ fontSize: '22px' }}>
+          <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Good sleep helps your brain clear waste, store memories, and handle stress.</li>
+            <li>Your bed should be a cue for sleep. The more time you spend awake in bed, the harder it becomes to fall asleep.</li>
+            <li>A few daily habits make sleep easier: the same wake time every day, daylight in the morning, and less caffeine after lunch.</li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your wake time this week:</strong> up at [wake time] every day. Your sleep window starts in Week 2, after your clinician reviews this week’s sleep diary.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Get up at the same time every day, even on weekends: [wake time].</li>
+            <li>Go to bed only when you feel sleepy, not just tired.</li>
+            <li>If you can’t sleep and feel awake or frustrated, get up and do something quiet in dim light. Go back to bed when you feel sleepy.</li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> your wake time and your next check-in. Tick off each day you follow the plan.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> what could make it hard to get out of bed when you can’t sleep? How can your partner help?
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> one night that went well, and one that didn’t.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Good to know:</strong> If you get up at night, use a night-light and stand up slowly. Don’t drive or use machinery if you feel very sleepy.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+        </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Download
+          </button>
+        </div>
+      </>
+    )
+  },
+
+  {
+    week: 2,
+    contents: (
+      <>
+        <h2
+          className="items-center justify-center"
+          style={{
+            padding: '10px',
+            color: '#7200CA',
+            textAlign: 'center',
+            fontSize: '28px'
+          }}
+        >
+          <strong>Module 2 Summary: Your Sleep Window</strong>
+        </h2>
+        <div style={{ fontSize: '22px' }}>
+
+          <div style={{fontSize: '22px'}}>
+
+        <p >
+          <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Spending less time awake in bed helps your sleep become deeper and more solid.</li>
+            <li>Your sleep window is the time you will be in bed each night. It is set from your sleep diary and changes a little each week.</li>
+            <li>Setting aside “worry time” earlier in the evening, and using a relaxation skill at bedtime, can help quiet your mind.</li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your sleep window this week:</strong> in bed at [bedtime], up at [wake time].
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Stay up until your bedtime, and get up at your wake time every day.</li>
+            <li>Take 15 minutes of worry time before dinner. Write your worries down, with one next step for each.</li>
+            <li>Practice your relaxation skill once a day: [slow breathing or muscle relaxation].</li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> your bedtime and wake time, worry time, and your next check-in. Tick off each day you follow the plan.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> what can you do in the evening to stay awake until your bedtime?
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> how you felt during the day, and any times you felt very sleepy.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Good to know:</strong> If you get up at night, use a night-light and stand up slowly. Don’t drive or use machinery if you feel very sleepy.
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+        </p>
+        </div>
+
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Download
+          </button>
+        </div>
+      </>
+    )
+  },
+
+  {
+    week: 3,
+    contents: (
+      <>
+        <h2
+          className="items-center justify-center"
+          style={{
+            padding: '10px',
+            color: '#7200CA',
+            textAlign: 'center',
+            fontSize: '28px'
+          }}
+        >
+          <strong>Module 3 Summary: Sleep, Memory, and Your Thoughts </strong>
+        </h2>
+
+        <div style={{fontSize: '22px'}}>
+
+        <p style={{ fontSize: '22px' }}>
+          <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Poor sleep can make memory problems feel worse. Better sleep can help you think more clearly during the day. </li>
+            <li>Thoughts like “I’ll never sleep tonight” can keep you awake. Noticing and changing them can help. </li>
+            <li>Managing daytime stress, with breaks, a routine, and time with others, helps you sleep at night.  </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your sleep window this week:</strong>  in bed at [bedtime], up at [wake time].  
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Keep your sleep window </li>
+            <li>When a worrying sleep thought comes up, try “catch it, check it, change it.” Notice the thought, ask whether it’s true, and replace it with a calmer one.  </li>
+            <li>Plan one relaxing or enjoyable activity each day. </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> your bedtime and wake time, your daily activity, and your next check-in. Tick off each day you follow the plan.  
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> which thoughts about sleep come up most for you? What is a calmer way to see them? 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> one thought you caught and changed this week. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Good to know:</strong> Some nights will still be hard, and that’s normal. One bad night does not undo your progress. Keep your wake time the same. 
+          </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+        </p>
+
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Download
+          </button>
+        </div>
+      </>
+    )
+  },
+
+  {
+    week: 4,
+    contents: (
+      <>
+        <h2
+          className="items-center justify-center"
+          style={{
+            padding: '10px',
+            color: '#7200CA',
+            textAlign: 'center',
+            fontSize: '28px'
+          }}
+        >
+          <strong>Module 4 Summary: Keeping Your Progress </strong>
+        </h2>
+
+        <div style={{fontSize: '22px'}}>
+
+        <p style={{ fontSize: '22px' }}>
+          <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>The skills that improved your sleep work best when you keep using them. </li>
+            <li>Stress, illness, or travel can bring sleep problems back. You now know what to do if that happens. </li>
+            <li>See your doctor if you have loud snoring, gasping at night, leg discomfort, or poor sleep that lasts more than a few weeks.  </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your sleep window from now on: </strong> in bed at [bedtime], up at [wake time].  
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Finish My Sleep Plan with your care partner, then print it or save it.</li>
+            <li>Keep your wake time the same every day.</li>
+            <li>If sleep gets worse for more than a few nights, go back to the steps in My Sleep Plan. </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> your bedtime and wake time, a monthly reminder to read My Sleep Plan, and when your booster session will be.  
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> What helped your sleep most? How will you notice if old habits come back? 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> Your completed My Sleep Plan. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Good to know:</strong> You can rewatch any session and print any handout in your session library at any time. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+        </p>
+
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Download
+          </button>
+        </div>
+      </>
+    )
+  }
+
+];
+
+
 
   if (!weekKey || !module || !currentSelection) {
     return (
@@ -456,6 +859,7 @@ export default function SleepModulePage() {
 
     void target.requestFullscreen?.();
   }
+
 
   return (
     <PatientSidebarShell>
@@ -791,6 +1195,8 @@ export default function SleepModulePage() {
                   })}
                 </div>
               )}
+
+              
             </aside>
               <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
                 <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
@@ -803,14 +1209,37 @@ export default function SleepModulePage() {
                   Recommended by your clinician
                 </p>
               </div>
+
+              <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
+                  Module Week Summary
+                </p>
+                <div>
+                  <button onClick={handleOpen}
+                    className="rounded-lg px-4 py-2 cursor-pointer"
+                    style={{
+                      backgroundColor: '#7200CA',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }}
+                  >Week {module.weekNumber} Summary</button>
+                   
+                
+                </div>
+                
+              </div>
+
+
+             
             </div>
-            
+
             {/* Previous Week Resources */}
             {(() => {
               const prevResources = sleepModuleData[weekKey!].resources;
               if (prevResources.length === 0) return null;
               return (
-                <div className="rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
+                <div className=" rounded-[12px] bg-white p-4" style={{ border: '0.5px solid #E9D5FF' }}>
                   <p style={{ fontSize: '13px', fontWeight: 600, color: '#1A1A2E', marginBottom: '12px' }}>
                     Resources
                   </p>
@@ -840,7 +1269,7 @@ export default function SleepModulePage() {
                       >
                         <div className="flex items-center gap-2">
                           <div
-                            className="relative flex h-[50px] w-[80px] items-center justify-center rounded-[6px]"
+                            className=" relative flex h-[50px] w-[80px] items-center justify-center rounded-[6px]"
                             style={{ backgroundColor: '#1A1A2E' }}
                           >
                             <Play size={14} color="white" fill="white" opacity={0.7} />
@@ -857,9 +1286,17 @@ export default function SleepModulePage() {
                 </div>
               );
             })()}
+
+            
+
+            
+            
+            
           </div>
         </div>
       </div>
+
+      
 
       {showCompletionModal && (
         <div
@@ -908,7 +1345,29 @@ export default function SleepModulePage() {
             </button>
           </div>
         </div>
-      )}
+
+        
+      )
+      
+      }
+
+      {isOpen &&  module && (
+           <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 isolate" style={{isolation: 'isolate'}} >
+
+            <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+
+              <div className="relative w-full max-w-3xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-2xl " style={{zIndex: 1,}} onClick={(e) => e.stopPropagation()} >
+
+                   
+                    {moduleSummaries.filter((resource) => resource.week === module.weekNumber).map((resource) => (
+                      <div key={resource.week}>
+                        {resource.contents}
+                      </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
     </PatientSidebarShell>
   );
 }

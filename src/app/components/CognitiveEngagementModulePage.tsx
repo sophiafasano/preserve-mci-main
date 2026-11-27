@@ -36,6 +36,13 @@ interface PlayerSelection {
   kind: 'queue' | 'resource';
 }
 
+type ModuleSummaries = {
+  week: number;
+  contents: React.ReactNode;
+
+};
+
+
 export default function CognitiveEngagementModulePage() {
 
   const navigate = useNavigate();
@@ -394,6 +401,110 @@ export default function CognitiveEngagementModulePage() {
   }, [activeQueueIndex, module, selectedResource]);
 
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
+  const moduleSummaries: ModuleSummaries[] = [
+  {
+    week: 1,
+    contents: (
+      <>
+        <h2
+          className="items-center justify-center"
+          style={{
+            padding: '10px',
+            color: '#7200CA',
+            textAlign: 'center',
+            fontSize: '28px'
+          }}
+        >
+          <strong>Module 1 Summary: Keeping Your Mind Active </strong>
+        </h2>
+
+        <div style={{fontSize: '22px'}}>
+
+        <p style={{ fontSize: '22px' }}>
+          <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Activities that challenge your mind, such as reading, games, music, or learning something new, are linked to better brain health. </li>
+            <li>The best activities are ones you enjoy, and that include other people. </li>
+            <li>Everyday memory tools, such as calendars, lists, pill organizers, and a set place for keys, make daily life easier.  </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Key fact this week: </strong> Using memory tools is not a sign of weakness. Many people use them to stay organized and independent. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+          <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+            <li>Make a list of activities you enjoy or used to enjoy.  </li>
+            <li>Write down the memory tools you already use. </li>
+            <li>Read the everyday memory tools handout. </li>
+          </ul>
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> Your next check-in, and time to read this week’s handout. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> Which activities could you enjoy together? 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> Your list of activities and memory tools. 
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Good to know:</strong> You can rewatch this week’s video and print any handout in your module library at any time.  
+        </p>
+
+        <p>
+          <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+        </p>
+        </div>
+
+        <div className="flex items-center justify-between mt-4">
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Close
+          </button>
+
+          <button
+            className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+            style={{
+              backgroundColor: '#7200CA',
+              color: 'white',
+              fontSize: '14px',
+              fontWeight: 600,
+              marginTop: '3%'
+            }}
+            onClick={handleClose}
+          >
+            Download
+          </button>
+        </div>
+      </>
+    )
+  },
+
+];
+
+
+
+
   if (!weekKey || !module || !currentSelection) {
     return (
       <SidebarShell>
@@ -405,6 +516,9 @@ export default function CognitiveEngagementModulePage() {
       </SidebarShell>
     );
   }
+
+
+
 
   const isQueueSelection = currentSelection.kind === 'queue';
   const queueHasPrevious = isQueueSelection && activeQueueIndex > 0;
@@ -742,6 +856,7 @@ export default function CognitiveEngagementModulePage() {
                 </button>
               </div>
 
+             
               {activeTab === 'queue' && (
                 <div className="space-y-2">
                   {module.queue.map((item, index) => {
@@ -796,8 +911,30 @@ export default function CognitiveEngagementModulePage() {
                 </div>
               )}
             </aside>
+
+             <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
+                  Module Week Summary
+                </p>
+                <div>
+                  <button onClick={handleOpen}
+                    className="rounded-lg px-4 py-2 cursor-pointer"
+                    style={{
+                      backgroundColor: '#7200CA',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }}
+                  >Week {module.weekNumber} Summary</button>
+                   
+                
+                </div>
+                
+              </div>
               
             </div>
+
+            
             
             {/* Previous Week Resources */}
             {(() => {
@@ -903,6 +1040,24 @@ export default function CognitiveEngagementModulePage() {
           </div>
         </div>
       )}
+
+      {isOpen &&  module && (
+           <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 isolate" style={{isolation: 'isolate'}} >
+
+            <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+
+              <div className="relative w-full max-w-3xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-2xl " style={{zIndex: 1,}} onClick={(e) => e.stopPropagation()} >
+
+                   
+                    {moduleSummaries.filter((resource) => resource.week === module.weekNumber).map((resource) => (
+                      <div key={resource.week}>
+                        {resource.contents}
+                      </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
     </SidebarShell>
   );
 }

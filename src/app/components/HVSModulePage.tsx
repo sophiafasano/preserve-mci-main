@@ -36,6 +36,12 @@ interface PlayerSelection {
   kind: 'queue' | 'resource';
 }
 
+type ModuleSummaries = {
+  week: number;
+  contents: React.ReactNode;
+
+};
+
 export default function HVSModulePage() {
 
   const navigate = useNavigate();
@@ -392,6 +398,107 @@ export default function HVSModulePage() {
       playPlaceholder();
     }
   }, [activeQueueIndex, module, selectedResource]);
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+    const handleOpen = () => setIsOpen(true);
+    const handleClose = () => setIsOpen(false);
+  
+    const moduleSummaries: ModuleSummaries[] = [
+    {
+      week: 1,
+      contents: (
+        <>
+          <h2
+            className="items-center justify-center"
+            style={{
+              padding: '10px',
+              color: '#7200CA',
+              textAlign: 'center',
+              fontSize: '28px'
+            }}
+          >
+            <strong>Module 1 Summary: Hearing, Vision, and Staying Connected </strong>
+          </h2>
+  
+          <div style={{fontSize: '22px'}}>
+  
+          <p style={{ fontSize: '22px' }}>
+            <strong style={{ color: '#7200CA' }}>What you learned this week</strong>
+            <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+              <li>Hearing loss is one of the most common risk factors for memory problems that can be addressed. Hearing aids may help. </li>
+              <li>Vision problems can make daily tasks and staying active harder. Regular eye exams catch problems early. </li>
+              <li>Staying in touch with family, friends, and your community is good for your brain and your mood.  </li>
+            </ul>
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Key fact this week: </strong> Adults over 60 should have their hearing checked regularly and an eye exam every 1-2 years, or as their doctor advises. 
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Your plan for this week</strong>
+            <ul style={{ listStyleType: 'disc', marginLeft: '5%' }}>
+              <li>Check when your last hearing test and eye exam were. </li>
+              <li>Write down one question about your hearing or vision to ask your doctor.  </li>
+              <li>Make a list of people and groups you enjoy spending time with. </li>
+            </ul>
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Write it in your calendar:</strong> Any hearing or eye appointments, and your booster session date. 
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Talk with your care partner:</strong> What helps you both stay connected with others? 
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Bring to your check-in:</strong> One thing you learned in this program that you want to remember. 
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Good to know:</strong> You can rewatch this week’s video and print any handout in your module library at any time.  
+          </p>
+  
+          <p>
+            <strong style={{ color: '#7200CA' }}>Need help?</strong> Message the study team on the platform. For a mental health crisis, call or text 988.
+          </p>
+          </div>
+  
+          <div className="flex items-center justify-between mt-4">
+            <button
+              className="rounded-lg px-4 py-2 cursor-pointer flex justify-start"
+              style={{
+                backgroundColor: '#7200CA',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                marginTop: '3%'
+              }}
+              onClick={handleClose}
+            >
+              Close
+            </button>
+  
+            <button
+              className="rounded-lg px-4 py-2 cursor-pointer flex justify-end"
+              style={{
+                backgroundColor: '#7200CA',
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 600,
+                marginTop: '3%'
+              }}
+              onClick={handleClose}
+            >
+              Download
+            </button>
+          </div>
+        </>
+      )
+    },
+  
+  ];
 
 
   if (!weekKey || !module || !currentSelection) {
@@ -796,6 +903,26 @@ export default function HVSModulePage() {
                 </div>
               )}
             </aside>
+
+            <div className="rounded-[12px] bg-white p-4" style={{ backgroundColor: '#F3E9FB', border: '0.5px solid #E9D5FF' }}>
+                <p style={{ fontSize: '16px', color: '#6B7280', marginBottom: '4px' }}>
+                  Module Week Summary
+                </p>
+                <div>
+                  <button onClick={handleOpen}
+                    className="rounded-lg px-4 py-2 cursor-pointer"
+                    style={{
+                      backgroundColor: '#7200CA',
+                      color: 'white',
+                      fontSize: '14px',
+                      fontWeight: 600
+                    }}
+                  >Week {module.weekNumber} Summary</button>
+                   
+                
+                </div>
+                
+              </div>
               
             </div>
             
@@ -903,6 +1030,23 @@ export default function HVSModulePage() {
           </div>
         </div>
       )}
+      {isOpen &&  module && (
+           <div className="fixed inset-0 z-[9999999] flex items-center justify-center p-4 isolate" style={{isolation: 'isolate'}} >
+
+            <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+
+              <div className="relative w-full max-w-3xl max-h-[95vh] overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-2xl " style={{zIndex: 1,}} onClick={(e) => e.stopPropagation()} >
+
+                   
+                    {moduleSummaries.filter((resource) => resource.week === module.weekNumber).map((resource) => (
+                      <div key={resource.week}>
+                        {resource.contents}
+                      </div>
+              ))}
+            </div>
+          </div>
+        )
+      }
     </SidebarShell>
   );
 }
